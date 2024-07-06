@@ -12,7 +12,7 @@ class SensorReadingSerializer(serializers.ModelSerializer):
         representation = super().to_representation(instance)
         
         # Verifica si 'timestamp' está en la representación y, si es así, imprímelo en la terminal
-        if 'timestamp' in representation:
-            print(f"Accessed timestamp: {representation['timestamp']}")
+        if 'temperature' in representation:
+            print(f"Accessed timestamp: {representation['temperature']}")
         
         return representation
