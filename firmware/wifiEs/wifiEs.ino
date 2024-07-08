@@ -2,8 +2,8 @@
 #include <DHT.h>
 
 #ifndef STASSID
-#define STASSID "FTTH-CVCA-belliceleste"
-#define STAPSK "28428631"
+#define STASSID "28428631"
+#define STAPSK "FTTH-CVCA-belliceleste"
 #endif
 
 const char* ssid = STASSID;

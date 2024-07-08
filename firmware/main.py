@@ -37,7 +37,7 @@ def upload_firmware(serial_port, firmware_path):
 
 if __name__ == '__main__':
     # Configuración inicial
-    ruta_ino = 'senWi/senWi.ino'  # Ruta al archivo .ino
+    ruta_ino = 'wifiEs/wifiEs.ino'  # Ruta al archivo .ino
     ssid = '28428631'  # SSID de tu red WiFi
     password = 'FTTH-CVCA-belliceleste'  # Contraseña de tu red WiFi
     fqbn = 'esp8266:esp8266:generic'  # Configuración del hardware ESP8266
