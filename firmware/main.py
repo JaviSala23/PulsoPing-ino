@@ -1,56 +1,28 @@
-import subprocess
-import os
+import serial
+import time
 
-def modificar_ino(ruta_ino, ssid, password):
-    # Modifica el archivo .ino para configurar SSID y contraseña de WiFi
-    with open(ruta_ino, 'r') as file:
-        lines = file.readlines()
+# Configuración del puerto serial
+serial_port = 'COM3'  # Ajusta el puerto serial según tu configuración
+baud_rate = 115200
+timeout = 1  # Tiempo de espera para la comunicación serial
 
-    with open(ruta_ino, 'w') as file:
-        for line in lines:
-            if '#define STASSID' in line:
-                line = f'#define STASSID "{ssid}"\n'
-            elif '#define STAPSK' in line:
-                line = f'#define STAPSK "{password}"\n'
-            file.write(line)
+# Función para enviar comandos al ESP8266
+def send_command(command):
+    with serial.Serial(serial_port, baud_rate, timeout=timeout) as ser:
+        ser.write(command.encode())
+        time.sleep(0.1)  # Espera breve para asegurar que se envíe completamente
+        response = ser.read_all().decode().strip()
+        return response
 
-def compilar_sketch(ruta_ino, fqbn):
-    # Compila el sketch utilizando Arduino CLI
-    result = subprocess.run(['arduino-cli', 'compile', '--fqbn', fqbn, ruta_ino], capture_output=True, text=True)
-    print(result.stdout)
-    if result.returncode == 0:
-        print("Compilación exitosa.")
-    else:
-        print("Error en la compilación.")
-        print(result.stderr)
-        exit(1)
+# Función para configurar el SSID y la contraseña
+def configure_wifi(ssid, password):
+    response = send_command(f"setSSID={ssid}\n")
+    print("Respuesta SSID:", response)
+    response = send_command(f"setPass={password}\n")
+    print("Respuesta contraseña:", response)
 
-def upload_firmware(serial_port, firmware_path):
-    # Carga el firmware en el ESP8266 utilizando Arduino CLI
-    result = subprocess.run(['arduino-cli', 'upload', '-p', serial_port, '-b', 'esp8266:esp8266:generic', firmware_path], capture_output=True, text=True)
-    print(result.stdout)
-    if result.returncode == 0:
-        print("Firmware cargado exitosamente.")
-    else:
-        print("Error al cargar el firmware.")
-        print(result.stderr)
+if __name__ == "__main__":
+    ssid = "tuSSID"  # Reemplaza con tu SSID
+    password = "tuContraseña"  # Reemplaza con tu contraseña
 
-if __name__ == '__main__':
-    # Configuración inicial
-    ruta_ino = 'wifiEs/wifiEs.ino'  # Ruta al archivo .ino
-    ssid = '28428631'  # SSID de tu red WiFi
-    password = 'FTTH-CVCA-belliceleste'  # Contraseña de tu red WiFi
-    fqbn = 'esp8266:esp8266:generic'  # Configuración del hardware ESP8266
-    serial_port = 'COM3'  # Puerto serial al que está conectado el ESP8266
-
-    # Modificar el archivo .ino con los datos de red
-    modificar_ino(ruta_ino, ssid, password)
-
-    # Compilar el sketch
-    compilar_sketch(ruta_ino, fqbn)
-
-    # Generar la ruta del archivo .bin generado por la compilación
-    firmware_path = os.path.splitext(ruta_ino)[0] + '.bin'
-
-    # Cargar el firmware en el ESP8266
-    upload_firmware(serial_port, firmware_path)
+    configure_wifi(ssid, password)
