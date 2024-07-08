@@ -11,7 +11,7 @@ class SensorReadingSerializer(serializers.ModelSerializer):
 
     class Meta:
         model = SensorReading
-        fields = ['temperature', 'placa', 'timestamp']
+        fields = ['temperature', 'placa', 'timestamp']  
         read_only_fields = ('timestamp',)
 
     def to_representation(self, instance):
