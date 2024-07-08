@@ -10,7 +10,7 @@ char ssid[32] = "default_ssid";
 char password[32] = "default_password";
 const char* host = "habitatonline.ar";
 const uint16_t port = 801;
-const char* path = "/sensor-readings/";
+const char* path = "/sensor_readings/";
 
 WiFiClient client;
 
@@ -99,7 +99,7 @@ void loop() {
   Serial.print(t);
   Serial.println(" *C");
 
-  String json = "{\"temperature\":" + String(t) + "}";
+  String json = "{\"temperature\":" + String(t) + ", \"placa\":1}";
 
 String request = "POST " + String(path) + " HTTP/1.1\r\n" +
                  "Host: " + String(host) + "\r\n" +

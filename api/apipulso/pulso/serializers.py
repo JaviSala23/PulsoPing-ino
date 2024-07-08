@@ -20,7 +20,7 @@ class SensorReadingSerializer(serializers.ModelSerializer):
         return representation
 
     def create(self, validated_data):
-        placa_id = validated_data.pop('placa')
-        placa = Placa.objects.get(id=placa_id)
-        sensor_reading = SensorReading.objects.create(placa=placa, **validated_data)
+        # No necesitas extraer placa_id, simplemente usa validated_data
+        sensor_reading = SensorReading.objects.create(**validated_data)
         return sensor_reading
+
