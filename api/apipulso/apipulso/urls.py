@@ -17,10 +17,11 @@ Including another URLconf
 from django.contrib import admin
 from django.urls import path
 from pulso import views as pulso
+
 urlpatterns = [
     path('admin/', admin.site.urls),
-    path('sensor-readings/', pulso.SensorReadingListCreate.as_view(), name='listacreadorsensor'),
-    path('sensor-readings/<int:pk>/', pulso.SensorReadingDetail.as_view(), name='listacreadorsensor2'),
+    path('sensor_readings/', pulso.SensorReadingListCreate.as_view(), name='sensor_reading_list_create'),
+    path('sensor_readings/<int:pk>/', pulso.SensorReadingDetail.as_view(), name='sensor_reading_detail'),
 ]
 from django.urls import path
 
