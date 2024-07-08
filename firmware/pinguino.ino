@@ -21,7 +21,7 @@ void setup() {
 
 void loop() {
   // Ejemplo de datos a enviar
-  String datos = "temperatura=25&humedad=50"; // Ejemplo de datos
+  String datos = "temperatura=25"; // Ejemplo de datos
   
   // Crear un cliente WiFi
   WiFiClient client;

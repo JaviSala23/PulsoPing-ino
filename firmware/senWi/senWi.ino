@@ -1,5 +1,10 @@
+
+
+
 #include <ESP8266WiFi.h>
 #include "DHT.h"
+
+
 
 #ifndef STASSID
 #define STASSID "28428631"
@@ -13,7 +18,7 @@ const char* host = "habitatonline.ar";
 const uint16_t port = 8000;
 const char* path = "/listaArticulosVendedores/0";
 
-#define DHTPIN D2     // GPIO2 (D4 on NodeMCU)
+#define DHTPIN 4     // GPIO2 (D4 on NodeMCU)
 #define DHTTYPE DHT22 // AM2302 is DHT22
 
 DHT dht(DHTPIN, DHTTYPE);
@@ -82,7 +87,7 @@ void loop() {
 
   unsigned long timeout = millis();
   while (client.available() == 0) {
-    if (millis() - timeout > 5000) {
+    if (millis() - timeout > 5000) 
       Serial.println(">>> Client Timeout !");
       client.stop();
       delay(60000);
