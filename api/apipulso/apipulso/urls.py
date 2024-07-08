@@ -23,5 +23,5 @@ urlpatterns = [
     path('sensor_readings/', pulso.SensorReadingListCreate.as_view(), name='sensor_reading_list_create'),
     path('sensor_readings/<int:pk>/', pulso.SensorReadingDetail.as_view(), name='sensor_reading_detail'),
 ]
-from django.urls import path
+
 
