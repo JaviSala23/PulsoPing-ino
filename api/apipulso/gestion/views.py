@@ -71,4 +71,4 @@ class TemperatureGraphView(View):
             plt.close()  # Cerrar la figura para liberar memoria
 
         # Renderizar el template con los gráficos generados
-        return render(request, 'temperature_graph.html', {'plots': plots})
+        return render(request, 'graficos.html', {'plots': plots})
