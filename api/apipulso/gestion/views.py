@@ -7,6 +7,8 @@ from datetime import datetime
 import glob
 import base64
 from io import BytesIO
+import matplotlib
+matplotlib.use('Agg')
 
 class TemperatureGraphView(View):
     def get(self, request):
@@ -46,7 +48,8 @@ class TemperatureGraphView(View):
             # Guardar datos en la estructura
             key = f"{placa_id}_{puerto}"
             data[key] = {'timestamps': timestamps, 'temperatures': temperatures}
-
+        
+m       
         # Crear gráficos
         plots = []
         for key, values in data.items():

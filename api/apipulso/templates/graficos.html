@@ -6,8 +6,11 @@
 <body>
     <h1>Gráficos de Temperatura por Placa y Puerto</h1>
     {% for plot in plots %}
-        <h2>Placa {{ plot.placa_id }}, Puerto {{ plot.puerto }}</h2>
-        <img src="data:image/png;base64,{{ plot.image_base64 }}" alt="Gráfico de Temperatura">
-    {% endfor %}
+<div>
+    <h3>Temperaturas - Placa {{ plot.placa_id }}, Puerto {{ plot.puerto }}</h3>
+    <img src="data:image/png;base64,{{ plot.image_base64 }}" alt="Gráfico de Temperaturas">
+</div>
+{% endfor %}
 </body>
 </html>
+
