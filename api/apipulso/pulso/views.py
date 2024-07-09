@@ -62,7 +62,8 @@ class SensorReadingListCreate(generics.ListCreateAPIView):
 
         if last_message is None or self.is_time_difference_greater_than(last_message.timestamp, timedelta(minutes=30)) or abs(last_message.temperature-reading.temperature)>=1:
             # Enviar un mensaje de alerta por Telegram
-            self.send_telegram_message(f"Alerta: La temperatura {reading.temperature}°C excede los límites ({temp_min}°C - {temp_max}°C) para Placa: {reading.placa.id}, Puerto: {reading.puerto}")
+            cuenta_art = Cuenta_has_Artefacto.objects.get(placa_id=reading.placa, puerto=reading.puerto)
+            self.send_telegram_message(f"Alerta: La temperatura {reading.temperature}°C excede los límites ({temp_min}°C - {temp_max}°C) para {cuenta_art.artefacto.descripcion}, Cliente: {{cuenta_art.cliente.nombre}}, Puerto: {reading.puerto}")
             MessageLog.objects.create(placa=reading.placa, puerto=reading.puerto, temperature= reading.temperature, message_type="ALERT")
 
     def is_time_difference_greater_than(self, last_timestamp, time_difference):
@@ -79,10 +80,10 @@ class SensorReadingListCreate(generics.ListCreateAPIView):
         # Verificar el último mensaje enviado para esta placa y puerto
         last_alert = MessageLog.objects.filter(placa=reading.placa, puerto=reading.puerto, message_type="ALERT").last()
         last_stable = MessageLog.objects.filter(placa=reading.placa, puerto=reading.puerto, message_type="STABLE").last()
-
+        cuenta_art = Cuenta_has_Artefacto.objects.get(placa_id=reading.placa, puerto=reading.puerto)
         if last_alert and (last_stable is None or last_alert.timestamp > last_stable.timestamp):
             # Enviar un mensaje indicando que la temperatura ha vuelto a los límites normales
-            self.send_telegram_message(f"Estable: La temperatura ha vuelto a los límites normales para Placa: {reading.placa.id}, Puerto: {reading.puerto}")
+            self.send_telegram_message(f"Estable: La temperatura ha vuelto a los límites normales para: {cuenta_art.artefacto.descripcion}, cliente {{cuenta_art.cliente.nombre}}, Puerto: {reading.puerto}")
             MessageLog.objects.create(placa=reading.placa, puerto=reading.puerto,temperature=reading.temperature, message_type="STABLE")
 
     def send_telegram_message(self, message):
