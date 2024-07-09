@@ -75,8 +75,8 @@ class SensorReadingListCreate(generics.ListCreateAPIView):
 
     def send_telegram_message(self, message):
         # Aquí debes implementar la lógica para enviar el mensaje por Telegram
-        telegram_token = 'YOUR_TELEGRAM_BOT_TOKEN'
-        chat_id = 'YOUR_TELEGRAM_CHAT_ID'
+        telegram_token = '7157402657:AAHIiCK42UKAslXGH0SU0HDpyBwEjjo0xo4'
+        chat_id = '6476665770'
         url = f"https://api.telegram.org/bot{telegram_token}/sendMessage"
         params = {
             'chat_id': chat_id,
