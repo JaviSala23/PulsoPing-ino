@@ -49,7 +49,7 @@ class TemperatureGraphView(View):
             key = f"{placa_id}_{puerto}"
             data[key] = {'timestamps': timestamps, 'temperatures': temperatures}
         
-m       
+    
         # Crear gráficos
         plots = []
         for key, values in data.items():
