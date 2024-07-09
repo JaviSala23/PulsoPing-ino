@@ -65,9 +65,26 @@ class SensorReading(models.Model):
     def __str__(self):
         return f"{self.placa.id}-{self.timestamp} - {self.temperature}°C"
 
-# Create your models here.
 
 
+
+class MessageLog(models.Model):
+    id = models.AutoField(primary_key=True)
+    placa = models.ForeignKey(
+        Placa,
+        null=False,
+        blank=False,
+        on_delete=models.PROTECT
+    )
+    puerto = models.IntegerField(
+        blank=False,
+        null=False,
+    )
+    timestamp = models.DateTimeField(auto_now_add=True)
+    message_type = models.CharField(max_length=50)  # Puede ser "ALERT" o "STABLE"
+
+    def __str__(self):
+        return f"Placa: {self.placa.id}, Puerto: {self.puerto}, Tipo: {self.message_type}, Timestamp: {self.timestamp}"
 
 
 
