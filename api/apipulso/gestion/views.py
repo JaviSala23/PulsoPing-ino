@@ -5,6 +5,8 @@ import matplotlib.pyplot as plt
 from matplotlib.dates import DateFormatter
 from datetime import datetime
 import glob
+import base64
+from io import BytesIO
 
 class TemperatureGraphView(View):
     def get(self, request):
@@ -18,7 +20,6 @@ class TemperatureGraphView(View):
             parts = os.path.basename(file_path).split('_')
             if len(parts) < 4:
                 continue  # Saltar archivos que no cumplen con la estructura esperada
-            
             placa_id = parts[1]
             puerto_parts = parts[3].split('.')
             if len(puerto_parts) < 1:
@@ -58,10 +59,7 @@ class TemperatureGraphView(View):
             plt.gca().xaxis.set_major_formatter(DateFormatter('%Y-%m-%d %H:%M:%S'))
             plt.tight_layout()
 
-            # Convertir el gráfico a imagen en formato base64 y pasarla al template
-            from io import BytesIO
-            import base64
-
+            # Convertir el gráfico a imagen en formato base64
             buffer = BytesIO()
             plt.savefig(buffer, format='png')
             buffer.seek(0)
@@ -73,4 +71,4 @@ class TemperatureGraphView(View):
             plt.close()  # Cerrar el gráfico para liberar memoria
 
         # Renderizar el template con los gráficos generados
-        return render(request, 'graficos.html', {'plots': plots})
+        return render(request, 'temperature_graph.html', {'plots': plots})
