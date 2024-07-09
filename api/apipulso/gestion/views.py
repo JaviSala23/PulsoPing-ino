@@ -54,6 +54,7 @@ class TemperatureGraphView(View):
         plots = []
         for key, values in data.items():
             placa_id, puerto = key.split('_')
+            print(values['timestamps'], values['temperatures'])
             plt.figure()
             plt.plot(values['timestamps'], values['temperatures'], marker='o', linestyle='-', color='b')
             plt.title(f'Temperaturas - Placa {placa_id}, Puerto {puerto}')
