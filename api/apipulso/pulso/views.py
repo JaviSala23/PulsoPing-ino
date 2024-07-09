@@ -20,7 +20,8 @@ class SensorReadingListCreate(generics.ListCreateAPIView):
         # Verificar si la variación de temperatura es al menos 0.5 grados para el mismo puerto
         if last_reading is None or abs(serializer.validated_data['temperature'] - last_reading.temperature) >= 0.5:
             serializer.save()
-            self.check_temperature_and_notify(serializer.instance)
+        
+        self.check_temperature_and_notify(serializer.instance)
 
     def save_to_file(self, data):
         placa_id = data['placa'].id
