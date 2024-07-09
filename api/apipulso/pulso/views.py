@@ -63,7 +63,7 @@ class SensorReadingListCreate(generics.ListCreateAPIView):
         if last_message is None or self.is_time_difference_greater_than(last_message.timestamp, timedelta(minutes=30)) or abs(last_message.temperature-reading.temperature)>=1:
             # Enviar un mensaje de alerta por Telegram
             cuenta_art = Cuenta_has_Artefacto.objects.get(placa_id=reading.placa, puerto=reading.puerto)
-            self.send_telegram_message(f"Alerta: La temperatura {reading.temperature}°C excede los límites ({temp_min}°C - {temp_max}°C) para {cuenta_art.artefacto.descripcion}, Cliente: {cuenta_art.cuenta.nombre}, Puerto: {reading.puerto}")
+            self.send_telegram_message(f"Alerta: La temperatura {reading.temperature}°C excede los límites ({temp_min}°C - {temp_max}°C) para {cuenta_art.artefacto.descripcion}, Cliente: {cuenta_art.cuenta.nombre_cuenta}, Puerto: {reading.puerto}")
             MessageLog.objects.create(placa=reading.placa, puerto=reading.puerto, temperature= reading.temperature, message_type="ALERT")
 
     def is_time_difference_greater_than(self, last_timestamp, time_difference):
@@ -83,7 +83,7 @@ class SensorReadingListCreate(generics.ListCreateAPIView):
         cuenta_art = Cuenta_has_Artefacto.objects.get(placa_id=reading.placa, puerto=reading.puerto)
         if last_alert and (last_stable is None or last_alert.timestamp > last_stable.timestamp):
             # Enviar un mensaje indicando que la temperatura ha vuelto a los límites normales
-            self.send_telegram_message(f"Estable: La temperatura ha vuelto a los límites normales para: {cuenta_art.artefacto.descripcion}, cliente {cuenta_art.cuenta.nombre}, Puerto: {reading.puerto}")
+            self.send_telegram_message(f"Estable: La temperatura ha vuelto a los límites normales para: {cuenta_art.artefacto.descripcion}, cliente {cuenta_art.cuenta.nombre_cuenta}, Puerto: {reading.puerto}")
             MessageLog.objects.create(placa=reading.placa, puerto=reading.puerto,temperature=reading.temperature, message_type="STABLE")
 
     def send_telegram_message(self, message):
