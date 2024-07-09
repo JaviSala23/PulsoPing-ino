@@ -67,4 +67,4 @@ class TemperatureGraphView(View):
             plots.append({'placa_id': placa_id, 'puerto': puerto, 'image_path': image_path})
 
         # Renderizar el template con los gráficos generados
-        return render(request, 'temperature_graph.html', {'plots': plots})
+        return render(request, 'graficos.html', {'plots': plots})
