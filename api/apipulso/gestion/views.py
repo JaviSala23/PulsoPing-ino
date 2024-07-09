@@ -16,6 +16,7 @@ class TemperatureGraphView(View):
         # Inicializar estructuras de datos para los gráficos
         data = {}
         for file_path in file_paths:
+            print(file_path)
             # Obtener placa y puerto desde el nombre del archivo
             parts = os.path.basename(file_path).split('_')
             if len(parts) < 4:
