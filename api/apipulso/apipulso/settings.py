@@ -188,4 +188,3 @@ CORS_ALLOWED_HEADERS = [
     
 ]  # Encabezados permitidos en solicitudes CORS
 
-a
