@@ -1,4 +1,4 @@
-iimport os
+import os
 import requests
 from rest_framework import generics
 from .models import SensorReading, MessageLog, Cuenta_has_Artefacto
