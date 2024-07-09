@@ -38,13 +38,15 @@ class TemperatureGraphView(View):
             timestamps = []
             temperatures = []
             for line in lines:
-                parts = line.strip().split(' - ')
+                parts = line.strip().split('-')
                 if len(parts) < 3:
                     continue  # Saltar líneas que no cumplen con la estructura esperada
                 timestamp = datetime.strptime(parts[0], "%Y-%m-%d %H:%M:%S")
-                temperature = float(parts[1].split('°C')[0])
+                temperature = float(parts[1])
                 timestamps.append(timestamp)
                 temperatures.append(temperature)
+                placa_id=parts[2]
+                puerto=parts[3]
 
             # Guardar datos en la estructura
             key = f"{placa_id}_{puerto}"
@@ -54,7 +56,6 @@ class TemperatureGraphView(View):
         plots = []
         for key, values in data.items():
             placa_id, puerto = key.split('_')
-            print(values['timestamps'], values['temperatures'])
             plt.figure()
             plt.plot(values['timestamps'], values['temperatures'], marker='o', linestyle='-', color='b')
             plt.title(f'Temperaturas - Placa {placa_id}, Puerto {puerto}')
