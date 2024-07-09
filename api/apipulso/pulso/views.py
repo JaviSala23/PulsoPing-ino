@@ -5,6 +5,7 @@ from .models import SensorReading, MessageLog
 from gestion.models import Cuenta_has_Artefacto
 from .serializers import SensorReadingSerializer
 from datetime import datetime, timedelta
+import pytz
 
 class SensorReadingListCreate(generics.ListCreateAPIView):
     queryset = SensorReading.objects.all()
@@ -59,10 +60,20 @@ class SensorReadingListCreate(generics.ListCreateAPIView):
         # Verificar el último mensaje enviado para esta placa y puerto
         last_message = MessageLog.objects.filter(placa=reading.placa, puerto=reading.puerto, message_type="ALERT").last()
 
-        if last_message is None or datetime.now() - last_message.timestamp >= timedelta(minutes=30):
+        if last_message is None or self.is_time_difference_greater_than(last_message.timestamp, timedelta(minutes=30)):
             # Enviar un mensaje de alerta por Telegram
             self.send_telegram_message(f"Alerta: La temperatura {reading.temperature}°C excede los límites ({temp_min}°C - {temp_max}°C) para Placa: {reading.placa.id}, Puerto: {reading.puerto}")
             MessageLog.objects.create(placa=reading.placa, puerto=reading.puerto, message_type="ALERT")
+
+    def is_time_difference_greater_than(self, last_timestamp, time_difference):
+        # Asegurarse de que last_timestamp sea consciente de la zona horaria
+        if last_timestamp.tzinfo is None:
+            last_timestamp = pytz.utc.localize(last_timestamp)
+        
+        # Obtener el tiempo actual consciente de la zona horaria
+        now = datetime.now(pytz.utc)
+        
+        return now - last_timestamp >= time_difference
 
     def send_stable(self, reading):
         # Verificar el último mensaje enviado para esta placa y puerto
