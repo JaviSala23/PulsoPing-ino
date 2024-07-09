@@ -21,6 +21,7 @@ class Firmware(models.Model):
     )
 
 
+
 class Placa(models.Model):
     id = models.AutoField(primary_key=True)
     codigo=models.CharField(
@@ -52,6 +53,11 @@ class SensorReading(models.Model):
         null=False,
         on_delete=models.PROTECT
     )
+    puerto = models.IntegerField(
+        blank=False,
+        null=False,
+    )
+    
 
 
     def __str__(self):

@@ -160,3 +160,7 @@ class Cuenta_has_Artefacto(models.Model):
         blank=True,
         on_delete=models.PROTECT
     )
+    puerto = models.IntegerField(
+        blank=False,
+        null=False,
+    )
