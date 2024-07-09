@@ -71,8 +71,8 @@ class TemperatureGraphView(View):
             buffer.close()
 
             plots.append({'placa_id': placa_id, 'puerto': puerto, 'image_base64': image_base64})
-
+            
             plt.close()  # Cerrar la figura para liberar memoria
-
+            print(plots)
         # Renderizar el template con los gráficos generados
         return render(request, 'graficos.html', {'plots': plots})
