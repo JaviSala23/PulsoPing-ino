@@ -86,5 +86,6 @@ class MessageLog(models.Model):
     def __str__(self):
         return f"Placa: {self.placa.id}, Puerto: {self.puerto}, Tipo: {self.message_type}, Timestamp: {self.timestamp}"
 
-
+    temperature= models.FloatField(blank=False,
+        null=False)
 
