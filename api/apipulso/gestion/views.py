@@ -38,7 +38,7 @@ class TemperatureGraphView(View):
             temperatures = []
             for line in lines:
                 parts = line.strip().split(' - ')
-                if len(parts) < 2:
+                if len(parts) < 3:
                     continue  # Saltar líneas que no cumplen con la estructura esperada
                 timestamp = datetime.strptime(parts[0], "%Y-%m-%d %H:%M:%S")
                 temperature = float(parts[1].split('°C')[0])
@@ -73,6 +73,6 @@ class TemperatureGraphView(View):
             plots.append({'placa_id': placa_id, 'puerto': puerto, 'image_base64': image_base64})
             
             plt.close()  # Cerrar la figura para liberar memoria
-            print(plots)
+        
         # Renderizar el template con los gráficos generados
         return render(request, 'graficos.html', {'plots': plots})
