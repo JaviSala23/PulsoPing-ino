@@ -1,8 +1,3 @@
-
-
-# Create your views here.
-
-
 import os
 from django.shortcuts import render
 from django.views import View
@@ -20,8 +15,9 @@ class TemperatureGraphView(View):
         data = {}
         for file_path in file_paths:
             # Obtener placa y puerto desde el nombre del archivo
-            _, placa_id, puerto = file_path.split('/')[1].split('_')
-            puerto = puerto.split('.')[0]
+            parts = os.path.basename(file_path).split('_')
+            placa_id = parts[1]
+            puerto = parts[3].split('.')[0]
 
             # Leer datos del archivo
             with open(file_path, 'r') as f:
