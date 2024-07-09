@@ -85,7 +85,7 @@ void loop() {
    // Read temperature from AM2302 sensor
   float h = dht.readHumidity();
   float t = dht.readTemperature();
-
+  float c = dht.readTemperature();
   // Sensor reading and data transmission logic (unchanged)
   delay(2000);
  // Check if any reads failed and exit early (to try again).
@@ -99,7 +99,8 @@ void loop() {
   Serial.print(t);
   Serial.println(" *C");
 
-  String json = "{\"temperature\":" + String(t) + ", \"placa\":1}";
+  String json = "{\"temperature\":" + String(t) + ", \"placa\":1, \"puerto\":1}";
+  String json1 = "{\"temperature\":" + String(c) + ", \"placa\":1, \"puerto\":2}";
 
 String request = "POST " + String(path) + " HTTP/1.1\r\n" +
                  "Host: " + String(host) + "\r\n" +
@@ -111,8 +112,19 @@ String request = "POST " + String(path) + " HTTP/1.1\r\n" +
 Serial.println("Sending data to server:");
 Serial.println(request);
 
+String request1 = "POST " + String(path) + " HTTP/1.1\r\n" +
+                 "Host: " + String(host) + "\r\n" +
+                 "Content-Type: application/json\r\n" +
+                 "Content-Length: " + String(json.length()) + "\r\n" +
+                 "Connection: close\r\n\r\n" +
+                 json1;
+
+Serial.println("Sending data to server:");
+Serial.println(request1);
+
 if (client.connect(host, port)) {
   client.print(request);
+  client.print(request1);
 } else {
   Serial.println("Connection failed");
 }
