@@ -14,6 +14,7 @@ class TemperatureGraphView(View):
     def get(self, request):
         # Obtener la lista de archivos de texto guardados
         file_paths = glob.glob('readings/placa_*/puerto_*.txt')
+        print(file_paths)  # Verifica qué archivos se están encontrando
 
         # Inicializar estructuras de datos para los gráficos
         data = {}
@@ -49,7 +50,6 @@ class TemperatureGraphView(View):
             key = f"{placa_id}_{puerto}"
             data[key] = {'timestamps': timestamps, 'temperatures': temperatures}
         
-    
         # Crear gráficos
         plots = []
         for key, values in data.items():
