@@ -1,0 +1,264 @@
+/*estilo Mensajes*/
+
+.messages {
+    list-style-type: none;
+    width: 100%;
+    background-color: #f9f9f9;
+}
+
+.messages .success {
+    width: 100%;
+    font-size: 20px;
+    padding-left: 20px;
+    background-color: rgb(163, 245, 143);
+    color: rgb(0, 0, 0);
+}
+
+.messages .error {
+    width: 100%;
+    font-size: 20px;
+    padding-left: 20px;
+    background-color: #f07400;
+    color: rgb(255, 255, 255);
+}
+.messages .error {
+    width: 100%;
+    font-size: 20px;
+    padding-left: 20px;
+    background-color: #1316f1;
+    color: rgb(255, 255, 255);
+}
+
+
+
+/* Sucursal */
+
+#sucursalFormulario {
+    margin-bottom: 10px;
+    padding: 20px;
+    background-color: #FFFFFF;
+}
+
+#sucursalFormulario input[type=text],
+select {
+    border: 1px solid #858796;
+    /*display: table ;*/
+    border-radius: 5px;
+    padding: 3px;
+    width: 55%;
+    background-color: white;
+}
+
+#sucursalFormulario input[type=text]:disabled,
+select:disabled {
+    border: 1px solid #858796;
+    ;
+    /*display: table ;*/
+    border-radius: 5px;
+    padding: 3px;
+    width: 55%;
+    background-color: rgb(230, 230, 230);
+}
+
+#sucursalFormulario label {
+    color: black;
+    margin-top: 5px;
+    width: 40%;
+}
+
+
+/* Sucursal */
+
+#sucursalFormulario {
+    margin-bottom: 10px;
+    padding: 20px;
+    background-color: #FFFFFF;
+}
+
+#sucursalFormulario input[type=text],
+select {
+    border: 1px solid #858796;
+    ;
+    /*display: table ;*/
+    border-radius: 5px;
+    padding: 3px;
+    width: 55%;
+    background-color: white;
+}
+
+#sucursalFormulario input[type=text]:disabled,
+select:disabled {
+    border: 1px solid #858796;
+    ;
+    /*display: table ;*/
+    border-radius: 5px;
+    padding: 3px;
+    width: 55%;
+    background-color: rgb(230, 230, 230);
+}
+
+#sucursalFormulario label {
+    color: #858796;
+    ;
+    margin-top: 5px;
+    width: 40%;
+}
+
+
+/* Rubro */
+
+#rubroFormulario {
+    margin-bottom: 10px;
+    padding: 20px;
+    background-color: #FFFFFF;
+}
+
+#rubroFormulario input[type=text],
+select {
+    border: 1px solid #858796;
+    ;
+    /*display: table ;*/
+    border-radius: 5px;
+    padding: 3px;
+    background-color: white;
+}
+
+#rubroFormulario input[type=text]:disabled,
+select:disabled {
+    border: 1px solid #858796;
+    ;
+    /*display: table ;*/
+    border-radius: 5px;
+    padding: 3px;
+    width: 55%;
+    background-color: rgb(230, 230, 230);
+}
+
+#rubroFormulario label {
+    color: #858796;
+    ;
+    margin-top: 5px;
+}
+
+
+/* Seccion */
+
+#seccionFormulario {
+    margin-bottom: 10px;
+    padding: 20px;
+    background-color: #FFFFFF;
+}
+
+#seccionFormulario input[type=text],
+select {
+    border: 1px solid #858796;
+    ;
+    /*display: table ;*/
+    border-radius: 5px;
+    padding: 3px;
+    width: 55%;
+    background-color: white;
+}
+
+#seccionFormulario input[type=text]:disabled,
+select:disabled {
+    border: 1px solid #858796;
+    ;
+    /*display: table ;*/
+    border-radius: 5px;
+    padding: 3px;
+    width: 55%;
+    background-color: rgb(230, 230, 230);
+}
+
+#seccionFormulario label {
+    color: #858796;
+    ;
+    margin-top: 5px;
+    width: 40%;
+}
+
+
+/* Proveedor */
+
+#proveedorFormulario {
+    margin-bottom: 10px;
+    padding: 20px;
+    background-color: #FFFFFF;
+}
+
+#proveedorFormulario input[type=text],
+input[type=number],
+input[type=date],
+input[type=email],
+select {
+    border: 1px solid #858796;
+    ;
+    /*display: table ;*/
+    border-radius: 5px;
+    padding: 3px;
+    width: 55%;
+    background-color: white;
+}
+
+#proveedorFormulario input[type=text]:disabled,
+select:disabled {
+    border: 1px solid #858796;
+    ;
+    /*display: table ;*/
+    border-radius: 5px;
+    padding: 3px;
+    width: 55%;
+    background-color: rgb(230, 230, 230);
+}
+
+#proveedorFormulario label {
+    color: #858796;
+    ;
+    margin-top: 5px;
+    width: 40%;
+}
+
+#id_tipoCuenta {
+    visibility: hidden;
+}
+
+#tablasArticulos scroll {
+    margin: 4px, 4px;
+    padding: 4px;
+    background-color: #08c708;
+    width: 300px;
+    overflow-x: auto;
+    overflow-y: hidden;
+    white-space: nowrap;
+}
+
+#usuario {
+    margin-bottom: 10px;
+    padding: 20px;
+    background-color: #FFFFFF;
+}
+
+#usuario label {
+    width: 100%;
+}
+
+#usuario input {
+    border: 1px solid #858796;
+    width: 100%;
+    display: table;
+    border-radius: 5px;
+    padding: 3px;
+    background-color: white;
+}
+
+#formimpuestos {
+    border-top: 1px dotted black;
+    color: black;
+    font-weight: bolder;
+    
+}
+#formimpuestos label{
+    color: black;
+    font-weight: bolder;
+}
