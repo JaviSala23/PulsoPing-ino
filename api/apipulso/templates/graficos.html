@@ -1,0 +1,17 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Gráficos de Temperatura</title>
+</head>
+<body>
+    <h1>Gráficos de Temperatura por Placa y Puerto</h1>
+    {% for plot in plots %}
+    <div style="margin-bottom: 20px;">
+        <h2>Placa {{ plot.placa_id }}, Puerto {{ plot.puerto }}</h2>
+        <img src="{{ plot.image_path }}" alt="Gráfico Temperatura">
+    </div>
+    {% endfor %}
+</body>
+</html>

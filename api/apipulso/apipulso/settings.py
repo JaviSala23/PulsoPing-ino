@@ -127,11 +127,59 @@ USE_TZ = True
 
 
 # Static files (CSS, JavaScript, Images)
-# https://docs.djangoproject.com/en/5.0/howto/static-files/
+# https://docs.djangoproject.com/en/3.2/howto/static-files/
 
-STATIC_URL = 'static/'
+STATIC_URL = '/static/'
+STATICFILES_DIRS = [
+os.path.join(BASE_DIR, "static")
+]
+STATIC_ROOT = os.path.join(BASE_DIR, 'staticfiles')
 
+
+MEDIA_URL = '/media/'
+MEDIA_ROOT = os.path.join(BASE_DIR, 'media/')
 # Default primary key field type
-# https://docs.djangoproject.com/en/5.0/ref/settings/#default-auto-field
+# https://docs.djangoproject.com/en/3.2/ref/settings/#default-auto-field
 
 DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
+
+#expiracion de sesion
+#SESSION_COOKIE_AGE = 3600 # 600 segundos = 10 minutos
+#SESSION_EXPIRE_AT_BROWSER_CLOSE = False
+
+
+EMAIL_USE_TLS=True
+EMAIL_HOST ='mail.mantistec.com.ar'
+EMAIL_PORT=22
+EMAIL_HOST_USER='info@mantistec.com.ar'
+EMAIL_HOST_PASSWORD='jXGH%*C{c_8='
+EMAIL_BACKEND='django.core.mail.backends.smtp.EmailBackend'
+
+
+CORS_ORIGIN_ALLOW_ALL = True  # Permite que cualquier origen acceda a tu servidor (solo para pruebas, NO recomendado para producción)
+CORS_ALLOW_CREDENTIALS = True  # Permite enviar credenciales (por ejemplo, cookies) en solicitudes CORS
+CORS_ALLOWED_ORIGINS = [
+    
+    # Lista de orígenes permitidos (por ejemplo, 'http://localhost:8000', 'http://habitatonline.ar', etc.)
+    # Asegúrate de agregar los orígenes desde donde se realizarán las solicitudes (por ejemplo, el servidor PHP)
+]
+CORS_ALLOWED_METHODS = [
+    'GET',
+    'POST',
+    'PUT',
+    'PATCH',
+    'DELETE',
+    'OPTIONS',
+]  # Métodos HTTP permitidos en solicitudes CORS
+CORS_ALLOWED_HEADERS = [
+    'Accept',
+    'Accept-Encoding',
+    'Authorization',
+    'Content-Type',
+    'DNT',
+    'Origin',
+    'User-Agent',
+    'X-CSRFToken',
+    'X-Requested-With',
+    
+]  # Encabezados permitidos en solicitudes CORS
