@@ -38,7 +38,7 @@ class TemperatureGraphView(View):
             timestamps = []
             temperatures = []
             for line in lines:
-                parts = line.strip().split('-')
+                parts = line.strip().split(',')
                 if len(parts) < 3:
                     continue  # Saltar líneas que no cumplen con la estructura esperada
                 timestamp = datetime.strptime(parts[0], "%Y-%m-%d %H:%M:%S")
