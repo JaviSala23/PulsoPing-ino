@@ -1,3 +1,205 @@
+cuenta_art=Cuenta_has_Artefacto.objects.filter(placa_id=reading.placa).filter(puerto=reading.puerto)
+
+esto me muestra solo un registro y tiene que ahcer como puedo tomarlo con get en vez de filter asi no hago un for
+ChatGPT
+
+Si Cuenta_has_Artefacto es un modelo en Django y sabes que solo habrá un registro que cumpla con las condiciones que has filtrado, puedes usar el método get() en lugar de filter(). Aquí tienes cómo podrías ajustar tu código:
+
+python
+
+try:
+    cuenta_art = Cuenta_has_Artefacto.objects.get(placa_id=reading.placa, puerto=reading.puerto)
+    # Aquí manejas el objeto cuenta_art como necesites
+except Cuenta_has_Artefacto.DoesNotExist:
+    # Manejo en caso de que no se encuentre ningún registro que cumpla los criterios
+    pass
+
+En este código:
+
+    get(placa_id=reading.placa, puerto=reading.puerto) busca un único objeto que cumpla con ambas condiciones (placa_id igual a reading.placa y puerto igual a reading.puerto).
+    Si se encuentra el objeto, se asigna a cuenta_art y puedes trabajar con él directamente.
+    Si no se encuentra ningún registro que cumpla con esas condiciones, se levanta una excepción Cuenta_has_Artefacto.DoesNotExist, que puedes manejar según tus necesidades.
+
+Usar get() en lugar de filter() es útil cuando esperas exactamente un resultado y no necesitas iterar sobre los resultados, lo cual simplifica tu código y mejora su legibilidad.
+ahora tengo que ver los archivos que grabamos aca:
+
+import os
+import requests
+from rest_framework import generics
+from .models import SensorReading, MessageLog
+from gestion.models import Cuenta_has_Artefacto
+from .serializers import SensorReadingSerializer
+from datetime import datetime, timedelta
+import pytz
+
+class SensorReadingListCreate(generics.ListCreateAPIView):
+    queryset = SensorReading.objects.all()
+    serializer_class = SensorReadingSerializer 
+
+    def perform_create(self, serializer):
+        # Guardar en un archivo de texto
+        self.save_to_file(serializer.validated_data)
+
+        # Obtener el último registro de la base de datos para el mismo puerto
+        last_reading = SensorReading.objects.filter(puerto=serializer.validated_data['puerto']).order_by('timestamp').last()
+
+        # Verificar si la variación de temperatura es al menos 0.5 grados para el mismo puerto
+        if last_reading is None or abs(serializer.validated_data['temperature'] - last_reading.temperature) >= 0.5:
+            serializer.save()
+        
+        self.check_temperature_and_notify(serializer.instance)
+
+    def save_to_file(self, data):
+        placa_id = data['placa'].id
+        puerto = data['puerto']
+        
+        # Crear el directorio basado en el número de la placa si no existe
+        directory = f"readings/placa_{placa_id}"
+        if not os.path.exists(directory):
+            os.makedirs(directory)
+        
+        # Nombre del archivo basado en el puerto
+        file_path = os.path.join(directory, f"puerto_{puerto}.txt")
+        
+        # Asegurar que el timestamp esté presente en los datos
+        if 'timestamp' not in data:
+            data['timestamp'] = datetime.now().strftime("%Y-%m-%d %H:%M:%S")
+        
+        # Guardar los datos en el archivo de texto
+        with open(file_path, 'a') as f:
+            f.write(f"{data['timestamp']} - {data['temperature']}°C - Placa: {data['placa'].id} - Puerto: {data['puerto']}\n")
+
+    def check_temperature_and_notify(self, reading):
+        # Obtener los rangos de temperatura de Cuenta_has_Artefacto
+        cuenta_artefacto = Cuenta_has_Artefacto.objects.get(placa=reading.placa, puerto=reading.puerto)
+        temp_min = cuenta_artefacto.temp_min
+        temp_max = cuenta_artefacto.temp_max
+
+        # Comprobar si la temperatura excede los límites
+        if reading.temperature < temp_min or reading.temperature > temp_max:
+            self.send_alert(reading, temp_min, temp_max)
+        else:
+            self.send_stable(reading)
+
+    def send_alert(self, reading, temp_min, temp_max):
+        # Verificar el último mensaje enviado para esta placa y puerto
+        last_message = MessageLog.objects.filter(placa=reading.placa, puerto=reading.puerto, message_type="ALERT").last()
+
+        if last_message is None or self.is_time_difference_greater_than(last_message.timestamp, timedelta(minutes=30)) or abs(last_message.temperature-reading.temperature)>=1:
+            # Enviar un mensaje de alerta por Telegram
+            cuenta_art = Cuenta_has_Artefacto.objects.get(placa_id=reading.placa, puerto=reading.puerto)
+            self.send_telegram_message(f"Alerta: La temperatura {reading.temperature}°C excede los límites ({temp_min}°C - {temp_max}°C) para {cuenta_art.artefacto.descripcion}, Cliente: {cuenta_art.cuenta.nombre_cuenta}, Puerto: {reading.puerto}")
+            MessageLog.objects.create(placa=reading.placa, puerto=reading.puerto, temperature= reading.temperature, message_type="ALERT")
+
+    def is_time_difference_greater_than(self, last_timestamp, time_difference):
+        # Asegurarse de que last_timestamp sea consciente de la zona horaria
+        if last_timestamp.tzinfo is None:
+            last_timestamp = pytz.utc.localize(last_timestamp)
+        
+        # Obtener el tiempo actual consciente de la zona horaria
+        now = datetime.now(pytz.utc)
+        
+        return now - last_timestamp >= time_difference
+
+    def send_stable(self, reading):
+        # Verificar el último mensaje enviado para esta placa y puerto
+        last_alert = MessageLog.objects.filter(placa=reading.placa, puerto=reading.puerto, message_type="ALERT").last()
+        last_stable = MessageLog.objects.filter(placa=reading.placa, puerto=reading.puerto, message_type="STABLE").last()
+        cuenta_art = Cuenta_has_Artefacto.objects.get(placa_id=reading.placa, puerto=reading.puerto)
+        if last_alert and (last_stable is None or last_alert.timestamp > last_stable.timestamp):
+            # Enviar un mensaje indicando que la temperatura ha vuelto a los límites normales
+            self.send_telegram_message(f"Estable: La temperatura ha vuelto a los límites normales para: {cuenta_art.artefacto.descripcion}, cliente {cuenta_art.cuenta.nombre_cuenta}, Puerto: {reading.puerto}")
+            MessageLog.objects.create(placa=reading.placa, puerto=reading.puerto,temperature=reading.temperature, message_type="STABLE")
+
+    def send_telegram_message(self, message):
+        # Aquí debes implementar la lógica para enviar el mensaje por Telegram
+        telegram_token = '7157402657:AAHIiCK42UKAslXGH0SU0HDpyBwEjjo0xo4'
+        chat_id = '6476665770'
+        url = f"https://api.telegram.org/bot{telegram_token}/sendMessage"
+        params = {
+            'chat_id': chat_id,
+            'text': message
+        }
+        response = requests.get(url, params=params)
+        return response.json()
+
+class SensorReadingDetail(generics.RetrieveUpdateDestroyAPIView):
+    queryset = SensorReading.objects.all()
+    serializer_class = SensorReadingSerializer
+
+
+eso necesito que se vean y se cree graficos... para ver las temperaturas de los sensores por artefactos y cuentas... creame la view  que lea esos archivos genere los graficos y el template para verlo.
+ChatGPT
+
+Para generar gráficos y visualizar las temperaturas de los sensores por artefactos y cuentas basados en los archivos de texto guardados, puedes seguir estos pasos:
+
+    Crear una vista Django:
+
+python
+
+import os
+from django.shortcuts import render
+from django.views import View
+import matplotlib.pyplot as plt
+from matplotlib.dates import DateFormatter
+from datetime import datetime
+import glob
+
+class TemperatureGraphView(View):
+    def get(self, request):
+        # Obtener la lista de archivos de texto guardados
+        file_paths = glob.glob('readings/placa_*/puerto_*.txt')
+
+        # Inicializar estructuras de datos para los gráficos
+        data = {}
+        for file_path in file_paths:
+            # Obtener placa y puerto desde el nombre del archivo
+            _, placa_id, puerto = file_path.split('/')[1].split('_')
+            puerto = puerto.split('.')[0]
+
+            # Leer datos del archivo
+            with open(file_path, 'r') as f:
+                lines = f.readlines()
+
+            # Procesar cada línea de datos
+            timestamps = []
+            temperatures = []
+            for line in lines:
+                parts = line.strip().split(' - ')
+                timestamp = datetime.strptime(parts[0], "%Y-%m-%d %H:%M:%S")
+                temperature = float(parts[1].split('°C')[0])
+                timestamps.append(timestamp)
+                temperatures.append(temperature)
+
+            # Guardar datos en la estructura
+            key = f"{placa_id}_{puerto}"
+            data[key] = {'timestamps': timestamps, 'temperatures': temperatures}
+
+        # Crear gráficos
+        plots = []
+        for key, values in data.items():
+            placa_id, puerto = key.split('_')
+            plt.figure()
+            plt.plot(values['timestamps'], values['temperatures'], marker='o', linestyle='-', color='b')
+            plt.title(f'Temperaturas - Placa {placa_id}, Puerto {puerto}')
+            plt.xlabel('Tiempo')
+            plt.ylabel('Temperatura (°C)')
+            plt.xticks(rotation=45)
+            plt.gca().xaxis.set_major_formatter(DateFormatter('%Y-%m-%d %H:%M:%S'))
+            plt.tight_layout()
+
+            # Guardar la figura como imagen para mostrar en el template
+            image_path = f"static/temperature_plots/{key}.png"
+            plt.savefig(image_path)
+            plots.append({'placa_id': placa_id, 'puerto': puerto, 'image_path': image_path})
+
+        # Renderizar el template con los gráficos generados
+        return render(request, 'temperature_graph.html', {'plots': plots})
+
+    Crear el template HTML temperature_graph.html:
+
+html
+
 <!DOCTYPE html>
 <html lang="en">
 <head>
@@ -11,6 +213,531 @@
     <div style="margin-bottom: 20px;">
         <h2>Placa {{ plot.placa_id }}, Puerto {{ plot.puerto }}</h2>
         <img src="{{ plot.image_path }}" alt="Gráfico Temperatura">
+    </div>
+    {% endfor %}
+</body>
+</html>
+
+    Configurar las rutas y vistas en urls.py:
+
+python
+
+from django.urls import path
+from .views import TemperatureGraphView
+
+urlpatterns = [
+    path('temperature-graph/', TemperatureGraphView.as_view(), name='temperature_graph'),
+    # Otras rutas de tu aplicación
+]
+
+Explicación:
+
+    Vista TemperatureGraphView:
+        get method: Esta vista carga todos los archivos de texto guardados, lee los datos de temperatura y genera un gráfico para cada combinación de placa y puerto encontrada.
+        Utiliza glob para obtener todos los archivos de texto bajo el directorio readings/.
+        Para cada archivo, lee las líneas, procesa los datos de temperatura y genera un gráfico usando matplotlib.
+        Guarda cada gráfico como imagen en la carpeta estática (static/temperature_plots/) y pasa la ruta de la imagen al template.
+
+    Template temperature_graph.html:
+        Itera sobre los datos pasados desde la vista y muestra cada gráfico junto con información de placa y puerto.
+        Cada gráfico se muestra en una etiqueta img utilizando la ruta de imagen generada por matplotlib.
+
+    Configuración adicional:
+        Asegúrate de tener matplotlib instalado (pip install matplotlib).
+        Configura la carpeta estática en tu configuración de Django para que los archivos de imagen generados sean accesibles desde el navegador.
+
+Esta implementación te permitirá visualizar gráficamente las temperaturas registradas por sensor para cada placa y puerto desde tu aplicación Django. Asegúrate de ajustar las rutas y configuraciones según la estructura de tu proyecto.
+ValueError at /temperature-graph/
+
+not enough values to unpack (expected 3, got 2)
+ChatGPT
+
+El error ValueError: not enough values to unpack indica que Python espera recibir una cantidad específica de valores al intentar desempaquetar una secuencia (como una lista o una tupla), pero no recibe la cantidad esperada. En este caso, parece que hay un problema al dividir la ruta del archivo en partes.
+
+Vamos a corregir eso ajustando la forma en que obtenemos placa_id y puerto desde el nombre del archivo. Aquí está la corrección en el código:
+
+python
+
+import os
+from django.shortcuts import render
+from django.views import View
+import matplotlib.pyplot as plt
+from matplotlib.dates import DateFormatter
+from datetime import datetime
+import glob
+
+class TemperatureGraphView(View):
+    def get(self, request):
+        # Obtener la lista de archivos de texto guardados
+        file_paths = glob.glob('readings/placa_*/puerto_*.txt')
+
+        # Inicializar estructuras de datos para los gráficos
+        data = {}
+        for file_path in file_paths:
+            # Obtener placa y puerto desde el nombre del archivo
+            parts = os.path.basename(file_path).split('_')
+            placa_id = parts[1]
+            puerto = parts[3].split('.')[0]
+
+            # Leer datos del archivo
+            with open(file_path, 'r') as f:
+                lines = f.readlines()
+
+            # Procesar cada línea de datos
+            timestamps = []
+            temperatures = []
+            for line in lines:
+                parts = line.strip().split(' - ')
+                timestamp = datetime.strptime(parts[0], "%Y-%m-%d %H:%M:%S")
+                temperature = float(parts[1].split('°C')[0])
+                timestamps.append(timestamp)
+                temperatures.append(temperature)
+
+            # Guardar datos en la estructura
+            key = f"{placa_id}_{puerto}"
+            data[key] = {'timestamps': timestamps, 'temperatures': temperatures}
+
+        # Crear gráficos
+        plots = []
+        for key, values in data.items():
+            placa_id, puerto = key.split('_')
+            plt.figure()
+            plt.plot(values['timestamps'], values['temperatures'], marker='o', linestyle='-', color='b')
+            plt.title(f'Temperaturas - Placa {placa_id}, Puerto {puerto}')
+            plt.xlabel('Tiempo')
+            plt.ylabel('Temperatura (°C)')
+            plt.xticks(rotation=45)
+            plt.gca().xaxis.set_major_formatter(DateFormatter('%Y-%m-%d %H:%M:%S'))
+            plt.tight_layout()
+
+            # Guardar la figura como imagen para mostrar en el template
+            image_path = f"static/temperature_plots/{key}.png"
+            plt.savefig(image_path)
+            plots.append({'placa_id': placa_id, 'puerto': puerto, 'image_path': image_path})
+
+        # Renderizar el template con los gráficos generados
+        return render(request, 'temperature_graph.html', {'plots': plots})
+
+Cambios realizados:
+
+    Obtención de placa_id y puerto: Ahora, utilizamos os.path.basename(file_path) para obtener solo el nombre del archivo, luego dividimos ese nombre en partes usando .split('_') y .split('.'). Esto asegura que obtengamos correctamente placa_id y puerto sin problemas de desempaquetado.
+
+Con estos cambios, el código debería funcionar correctamente y generar los gráficos de temperatura basados en los archivos de texto guardados en tu aplicación Django. Asegúrate de tener configurada la carpeta estática en tu configuración de Django para que las imágenes generadas por matplotlib sean accesibles desde el navegador.
+IndexError at /temperature-graph/
+
+list index out of range
+
+            # Inicializar estructuras de datos para los gráficos
+
+            data = {}
+
+            for file_path in file_paths:
+
+                # Obtener placa y puerto desde el nombre del archivo
+
+                parts = os.path.basename(file_path).split('_')
+
+                placa_id = parts[1]
+
+                puerto = parts[3].split('.')[0]
+
+     …
+
+                # Leer datos del archivo
+
+                with open(file_path, 'r') as f:
+
+                    lines = f.readlines()
+
+                # Procesar cada línea de datos
+
+ChatGPT
+
+El error IndexError: list index out of range indica que estás intentando acceder a un índice en una lista que está fuera del rango válido de índices. Esto sucede cuando la lista no tiene tantos elementos como esperabas al intentar dividirla o acceder a un índice específico.
+
+En el contexto de tu código, el error ocurre probablemente porque la lista parts obtenida al dividir os.path.basename(file_path).split('_') no tiene suficientes elementos para satisfacer las operaciones que intentas realizar a continuación (por ejemplo, parts[1] o parts[3]).
+
+Para evitar este error, asegúrate de verificar la estructura de los nombres de archivo antes de acceder a los elementos de la lista parts. Podrías hacer algo como esto para depurar y verificar qué está ocurriendo:
+
+python
+
+import os
+from django.shortcuts import render
+from django.views import View
+import matplotlib.pyplot as plt
+from matplotlib.dates import DateFormatter
+from datetime import datetime
+import glob
+
+class TemperatureGraphView(View):
+    def get(self, request):
+        # Obtener la lista de archivos de texto guardados
+        file_paths = glob.glob('readings/placa_*/puerto_*.txt')
+
+        # Inicializar estructuras de datos para los gráficos
+        data = {}
+        for file_path in file_paths:
+            # Obtener placa y puerto desde el nombre del archivo
+            parts = os.path.basename(file_path).split('_')
+            if len(parts) < 4:
+                print(f"Error: No se pueden obtener placa y puerto de {file_path}. Parts: {parts}")
+                continue
+            
+            placa_id = parts[1]
+            puerto_parts = parts[3].split('.')
+            if len(puerto_parts) < 1:
+                print(f"Error: No se puede obtener puerto de {file_path}. Puerto parts: {puerto_parts}")
+                continue
+            puerto = puerto_parts[0]
+
+            # Leer datos del archivo
+            with open(file_path, 'r') as f:
+                lines = f.readlines()
+
+            # Procesar cada línea de datos
+            timestamps = []
+            temperatures = []
+            for line in lines:
+                parts = line.strip().split(' - ')
+                if len(parts) < 2:
+                    print(f"Error: No se pueden procesar los datos de línea en {file_path}. Parts: {parts}")
+                    continue
+                timestamp = datetime.strptime(parts[0], "%Y-%m-%d %H:%M:%S")
+                temperature = float(parts[1].split('°C')[0])
+                timestamps.append(timestamp)
+                temperatures.append(temperature)
+
+            # Guardar datos en la estructura
+            key = f"{placa_id}_{puerto}"
+            data[key] = {'timestamps': timestamps, 'temperatures': temperatures}
+
+        # Crear gráficos
+        plots = []
+        for key, values in data.items():
+            placa_id, puerto = key.split('_')
+            plt.figure()
+            plt.plot(values['timestamps'], values['temperatures'], marker='o', linestyle='-', color='b')
+            plt.title(f'Temperaturas - Placa {placa_id}, Puerto {puerto}')
+            plt.xlabel('Tiempo')
+            plt.ylabel('Temperatura (°C)')
+            plt.xticks(rotation=45)
+            plt.gca().xaxis.set_major_formatter(DateFormatter('%Y-%m-%d %H:%M:%S'))
+            plt.tight_layout()
+
+            # Guardar la figura como imagen para mostrar en el template
+            image_path = f"static/temperature_plots/{key}.png"
+            plt.savefig(image_path)
+            plots.append({'placa_id': placa_id, 'puerto': puerto, 'image_path': image_path})
+
+        # Renderizar el template con los gráficos generados
+        return render(request, 'temperature_graph.html', {'plots': plots})
+
+Cambios Realizados:
+
+    Verificación de partes (parts): Antes de intentar acceder a parts[1], parts[3], y puerto_parts[0], se verifica la longitud de estas listas para asegurarse de que haya suficientes elementos para acceder sin causar un IndexError.
+
+    Impresión de errores: Se han añadido impresiones para señalar los archivos que no se pueden procesar correctamente, mostrando los detalles de las partes involucradas.
+
+Al implementar estos cambios, podrás identificar y manejar los archivos que no siguen la estructura esperada o que tienen datos inesperados, evitando así el IndexError y permitiendo que tu vista maneje correctamente los archivos de temperatura.
+El error IndexError: list index out of range indica que estás intentando acceder a un índice en una lista que está fuera del rango válido de índices. Esto sucede cuando la lista no tiene tantos elementos como esperabas al intentar dividirla o acceder a un índice específico.
+
+En el contexto de tu código, el error ocurre probablemente porque la lista parts obtenida al dividir os.path.basename(file_path).split('_') no tiene suficientes elementos para satisfacer las operaciones que intentas realizar a continuación (por ejemplo, parts[1] o parts[3]).
+
+Para evitar este error, asegúrate de verificar la estructura de los nombres de archivo antes de acceder a los elementos de la lista parts. Podrías hacer algo como esto para depurar y verificar qué está ocurriendo:
+
+python
+
+import os
+from django.shortcuts import render
+from django.views import View
+import matplotlib.pyplot as plt
+from matplotlib.dates import DateFormatter
+from datetime import datetime
+import glob
+
+class TemperatureGraphView(View):
+    def get(self, request):
+        # Obtener la lista de archivos de texto guardados
+        file_paths = glob.glob('readings/placa_*/puerto_*.txt')
+
+        # Inicializar estructuras de datos para los gráficos
+        data = {}
+        for file_path in file_paths:
+            # Obtener placa y puerto desde el nombre del archivo
+            parts = os.path.basename(file_path).split('_')
+            if len(parts) < 4:
+                print(f"Error: No se pueden obtener placa y puerto de {file_path}. Parts: {parts}")
+                continue
+            
+            placa_id = parts[1]
+            puerto_parts = parts[3].split('.')
+            if len(puerto_parts) < 1:
+                print(f"Error: No se puede obtener puerto de {file_path}. Puerto parts: {puerto_parts}")
+                continue
+            puerto = puerto_parts[0]
+
+            # Leer datos del archivo
+            with open(file_path, 'r') as f:
+                lines = f.readlines()
+
+            # Procesar cada línea de datos
+            timestamps = []
+            temperatures = []
+            for line in lines:
+                parts = line.strip().split(' - ')
+                if len(parts) < 2:
+                    print(f"Error: No se pueden procesar los datos de línea en {file_path}. Parts: {parts}")
+                    continue
+                timestamp = datetime.strptime(parts[0], "%Y-%m-%d %H:%M:%S")
+                temperature = float(parts[1].split('°C')[0])
+                timestamps.append(timestamp)
+                temperatures.append(temperature)
+
+            # Guardar datos en la estructura
+            key = f"{placa_id}_{puerto}"
+            data[key] = {'timestamps': timestamps, 'temperatures': temperatures}
+
+        # Crear gráficos
+        plots = []
+        for key, values in data.items():
+            placa_id, puerto = key.split('_')
+            plt.figure()
+            plt.plot(values['timestamps'], values['temperatures'], marker='o', linestyle='-', color='b')
+            plt.title(f'Temperaturas - Placa {placa_id}, Puerto {puerto}')
+            plt.xlabel('Tiempo')
+            plt.ylabel('Temperatura (°C)')
+            plt.xticks(rotation=45)
+            plt.gca().xaxis.set_major_formatter(DateFormatter('%Y-%m-%d %H:%M:%S'))
+            plt.tight_layout()
+
+            # Guardar la figura como imagen para mostrar en el template
+            image_path = f"static/temperature_plots/{key}.png"
+            plt.savefig(image_path)
+            plots.append({'placa_id': placa_id, 'puerto': puerto, 'image_path': image_path})
+
+        # Renderizar el template con los gráficos generados
+        return render(request, 'temperature_graph.html', {'plots': plots})
+
+necesito que me muestre la temperatura en un grafico pero que no me lo guarde no hace nada de esto
+ChatGPT
+
+Entendido, quieres mostrar los gráficos de temperatura sin guardar las imágenes ni realizar ningún procesamiento adicional. Podemos simplificar la vista para que solo genere los gráficos y los muestre directamente en el navegador sin guardar archivos. Aquí tienes cómo hacerlo:
+
+python
+
+import os
+from django.shortcuts import render
+from django.views import View
+import matplotlib.pyplot as plt
+from matplotlib.dates import DateFormatter
+from datetime import datetime
+import glob
+
+class TemperatureGraphView(View):
+    def get(self, request):
+        # Obtener la lista de archivos de texto guardados
+        file_paths = glob.glob('readings/placa_*/puerto_*.txt')
+
+        # Inicializar estructuras de datos para los gráficos
+        data = {}
+        for file_path in file_paths:
+            # Obtener placa y puerto desde el nombre del archivo
+            parts = os.path.basename(file_path).split('_')
+            if len(parts) < 4:
+                continue  # Saltar archivos que no cumplen con la estructura esperada
+            
+            placa_id = parts[1]
+            puerto_parts = parts[3].split('.')
+            if len(puerto_parts) < 1:
+                continue  # Saltar archivos que no cumplen con la estructura esperada
+            puerto = puerto_parts[0]
+
+            # Leer datos del archivo
+            with open(file_path, 'r') as f:
+                lines = f.readlines()
+
+            # Procesar cada línea de datos
+            timestamps = []
+            temperatures = []
+            for line in lines:
+                parts = line.strip().split(' - ')
+                if len(parts) < 2:
+                    continue  # Saltar líneas que no cumplen con la estructura esperada
+                timestamp = datetime.strptime(parts[0], "%Y-%m-%d %H:%M:%S")
+                temperature = float(parts[1].split('°C')[0])
+                timestamps.append(timestamp)
+                temperatures.append(temperature)
+
+            # Guardar datos en la estructura
+            key = f"{placa_id}_{puerto}"
+            data[key] = {'timestamps': timestamps, 'temperatures': temperatures}
+
+        # Crear gráficos
+        plots = []
+        for key, values in data.items():
+            placa_id, puerto = key.split('_')
+            plt.figure()
+            plt.plot(values['timestamps'], values['temperatures'], marker='o', linestyle='-', color='b')
+            plt.title(f'Temperaturas - Placa {placa_id}, Puerto {puerto}')
+            plt.xlabel('Tiempo')
+            plt.ylabel('Temperatura (°C)')
+            plt.xticks(rotation=45)
+            plt.gca().xaxis.set_major_formatter(DateFormatter('%Y-%m-%d %H:%M:%S'))
+            plt.tight_layout()
+
+            # Convertir el gráfico a imagen en formato base64 y pasarla al template
+            from io import BytesIO
+            import base64
+
+            buffer = BytesIO()
+            plt.savefig(buffer, format='png')
+            buffer.seek(0)
+            image_base64 = base64.b64encode(buffer.getvalue()).decode()
+            buffer.close()
+
+            plots.append({'placa_id': placa_id, 'puerto': puerto, 'image_base64': image_base64})
+
+            plt.close()  # Cerrar el gráfico para liberar memoria
+
+        # Renderizar el template con los gráficos generados
+        return render(request, 'temperature_graph.html', {'plots': plots})
+
+En este código:
+
+    Generación de Gráficos: Los gráficos se generan utilizando matplotlib. Después de crear cada gráfico, se convierte a formato base64 y se pasa directamente al template como una cadena base64.
+
+    No Guardar Imágenes: No se guarda ningún archivo en el sistema de archivos. En lugar de eso, convertimos el gráfico a formato base64 y lo incluimos directamente en el HTML del template.
+
+    Cierre de Gráficos: Después de guardar el gráfico como base64, se cierra (plt.close()) para liberar memoria.
+
+Template HTML (temperature_graph.html)
+
+html
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Gráficos de Temperatura</title>
+</head>
+<body>
+    <h1>Gráficos de Temperatura por Placa y Puerto</h1>
+    {% for plot in plots %}
+    <div style="margin-bottom: 20px;">
+        <h2>Placa {{ plot.placa_id }}, Puerto {{ plot.puerto }}</h2>
+        <img src="data:image/png;base64,{{ plot.image_base64 }}" alt="Gráfico Temperatura">
+    </div>
+    {% endfor %}
+</body>
+</html>
+
+Explicación Adicional:
+
+    Base64: La imagen del gráfico se convierte a base64 usando base64.b64encode(buffer.getvalue()).decode() y se almacena en image_base64. Esta cadena base64 se incrusta directamente en la etiqueta <img> del HTML usando data:image/png;base64,{{ plot.image_base64 }}, lo que permite que el navegador la muestre como una imagen.
+
+    Cierre de Gráficos: Es importante cerrar cada gráfico después de haberlo convertido a base64 para evitar la acumulación de recursos en memoria.
+
+Con estos ajustes, ahora la vista generará y mostrará gráficos de temperatura en tiempo real directamente en tu aplicación Django, sin guardar archivos adicionales en el sistema de archivos.
+no ,uestra nada che+
+ChatGPT
+
+Si los gráficos no se muestran correctamente en tu aplicación Django, hay algunas posibles razones por las cuales esto podría estar ocurriendo. Vamos a revisar algunos puntos importantes para asegurarnos de que todo esté configurado correctamente:
+Verificación y Solución de Problemas
+
+    Ruta de los Archivos Estáticos:
+        Asegúrate de que la configuración de archivos estáticos en tu proyecto Django esté correctamente configurada. Debes tener una configuración en settings.py que incluya la carpeta donde se encuentran tus archivos estáticos (por ejemplo, STATICFILES_DIRS o STATIC_ROOT si estás en producción).
+
+    Template HTML:
+        Verifica que el template temperature_graph.html esté ubicado en la carpeta correcta dentro de tus templates. El nombre de la carpeta de templates debe coincidir con lo configurado en TEMPLATES en settings.py.
+
+    Debugging en la Vista:
+
+        Agrega impresiones (print) dentro de la vista TemperatureGraphView para verificar si los datos (plots) se están generando correctamente y están siendo pasados al template. Por ejemplo:
+
+        python
+
+        # Antes de retornar la renderización del template
+        print("Plots:", plots)
+
+        Esto te permitirá asegurarte de que los datos se están generando como esperas.
+
+    Verificación de Errores en el Navegador:
+        Abre la consola del navegador (usualmente puedes presionar F12 y seleccionar la pestaña "Consola") para ver si hay errores de carga de recursos estáticos o de renderización de imágenes.
+
+    Actualización del Navegador:
+        Asegúrate de que estás viendo la versión más reciente de la página en tu navegador. Puedes intentar recargar la página (Ctrl + R o Cmd + R en Mac).
+
+Ejemplo de Código Ajustado
+
+A continuación, te doy un ejemplo simplificado del código de la vista y del template para asegurarnos de que todo esté configurado correctamente:
+
+Vista (views.py):
+
+python
+
+from django.shortcuts import render
+from django.views import View
+import matplotlib.pyplot as plt
+from matplotlib.dates import DateFormatter
+from datetime import datetime
+import os
+
+class TemperatureGraphView(View):
+    def get(self, request):
+        # Ejemplo de datos de prueba
+        data = {
+            'placa_1_puerto_1': {'timestamps': [datetime(2024, 7, 10, 10, 0), datetime(2024, 7, 10, 11, 0)],
+                                 'temperatures': [25.5, 26.0]},
+            'placa_2_puerto_1': {'timestamps': [datetime(2024, 7, 10, 10, 0), datetime(2024, 7, 10, 11, 0)],
+                                 'temperatures': [24.0, 24.5]},
+        }
+
+        plots = []
+        for key, values in data.items():
+            placa_id, puerto = key.split('_')
+            plt.figure()
+            plt.plot(values['timestamps'], values['temperatures'], marker='o', linestyle='-', color='b')
+            plt.title(f'Temperaturas - Placa {placa_id}, Puerto {puerto}')
+            plt.xlabel('Tiempo')
+            plt.ylabel('Temperatura (°C)')
+            plt.xticks(rotation=45)
+            plt.gca().xaxis.set_major_formatter(DateFormatter('%Y-%m-%d %H:%M:%S'))
+            plt.tight_layout()
+
+            # Convertir el gráfico a imagen en formato base64
+            from io import BytesIO
+            import base64
+
+            buffer = BytesIO()
+            plt.savefig(buffer, format='png')
+            buffer.seek(0)
+            image_base64 = base64.b64encode(buffer.getvalue()).decode()
+            buffer.close()
+
+            plots.append({'placa_id': placa_id, 'puerto': puerto, 'image_base64': image_base64})
+
+            plt.close()  # Cerrar el gráfico para liberar memoria
+
+        return render(request, 'temperature_graph.html', {'plots': plots})
+
+Template HTML (temperature_graph.html):
+
+html
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Gráficos de Temperatura</title>
+</head>
+<body>
+    <h1>Gráficos de Temperatura</h1>
+    {% for plot in plots %}
+    <div style="margin-bottom: 20px;">
+        <h2>Placa {{ plot.placa_id }}, Puerto {{ plot.puerto }}</h2>
+        <img src="data:image/png;base64,{{ plot.image_base64 }}" alt="Gráfico de Temperatura">
     </div>
     {% endfor %}
 </body>
