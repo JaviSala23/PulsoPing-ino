@@ -59,7 +59,7 @@ class TemperatureGraphView(View):
             plt.gca().xaxis.set_major_formatter(DateFormatter('%Y-%m-%d %H:%M:%S'))
             plt.tight_layout()
 
-            # Convertir el gráfico a imagen en formato base64
+            # Convertir el gráfico a imagen en formato base64 y pasarla al template
             buffer = BytesIO()
             plt.savefig(buffer, format='png')
             buffer.seek(0)
@@ -68,7 +68,7 @@ class TemperatureGraphView(View):
 
             plots.append({'placa_id': placa_id, 'puerto': puerto, 'image_base64': image_base64})
 
-            plt.close()  # Cerrar el gráfico para liberar memoria
+            plt.close()  # Cerrar la figura para liberar memoria
 
         # Renderizar el template con los gráficos generados
-        return render(request, 'graficos.html', {'plots': plots})
+        return render(request, 'temperature_graph.html', {'plots': plots})
