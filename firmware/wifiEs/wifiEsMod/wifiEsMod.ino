@@ -124,15 +124,35 @@ Serial.println(request1);
 
 if (client.connect(host, port)) {
   client.print(request);
-  client.print(request1);
 } else {
   Serial.println("Connection failed");
 }
+
+
 
 // Wait for response from server
 while (client.connected() && !client.available()) {
   delay(100); // Wait for data
 }
+if (client.connect(host, port)) {
+  client.print(request1);
+} else {
+  Serial.println("Connection failed");
+}
+
+
+
+// Wait for response from server
+while (client.connected() && !client.available()) {
+  delay(100); // Wait for data
+}
+
+// Read response from server
+while (client.available()) {
+  String line = client.readStringUntil('\r');
+  Serial.print(line);
+}
+
 
 // Read response from server
 while (client.available()) {
