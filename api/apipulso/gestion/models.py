@@ -164,3 +164,7 @@ class Cuenta_has_Artefacto(models.Model):
         blank=False,
         null=False,
     )
+    temp_min=models.FloatField(blank=False,
+        null=False)
+    temp_max=models.FloatField(blank=False,
+        null=False)

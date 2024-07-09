@@ -46,7 +46,8 @@ class Placa(models.Model):
 class SensorReading(models.Model):
     id = models.AutoField(primary_key=True)
     timestamp = models.DateTimeField(auto_now_add=True)
-    temperature = models.FloatField()
+    temperature = models.FloatField(blank=False,
+        null=False)
     placa = models.ForeignKey(
         Placa,
         blank=False,
