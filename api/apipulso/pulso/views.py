@@ -83,7 +83,7 @@ class SensorReadingListCreate(generics.ListCreateAPIView):
         if last_alert and (last_stable is None or last_alert.timestamp > last_stable.timestamp):
             # Enviar un mensaje indicando que la temperatura ha vuelto a los límites normales
             self.send_telegram_message(f"Estable: La temperatura ha vuelto a los límites normales para Placa: {reading.placa.id}, Puerto: {reading.puerto}")
-            MessageLog.objects.create(placa=reading.placa, puerto=reading.puerto, message_type="STABLE")
+            MessageLog.objects.create(placa=reading.placa, puerto=reading.puerto,temperature=reading.temperature, message_type="STABLE")
 
     def send_telegram_message(self, message):
         # Aquí debes implementar la lógica para enviar el mensaje por Telegram
