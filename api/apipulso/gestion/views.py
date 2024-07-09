@@ -16,8 +16,16 @@ class TemperatureGraphView(View):
         for file_path in file_paths:
             # Obtener placa y puerto desde el nombre del archivo
             parts = os.path.basename(file_path).split('_')
+            if len(parts) < 4:
+                print(f"Error: No se pueden obtener placa y puerto de {file_path}. Parts: {parts}")
+                continue
+            
             placa_id = parts[1]
-            puerto = parts[3].split('.')[0]
+            puerto_parts = parts[3].split('.')
+            if len(puerto_parts) < 1:
+                print(f"Error: No se puede obtener puerto de {file_path}. Puerto parts: {puerto_parts}")
+                continue
+            puerto = puerto_parts[0]
 
             # Leer datos del archivo
             with open(file_path, 'r') as f:
@@ -28,6 +36,9 @@ class TemperatureGraphView(View):
             temperatures = []
             for line in lines:
                 parts = line.strip().split(' - ')
+                if len(parts) < 2:
+                    print(f"Error: No se pueden procesar los datos de línea en {file_path}. Parts: {parts}")
+                    continue
                 timestamp = datetime.strptime(parts[0], "%Y-%m-%d %H:%M:%S")
                 temperature = float(parts[1].split('°C')[0])
                 timestamps.append(timestamp)
