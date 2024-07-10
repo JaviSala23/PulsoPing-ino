@@ -18,14 +18,14 @@ def TemperatureGraphView(request):
     data = []
 
     for file_path in file_paths:
-        print(file_path)
+        
         # Obtener placa y puerto desde el nombre del archivo
         parts = os.path.basename(file_path).split('_')
         if len(parts) < 4:
             continue  # Saltar archivos que no cumplen con la estructura esperada
         print(parts)
         # Leer datos del archivo
-        with open(file_path, 'r') as f:
+        with open(parts, 'r') as f:
             lines = f.readlines()
             print(lines)
 
