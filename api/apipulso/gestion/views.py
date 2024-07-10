@@ -14,7 +14,7 @@ from gestion.forms import *
 from django.utils.dateparse import parse_datetime
 import os
 from django.template.loader import render_to_string
-import calendar
+import locale
 
 def panel(request):
     return render(request,'inicio/panelControl.html')
@@ -269,17 +269,13 @@ def eliminar_cuenta_has_artefacto(request, id):
 
 
 
-def obtener_nombre_dia(dia):
-    return calendar.day_name[dia]
-
-
 
 
 '''
 Monitor temperatura grafico
 '''
 
-def TemperatureGraphView(request, cuenta, puerto):
+ddef TemperatureGraphView(request, cuenta, puerto):
     try:
         # Obtener el objeto Cuenta_has_Artefacto correspondiente
         artefacto1 = Cuenta_has_Artefacto.objects.get(cuenta=cuenta, puerto=puerto)
@@ -295,16 +291,12 @@ def TemperatureGraphView(request, cuenta, puerto):
         # Leer datos del archivo
         with open(url_clean, 'r') as f:
             lines = f.readlines()
-        print(f"Líneas leídas: {lines}")
     except Exception as e:
-        print(f"Error leyendo archivo {url_clean}: {e}")
         return HttpResponse(f"Error leyendo archivo {url_clean}: {e}", content_type="text/plain")
 
     for line in lines:
-        print(f"Procesando línea: {line}")
         parts = line.strip().split(',')
         if len(parts) < 2:
-            print(f"Línea no válida: {line}")
             continue  # Saltar líneas que no cumplen con la estructura esperada
 
         try:
@@ -312,7 +304,6 @@ def TemperatureGraphView(request, cuenta, puerto):
             temperature = float(parts[1])
             data.append((timestamp, temperature))
         except Exception as e:
-            print(f"Error procesando línea {line}: {e}")
             continue
 
     # Convertir los datos en un DataFrame de pandas
@@ -320,9 +311,8 @@ def TemperatureGraphView(request, cuenta, puerto):
         return HttpResponse("No se encontraron datos válidos en los archivos.", content_type="text/plain")
 
     df = pd.DataFrame(data, columns=['timestamp', 'temperature'])
-    print(df)
 
-    # Filtrar por fecha si se proporcionan parámetros
+    # Aplicar filtro por fecha si se proporcionan parámetros
     start_date_str = request.GET.get('start_date')
     end_date_str = request.GET.get('end_date')
     
@@ -332,29 +322,45 @@ def TemperatureGraphView(request, cuenta, puerto):
             end_date = datetime.strptime(end_date_str, "%Y-%m-%d")
             df = df[(df['timestamp'] >= start_date) & (df['timestamp'] <= end_date)]
         except Exception as e:
-            print(f"Error en el filtro de fechas: {e}")
             return HttpResponse(f"Error en el filtro de fechas: {e}", content_type="text/plain")
 
-    # Crear un gráfico con matplotlib
+    # Configurar la localización a español para los nombres de días y meses
+    locale.setlocale(locale.LC_TIME, 'es_ES.UTF-8')
+
+    # Crear un gráfico de puntos con matplotlib
     fig, ax = plt.subplots(figsize=(10, 6))
+    
+    # Colores basados en el rango de temperatura
     temperatures_in_range = (df['temperature'] >= artefacto1.temp_min) & (df['temperature'] <= artefacto1.temp_max)
+    ax.scatter(df['timestamp'][temperatures_in_range], df['temperature'][temperatures_in_range], c='green', label='Dentro de rango')
+    ax.scatter(df['timestamp'][~temperatures_in_range], df['temperature'][~temperatures_in_range], c='red', label='Fuera de rango')
     
-    # Gráfico de puntos
-    ax.scatter(df['timestamp'][temperatures_in_range], df['temperature'][temperatures_in_range], label='En rango', color='green')
-    ax.scatter(df['timestamp'][~temperatures_in_range], df['temperature'][~temperatures_in_range], label='Fuera de rango', color='red')
-    
-    ax.set_xlabel('Fecha')
+    # Etiquetas completas en los ejes
+    ax.set_xlabel('Fecha y Hora')
     ax.set_ylabel('Temperatura')
     ax.legend(loc='best')
     
-    # Formatear el eje x con nombres de días en español
-    ax.set_xticklabels([obtener_nombre_dia(dia.weekday()) for dia in df['timestamp']])
+    # Formato de fecha en el eje x
+    ax.xaxis.set_major_formatter(plt.DateFormatter('%A, %d de %B de %Y %H:%M:%S'))
     
+    # Rotación de las etiquetas del eje x para mejor visualización
     plt.xticks(rotation=45)
-    plt.tight_layout()
+    
+    # Agregar tooltips con mpld3 para mostrar temperaturas al pasar el mouse por encima
+    tooltips = mpld3.plugins.PointLabelTooltip(ax.get_children()[0], labels=list(df['temperature'].astype(str)))
+    mpld3.plugins.connect(fig, tooltips)
+    
+    # Convertir el gráfico en formato HTML interactivo con mpld3
+    interactive_graph = mpld3.fig_to_html(fig)
+    
+    # Guardar el gráfico en un objeto BytesIO para insertarlo en la plantilla
+    buf = BytesIO()
+    plt.savefig(buf, format='png')
+    buf.seek(0)
+    
+    # Codificar la imagen en base64 para poder insertarla en la plantilla
+    graph_base64 = base64.b64encode(buf.getvalue()).decode('utf-8')
+    buf.close()
 
-    # Agregar interactividad con mpld3
-    interactive_fig = mpld3.fig_to_html(fig)
-
-    # Renderizar la plantilla con el gráfico
-    return render(request, 'monitoreo/graficos.html', {'graph': interactive_fig, 'cuenta': cuenta, 'puerto': puerto, 'artefacto': artefacto1})
+    # Renderizar la plantilla con el gráfico interactivo y la imagen en base64
+    return render(request, 'monitoreo/graficos.html', {'graph': interactive_graph, 'graph_base64': graph_base64})
