@@ -10,55 +10,55 @@ from django.http import HttpResponse
 
 
 def TemperatureGraphView(request):
-        # Obtener la lista de archivos de texto guardados
-        file_paths = glob.glob('readings/placa_*/puerto_*.txt')
-        print(file_paths)  # Verifica qué archivos se están encontrando
+    # Obtener la lista de archivos de texto guardados
+    file_paths = glob.glob('readings/placa_*/puerto_*.txt')
+    print(file_paths)  # Verifica qué archivos se están encontrando
 
-        # Inicializar una lista para almacenar los datos
-        data = []
+    # Inicializar una lista para almacenar los datos
+    data = []
 
-        for file_path in file_paths:
-            print(file_path)
-            # Obtener placa y puerto desde el nombre del archivo
-            parts = os.path.basename(file_path).split('_')
+    for file_path in file_paths:
+        print(file_path)
+        # Obtener placa y puerto desde el nombre del archivo
+        parts = os.path.basename(file_path).split('_')
+        if len(parts) < 4:
+            continue  # Saltar archivos que no cumplen con la estructura esperada
+
+        # Leer datos del archivo
+        with open(file_path, 'r') as f:
+            lines = f.readlines()
+
+        for line in lines:
+            parts = line.strip().split(',')
             if len(parts) < 4:
-                continue  # Saltar archivos que no cumplen con la estructura esperada
+                continue  # Saltar líneas que no cumplen con la estructura esperada
+            timestamp = datetime.strptime(parts[0], "%Y-%m-%d %H:%M:%S")
+            temperature = float(parts[1])
+            placa_id = parts[2]
+            puerto = parts[3]
+            data.append((timestamp, temperature, placa_id, puerto))
 
-            # Leer datos del archivo
-            with open(file_path, 'r') as f:
-                lines = f.readlines()
+    # Convertir los datos en un DataFrame de pandas
+    df = pd.DataFrame(data, columns=['timestamp', 'temperature', 'placa_id', 'puerto'])
 
-            for line in lines:
-                parts = line.strip().split(',')
-                if len(parts) < 4:
-                    continue  # Saltar líneas que no cumplen con la estructura esperada
-                timestamp = datetime.strptime(parts[0], "%Y-%m-%d %H:%M:%S")
-                temperature = float(parts[1])
-                placa_id = parts[2]
-                puerto = parts[3]
-                data.append((timestamp, temperature, placa_id, puerto))
+    # Crear un gráfico con matplotlib
+    fig, ax = plt.subplots(figsize=(10, 6))
+    for key, grp in df.groupby(['placa_id', 'puerto']):
+        ax.plot(grp['timestamp'], grp['temperature'], label=f'Placa {key[0]} Puerto {key[1]}')
 
-        # Convertir los datos en un DataFrame de pandas
-        df = pd.DataFrame(data, columns=['timestamp', 'temperature', 'placa_id', 'puerto'])
+    ax.set_xlabel('Timestamp')
+    ax.set_ylabel('Temperature')
+    ax.legend(loc='best')
+    plt.xticks(rotation=45)
 
-        # Crear un gráfico con matplotlib
-        fig, ax = plt.subplots(figsize=(10, 6))
-        for key, grp in df.groupby(['placa_id', 'puerto']):
-            ax.plot(grp['timestamp'], grp['temperature'], label=f'Placa {key[0]} Puerto {key[1]}')
+    # Guardar el gráfico en un objeto BytesIO
+    buf = BytesIO()
+    plt.savefig(buf, format='png')
+    buf.seek(0)
 
-        ax.set_xlabel('Timestamp')
-        ax.set_ylabel('Temperature')
-        ax.legend(loc='best')
-        plt.xticks(rotation=45)
+    # Codificar la imagen en base64 para poder insertarla en la plantilla
+    image_base64 = base64.b64encode(buf.getvalue()).decode('utf-8')
+    buf.close()
 
-        # Guardar el gráfico en un objeto BytesIO
-        buf = BytesIO()
-        plt.savefig(buf, format='png')
-        buf.seek(0)
-
-        # Codificar la imagen en base64 para poder insertarla en la plantilla
-        image_base64 = base64.b64encode(buf.getvalue()).decode('utf-8')
-        buf.close()
-
-        # Renderizar la plantilla con el gráfico
-        return render(request, 'graficos.html', {'graph': image_base64})
+    # Renderizar la plantilla con el gráfico
+    return render(request, 'graficos.html', {'graph': image_base64})
