@@ -174,7 +174,6 @@ def nueva_cuenta_has_artefacto(request, id=0):
         form = CuentaHasArtefactoForm(instance=relacion)
         funcion = "Modificar"
     else:
-        relacion = None
         form = CuentaHasArtefactoForm()
         funcion = "Agregar"
     if request.method == 'POST':
@@ -192,11 +191,6 @@ def eliminar_cuenta_has_artefacto(request, id):
     relacion.delete()
     messages.success(request, f'Se ha eliminado la relación')
     return redirect('listar_cuenta_has_artefacto')
-
-
-
-
-
 
 
 
