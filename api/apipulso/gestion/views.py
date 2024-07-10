@@ -363,7 +363,7 @@ def TemperatureGraphView(request, cuenta, puerto):
 
     # Preparar datos para la tabla
     table_data = []
-    for date, temp, in_range in zip(df['Dia y Horario'], df['Temperatura'], df['dentro_rango']):
+    for date, temp, in_range in zip(df['timestamp'], df['temperature'], df['dentro_rango']):
         if in_range:
             color = 'blue'
         else:
