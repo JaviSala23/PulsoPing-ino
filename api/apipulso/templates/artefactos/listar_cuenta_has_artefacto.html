@@ -30,6 +30,8 @@
                 <tr style="background-color: rgb(211, 227, 250);color:rgb(95, 93, 93)">
                     <th rowspan="1" colspan="1">CUENTA</th>
                     <th rowspan="1" colspan="1">DISPOSITIVO</th>
+                    <th rowspan="1" colspan="1">COD. PLACA</th>
+                    <th rowspan="1" colspan="1">FIRMWARE PLACA</th>
                     <th rowspan="1" colspan="1">PLACA</th>
                     <th rowspan="1" colspan="1">PUERTO</th>
                     <th rowspan="1" colspan="1">TEMP. MÍN.</th>
@@ -43,7 +45,9 @@
                 <tr class="odd" style="color:rgb(112, 112, 112)">
                     <td>{{ relacion.cuenta.nombre_cuenta }}</td>
                     <td>{{ relacion.artefacto.descripcion }}</td>
-                    <td>{{ relacion.placa }}</td>
+                    <td>{{ relacion.artefacto.firmware }}</td>
+                    <td>{{ relacion.placa.codigo }}</td>
+                    <td>{{ relacion.placa.descripcion }}</td>
                     <td>{{ relacion.puerto }}</td>
                     <td>{{ relacion.temp_min }}</td>
                     <td>{{ relacion.temp_max }}</td>
