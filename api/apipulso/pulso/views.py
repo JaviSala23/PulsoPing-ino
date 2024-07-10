@@ -2,7 +2,7 @@ import os
 import requests
 from rest_framework import generics
 from .models import SensorReading, MessageLog
-from gestion.models import Cuenta_has_Artefacto
+from gestion.models import Cuenta_has_Artefacto,artefacto
 from .serializers import SensorReadingSerializer
 from datetime import datetime, timedelta
 import pytz
@@ -35,6 +35,9 @@ class SensorReadingListCreate(generics.ListCreateAPIView):
         
         # Nombre del archivo basado en el puerto
         file_path = os.path.join(directory, f"puerto_{puerto}.txt")
+        artefacto1=artefacto.objects.get(placa=placa_id,puerto=puerto)
+        artefacto1.url=file_path
+        artefacto1.save()
         
         # Asegurar que el timestamp esté presente en los datos
         if 'timestamp' not in data:
