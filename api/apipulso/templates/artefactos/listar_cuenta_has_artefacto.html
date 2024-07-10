@@ -67,16 +67,13 @@ function actualizarTabla() {
     $.ajax({
         url: "{% url 'actualizar_relaciones' %}",
         success: function(data) {
-            $('body').html("")
-            $('#tabla-relaciones').html(data);
-            // Actualiza el contenido de la tabla
+            $('#tabla-relaciones').html(data.tabla_html);
         },
         error: function(xhr, status, error) {
             console.error("Error al actualizar la tabla:", error);
         }
     });
 }
-
 // Actualiza la tabla cada 1 minuto
 setInterval(actualizarTabla, 60000);  // 60000 milisegundos = 1 minuto
 </script>

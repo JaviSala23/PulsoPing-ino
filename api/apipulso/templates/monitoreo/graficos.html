@@ -1,9 +1,28 @@
-{% extends 'layout.html' %} {% block titulo %}
+{% extends 'base.html' %}
 
-    <h1> Grafico de Temperatura</h1>
-    <div>
-        <img src="data:image/png;base64,{{ graph }}" alt="Temperature Graph">
+{% block titulo %}
+<h1>Gráfico de Temperatura - Cuenta: {{ cuenta }}, Puerto: {{ puerto }}</h1>
+{% endblock %}
+
+{% block contenido %}
+<div class="container">
+    <form method="get" class="form-inline">
+        <label for="start_date" class="mr-2">Fecha de inicio:</label>
+        <input type="date" id="start_date" name="start_date" class="form-control mr-2">
+        <label for="end_date" class="mr-2">Fecha de fin:</label>
+        <input type="date" id="end_date" name="end_date" class="form-control mr-2">
+        <button type="submit" class="btn btn-primary">Filtrar</button>
+    </form>
+    <hr>
+    <div id="graph-container">
+        {{ graph|safe }}
     </div>
-</body>
-</html>
+</div>
+
+<script src="https://cdnjs.cloudflare.com/ajax/libs/mpld3/0.5.7/mpld3.min.js"></script>
+<script>
+    $(document).ready(function() {
+        mpld3.enable_notebook();
+    });
+</script>
 {% endblock %}

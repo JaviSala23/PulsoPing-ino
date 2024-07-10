@@ -1,0 +1,22 @@
+{% for item in relaciones_actualizadas %}
+<tr class="odd" style="color: rgb(112, 112, 112)">
+    <td>{{ item.relacion.cuenta.nombre_cuenta }}</td>
+    <td>{{ item.relacion.artefacto.descripcion }}</td>
+    <td>{{ item.relacion.placa.codigo }}</td>
+    <td>{{ item.relacion.placa.firmware.descripcion }}</td>
+    <td>{{ item.relacion.placa.descripcion }}</td>
+    <td>{{ item.relacion.puerto }}</td>
+    <td>{{ item.relacion.temp_min }}</td>
+    <td>{{ item.relacion.temp_max }}</td>
+
+    <td>{% if item.ultimo_registro %} {{ item.ultimo_registro.temperatura }} {% else %} N/A {% endif %}</td>
+    <td>{% if item.ultimo_registro %} {{ item.ultimo_registro.fecha_hora }} {% else %} N/A {% endif %}</td>
+    <td>
+        <div class="table-data-feature">
+            <a href="{% url 'temperature_graph' item.relacion.placa.id item.relacion.puerto %}"><i class="fa-solid fa-chart-line"></i></a>
+            <a href="{% url 'nueva_cuenta_has_artefacto' item.relacion.id %}"><i class='fas fa-edit'></i></a>
+            <a href="{% url 'eliminar_cuenta_has_artefacto' item.relacion.id %}"><i class='far fa-trash-alt'></i></a>
+        </div>
+    </td>
+</tr>
+{% endfor %}

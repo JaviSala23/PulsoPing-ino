@@ -2,6 +2,7 @@ import pandas as pd
 import matplotlib.pyplot as plt
 from io import BytesIO
 import base64
+import mpld3
 from datetime import datetime
 from django.shortcuts import render,redirect, get_object_or_404
 from django.http import HttpResponse
@@ -12,6 +13,7 @@ from gestion.forms import *
 
 from django.utils.dateparse import parse_datetime
 import os
+from django.template.loader import render_to_string
 
 def panel(request):
     return render(request,'inicio/panelControl.html')
@@ -221,7 +223,10 @@ def actualizar_relaciones(request):
             'ultimo_registro': ultimo_registro
         })
 
-    return render(request, 'artefactos/listar_cuenta_has_artefacto.html', {'relaciones_actualizadas': relaciones_actualizadas})
+    # Renderizar solo el contenido de la tabla
+    tabla_html = render_to_string('artefactos/tabla_relaciones.html', {'relaciones_actualizadas': relaciones_actualizadas})
+    
+    return JsonResponse({'tabla_html': tabla_html})
 
 
 def nueva_cuenta_has_artefacto(request, id=0):
@@ -314,22 +319,33 @@ def TemperatureGraphView(request, cuenta, puerto):
     df = pd.DataFrame(data, columns=['timestamp', 'temperature'])
     print(df)
 
+    # Filtrar por fecha si se proporcionan parámetros
+    start_date_str = request.GET.get('start_date')
+    end_date_str = request.GET.get('end_date')
+    
+    if start_date_str and end_date_str:
+        try:
+            start_date = datetime.strptime(start_date_str, "%Y-%m-%d")
+            end_date = datetime.strptime(end_date_str, "%Y-%m-%d")
+            df = df[(df['timestamp'] >= start_date) & (df['timestamp'] <= end_date)]
+        except Exception as e:
+            print(f"Error en el filtro de fechas: {e}")
+            return HttpResponse(f"Error en el filtro de fechas: {e}", content_type="text/plain")
+
     # Crear un gráfico con matplotlib
     fig, ax = plt.subplots(figsize=(10, 6))
-    ax.plot(df['timestamp'], df['temperature'], label=f'Cuenta: {artefacto1.cuenta.nombre_cuenta}, Puerto {puerto}, {artefacto1.artefacto.descripcion}')
+    temperatures_in_range = (df['temperature'] >= artefacto1.tempMin) & (df['temperature'] <= artefacto1.tempMax)
+    ax.plot(df['timestamp'][temperatures_in_range], df['temperature'][temperatures_in_range], label='En rango', color='green')
+    ax.plot(df['timestamp'][~temperatures_in_range], df['temperature'][~temperatures_in_range], label='Fuera de rango', color='red')
+    
     ax.set_xlabel('Timestamp')
     ax.set_ylabel('Temperature')
     ax.legend(loc='best')
     plt.xticks(rotation=45)
+    plt.tight_layout()
 
-    # Guardar el gráfico en un objeto BytesIO
-    buf = BytesIO()
-    plt.savefig(buf, format='png')
-    buf.seek(0)
-
-    # Codificar la imagen en base64 para poder insertarla en la plantilla
-    image_base64 = base64.b64encode(buf.getvalue()).decode('utf-8')
-    buf.close()
+    # Agregar interactividad con mpld3
+    interactive_fig = mpld3.fig_to_html(fig)
 
     # Renderizar la plantilla con el gráfico
-    return render(request, 'monitoreo/graficos.html', {'graph': image_base64})
+    return render(request, 'monitoreo/graficos.html', {'graph': interactive_fig, 'cuenta': cuenta, 'puerto': puerto, 'artefacto': artefacto1})
