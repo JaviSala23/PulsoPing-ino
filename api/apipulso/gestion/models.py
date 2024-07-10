@@ -139,10 +139,7 @@ class artefacto(models.Model):
         blank=False,
         max_length=200
     )
-    url=models.TextField(
-        null=False, 
-        blank=False, max_length=400)
-
+    
 class Cuenta_has_Artefacto(models.Model):
     id = models.AutoField(primary_key=True)
     cuenta=models.ForeignKey(
@@ -171,6 +168,10 @@ class Cuenta_has_Artefacto(models.Model):
         null=False)
     temp_max=models.FloatField(blank=False,
         null=False)
+    url=models.TextField(
+        null=False, 
+        blank=False, max_length=400)
+
     
 
 
