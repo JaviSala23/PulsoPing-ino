@@ -1,24 +1,23 @@
 {% extends 'layout.html' %}
 {% load static %}
 
-{% block titulo %}
+{% block title %}
 <h1>Gráfico de Temperatura - Cuenta: {{ cuenta }}, Puerto: {{ puerto }}</h1>
 {% endblock %}
 
-{% block contenido %}
+{% block content %}
 <div class="container">
     <form method="get" class="form-inline">
         <label for="start_date" class="mr-2">Fecha de inicio:</label>
-        <input type="date" id="start_date" name="start_date" class="form-control mr-2" value="{{ request.GET.start_date }}">
+        <input type="date" id="start_date" name="start_date" class="form-control mr-2">
         <label for="end_date" class="mr-2">Fecha de fin:</label>
-        <input type="date" id="end_date" name="end_date" class="form-control mr-2" value="{{ request.GET.end_date }}">
+        <input type="date" id="end_date" name="end_date" class="form-control mr-2">
         <button type="submit" class="btn btn-primary">Filtrar</button>
     </form>
     <hr>
     <div id="graph-container">
-        {{ graph|safe }}
+        <img src="data:image/png;base64,{{ graph }}" alt="Gráfico de Temperatura">
     </div>
-    <hr>
     <div id="tabla_datos">
         <h2>Datos Tabulados de Temperaturas</h2>
         <table class="table table-striped">
@@ -26,15 +25,13 @@
                 <tr>
                     <th>Fecha y Hora</th>
                     <th>Temperatura</th>
-                    <th>Color</th>
                 </tr>
             </thead>
             <tbody>
-                {% for dato in tabla_datos %}
+                {% for data in tabla_datos %}
                 <tr>
-                    <td>{{ dato.fecha_hora }}</td>
-                    <td>{{ dato.temperatura }}</td>
-                    <td style="color: {{ dato.color }}">{{ dato.dentro_rango }}</td>
+                    <td>{{ data.fecha_hora }}</td>
+                    <td>{{ data.temperatura }}</td>
                 </tr>
                 {% endfor %}
             </tbody>

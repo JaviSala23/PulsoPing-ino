@@ -278,6 +278,7 @@ Monitor temperatura grafico
 '''
 
 
+
 # Diccionarios para traducir nombres de días y meses
 DIAS_ESPANOL = {
     0: 'Lunes', 1: 'Martes', 2: 'Miércoles', 3: 'Jueves',
