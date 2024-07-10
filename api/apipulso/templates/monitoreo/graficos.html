@@ -25,7 +25,11 @@
             </thead>
             <tbody>
                 {% for data in tabla_datos %}
-                <tr>
+                {% if data.color == 'red' %}
+                <tr style="color: red;">
+                {% else %}
+                <tr style="color: blue;">
+                {% endif %}
                     <td>{{ data.fecha_hora }}</td>
                     <td>{{ data.temperatura }}</td>
                 </tr>
