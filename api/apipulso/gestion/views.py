@@ -273,6 +273,7 @@ def eliminar_cuenta_has_artefacto(request, id):
 
 
 
+
 # Diccionarios para traducir nombres de días y meses
 DIAS_ESPANOL = {
     0: 'Lunes', 1: 'Martes', 2: 'Miércoles', 3: 'Jueves',
@@ -355,7 +356,7 @@ def TemperatureGraphView(request, cuenta, puerto):
     table_data = []
     for date, temp in zip(df['timestamp'], df['temperature']):
         date_str = translate_timestamp(date)  # Traducir la fecha y hora a español
-        table_data.append({'fecha_hora': date_str, 'temperatura': temp, 'color': 'blue'})
+        table_data.append({'fecha_hora': date_str, 'temperatura': temp})
 
     # Renderizar la plantilla con el gráfico interactivo y la tabla de datos
     return render(request, 'monitoreo/graficos.html', {'graph': interactive_graph, 'tabla_datos': table_data})
