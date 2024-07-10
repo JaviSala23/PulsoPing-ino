@@ -131,6 +131,9 @@ class cuenta (models.Model):
         null=True, 
         blank=False,
         on_delete=models.PROTECT)
+    
+    def __str__(self):
+        return self.nombre_cuenta
 
 class artefacto(models.Model):
     id = models.AutoField(primary_key=True)
@@ -139,6 +142,8 @@ class artefacto(models.Model):
         blank=False,
         max_length=200
     )
+    def __str__(self):
+        return self.descripcion
     
 class Cuenta_has_Artefacto(models.Model):
     id = models.AutoField(primary_key=True)

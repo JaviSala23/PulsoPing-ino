@@ -42,6 +42,8 @@ class Placa(models.Model):
         blank=False,
         on_delete=models.PROTECT
     )
+    def __str__(self):
+        return self.nombre
 
 
 class SensorReading(models.Model):
