@@ -3,7 +3,7 @@ import matplotlib.pyplot as plt
 from io import BytesIO
 import base64
 from datetime import datetime
-from django.shortcuts import render
+from django.shortcuts import render,redirect, get_object_or_404
 from django.http import HttpResponse
 from gestion.models import *
 from django.contrib import messages
@@ -58,19 +58,19 @@ def nuevaCuenta(request,tipo,id):
     if id!=0:
         funcion="Modificar"
         cuenta1=cuenta.objects.get(pk=id)
-        formulario.fields['id'].initial=cuenta1.id
+        formulario.fields['id'].initial=cuenta1.id_cuenta
         formulario.fields['tipoCuenta'].initial=tipocuenta.id_tipo_cuenta
-        formulario.fields['nombre'].initial=cuenta1.nombre
-        formulario.fields['TipoDocumento'].choices=[(cuenta1.tipo_documento.idtipo_documento,cuenta1.tipo_documento.descripcion)]
+        formulario.fields['nombre'].initial=cuenta1.nombre_cuenta
+        formulario.fields['TipoDocumento'].choices=[(cuenta1.tipo_documento_idtipo_documento.idtipo_documento,cuenta1.tipo_documento.descripcion)]
         formulario.fields['numeroDocumento'].initial=cuenta1.numero_documento
-        formulario.fields['TipoIva'].choices=[(cuenta1.situacionIva.idsituacionIva,cuenta1.situacionIva.descripcion)]
-        formulario.fields['telefono'].initial=cuenta1.telefono
-        formulario.fields['celular'].initial=cuenta1.celular
-        formulario.fields['email'].initial=cuenta1.email
-        formulario.fields['direccion'].initial=cuenta1.direccion
-        formulario.fields['paises'].choices=[(cuenta1.pais.id_pais,cuenta1.pais.nombre)]
-        formulario.fields['provincia'].choices=[(cuenta1.provincia.id_provincia,cuenta1.provincia.nombre_provincia)]
-        formulario.fields['localidad'].choices=[(cuenta1.localidad.id_localidad,cuenta1.localidad.nombre_localidad)]
+        formulario.fields['TipoIva'].choices=[(cuenta1.situacionIva_idsituacionIva.idsituacionIva,cuenta1.situacionIva.descripcion)]
+        formulario.fields['telefono'].initial=cuenta1.telefono_cuenta
+        formulario.fields['celular'].initial=cuenta1.celular_cuenta
+        formulario.fields['email'].initial=cuenta1.email_cuenta
+        formulario.fields['direccion'].initial=cuenta1.direccion_cuenta
+        formulario.fields['paises'].choices=[(cuenta1.pais_id.id_pais,cuenta1.pais.nombre)]
+        formulario.fields['provincia'].choices=[(cuenta1.provincia_idprovincia.id_provincia,cuenta1.provincia.nombre_provincia)]
+        formulario.fields['localidad'].choices=[(cuenta1.localidad_idlocalidad.id_localidad,cuenta1.localidad.nombre_localidad)]
       
     else:    
         funcion="Agregar"
@@ -95,18 +95,18 @@ def guardarCuenta(request):
             else:
                 cuenta1=cuenta()
             
-            cuenta1.nombre = request.POST['nombre']
+            cuenta1.nombre_cuenta = request.POST['nombre']
             cuenta1.numero_documento =request.POST['numeroDocumento']
-            cuenta1.direccion= request.POST['direccion']
-            cuenta1.telefono = request.POST['telefono']
-            cuenta1.email =  request.POST['email']
-            cuenta1.celular =  request.POST['celular']
-            cuenta1.tipo_documento = tipo_documento.objects.get(pk= request.POST['TipoDocumento'])
-            cuenta1.pais = pais.objects.get(pk= request.POST['paises'])
-            cuenta1.provincia= provincia.objects.get(pk= request.POST['provincia'])
-            cuenta1.localidad = localidad.objects.get(pk=request.POST['localidad'])
+            cuenta1.direccion_cuenta= request.POST['direccion']
+            cuenta1.telefono_cuenta = request.POST['telefono']
+            cuenta1.email_cuenta =  request.POST['email']
+            cuenta1.celular_cuenta =  request.POST['celular']
+            cuenta1.tipo_documento_idtipo_documento = tipo_documento.objects.get(pk= request.POST['TipoDocumento'])
+            cuenta1.pais_id = pais.objects.get(pk= request.POST['paises'])
+            cuenta1.provincia_idprovincia= provincia.objects.get(pk= request.POST['provincia'])
+            cuenta1.localidad_idlocalidad = localidad.objects.get(pk=request.POST['localidad'])
             cuenta1.tipo_cuenta=tipocuenta
-            cuenta1.situacionIva = situacionIva.objects.get(pk=request.POST['TipoIva'])
+            cuenta1.situacionIva_idsituacionIva = situacionIva.objects.get(pk=request.POST['TipoIva'])
 
             cuenta1.save()
             messages.success(request, f'Se ha guardado el : {tipocuenta.descripcion}')
@@ -124,6 +124,60 @@ def eliminarCuenta(request,tipo,id):
     cuenta1.delete()
     messages.success(request, f'Se ha eliminado la cuenta : {cuenta1.nombre}')
     return redirect('cuentas', tipo=tipocuenta.id_tipo_cuenta)
+
+'''
+Crear artefactos
+'''
+
+def listar_artefactos(request):
+    artefactos = artefacto.objects.all()
+    return render(request, 'artefactos/listar_artefactos.html', {'artefactos': artefactos})
+
+def nuevo_artefacto(request, id=0):
+    if id != 0:
+        artefacto1 = get_object_or_404(artefacto, pk=id)
+        form = ArtefactoForm(instance=artefacto1)
+        funcion = "Modificar"
+    else:
+        artefacto1 = None
+        form = ArtefactoForm()
+        funcion = "Agregar"
+    if request.method == 'POST':
+        form = ArtefactoForm(request.POST, instance=artefacto1)
+        if form.is_valid():
+            form.save()
+            messages.success(request, f'Se ha {funcion.lower()}do el artefacto correctamente')
+            return redirect('listar_artefactos')
+        else:
+            messages.error(request, 'No se pudo guardar el artefacto')
+    return render(request, 'artefactos/nuevo_artefacto.html', {'form': form, 'funcion': funcion})
+
+def eliminar_artefacto(request, id):
+    artefacto1 = get_object_or_404(artefacto, pk=id)
+    artefacto1.delete()
+    messages.success(request, f'Se ha eliminado el artefacto: {artefacto1.descripcion}')
+    return redirect('listar_artefactos')
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 
 
 

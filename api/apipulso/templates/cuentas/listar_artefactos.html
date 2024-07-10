@@ -1,0 +1,67 @@
+{% extends 'layout.html' %} {% block titulo %}
+
+
+<div class="d-sm-flex align-items-center justify-content-between mb-4">
+    <h2 class="title-1">Dispositivos</h2>
+    
+    <a href="{% url 'nuevo_artefacto' 0 %}}" class="btn btn-success btn-icon-split">
+        <span class="icon text-white-50">
+            <i class='fas fa-plus'></i>
+        </span>
+        <span class="text">Nuevo</span>
+    </a>
+
+ 
+    <span class="text"></span>
+    <span class="text"></span>
+    <span class="text"></span>
+    <span class="text"></span>
+    <span class="text"></span>
+    <span class="text"></span>
+    <span class="text"></span>
+    <span class="text"></span>
+</div>
+<small>Aquí podrás dar de alta, modificiar y eliminar, {{tipoCuenta.descripcion}}.</small>
+
+
+
+{% endblock %}
+
+
+
+{% endblock %} {% block contenido %}
+
+
+<div class="row">
+    <div class="col-sm-12">
+        <table class="table table-bordered dataTable" id="dataTable" width="100%" cellspacing="0" role="grid" aria-describedby="dataTable_info" style="width: 100%;">
+            <thead>
+                <tr style="background-color: rgb(211, 227, 250);color:rgb(95, 93, 93)">
+                    <th rowspan="1" colspan="1">NOMBRE</th>
+                    <th rowspan="1" colspan="1">DUCUMENTO</th>
+                    <th rowspan="1" colspan="1">CELULAR</th>
+                    <th rowspan="1" colspan="1">TELEFONO</th>
+                    <th rowspan="1" colspan="1">EMAIL</th>
+                    <th rowspan="1" colspan="1"></th>
+                </tr>
+            </thead>
+
+            <tbody>
+
+                {{ artefacto.descripcion }}
+                <tr class="odd" style="color:rgb(112, 112, 112)">
+                    <td>{{ artefacto.descripcion }}</td>
+                    <td>
+                        <div class="table-data-feature"><a href="{% url 'nuevo_artefacto' artefacto.id %}"><i class='fas fa-edit'></i></a><a href="{{% url 'eliminar_artefacto' artefacto.id %}"><i class='far fa-trash-alt'></i></a></div>
+                    </td>
+                    </form>
+                </tr>
+                {% endfor %}</tbody>
+        </table>
+    </div>
+</div>
+</div>
+</div>
+</div>
+</div>
+        {% endblock %}

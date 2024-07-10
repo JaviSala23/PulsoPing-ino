@@ -16,6 +16,13 @@ urlpatterns = [
     path('cuenta/guardar',gestion.guardarCuenta,name='guardarCuenta'),
     path('cuenta/eliminar/<int:tipo>/<int:id>',gestion.eliminarCuenta,name='eliminarCuenta'),
 
+
+    #artefacto
+    path('artefactos/', gestion.listar_artefactos, name='listar_artefactos'),
+    path('artefactos/nuevo/<int:id>/', gestion.nuevo_artefacto, name='nuevo_artefacto'),
+    path('artefactos/eliminar/<int:id>/', gestion.eliminar_artefacto, name='eliminar_artefacto'),
+]
+
     #auxiliares
     path('auxiliar/traerPais',gestion.traePais,name='traePais'),
     path('auxiliar/traeProvincias',gestion.traeProvincias,name='traeProvincias'),

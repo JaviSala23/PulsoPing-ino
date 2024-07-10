@@ -78,3 +78,9 @@ class FormCuenta(forms.Form):
     localidad=forms.ChoiceField(label='Seleccione Localidad',choices="" ,)
     tipoCuenta=forms.IntegerField(label='', initial=1,
         widget=forms.HiddenInput())
+
+
+class ArtefactoForm(forms.ModelForm):
+    class Meta:
+        model = artefacto
+        fields = ['descripcion']
