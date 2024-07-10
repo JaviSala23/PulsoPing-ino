@@ -11,21 +11,20 @@ from django.http import HttpResponse
 
 def TemperatureGraphView(request):
     # Obtener la lista de archivos de texto guardados
-    file_paths = glob.glob('/home/sensor/PulsoPing-ino/api/apipulso/readings/placa_*/puerto_*.txt')
-    print(file_paths)  # Verifica qué archivos se están encontrando
+    file_paths = glob.glob('/home/sensor/PulsoPing-ino/api/apipulsoreadings/placa_*/puerto_*.txt')
+   
 
     # Inicializar una lista para almacenar los datos
     data = []
 
     for file_path in file_paths:
-        
         # Obtener placa y puerto desde el nombre del archivo
         parts = os.path.basename(file_path).split('_')
         if len(parts) < 4:
             continue  # Saltar archivos que no cumplen con la estructura esperada
-        print(parts)
+        print(file_path)
         # Leer datos del archivo
-        with open(parts, 'r') as f:
+        with open(file_path, 'r') as f:
             lines = f.readlines()
             print(lines)
 
