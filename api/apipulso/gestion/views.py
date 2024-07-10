@@ -29,9 +29,13 @@ def TemperatureGraphView(request):
             lines = f.readlines()
 
         for line in lines:
+            print(line)
             parts = line.strip().split(',')
+
             if len(parts) < 4:
                 continue  # Saltar líneas que no cumplen con la estructura esperada
+
+            
             timestamp = datetime.strptime(parts[0], "%Y-%m-%d %H:%M:%S")
             temperature = float(parts[1])
             placa_id = parts[2]
