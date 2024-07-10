@@ -1,80 +1,64 @@
 import os
-from django.shortcuts import render
-from django.views import View
-import matplotlib.pyplot as plt
-from matplotlib.dates import DateFormatter
-from datetime import datetime
 import glob
-import base64
+import pandas as pd
+from datetime import datetime
+import matplotlib.pyplot as plt
 from io import BytesIO
-import matplotlib
-matplotlib.use('Agg')
+import base64
+from django.shortcuts import render
+from django.http import HttpResponse
 
-class TemperatureGraphView(View):
+class YourView(View):
     def get(self, request):
         # Obtener la lista de archivos de texto guardados
         file_paths = glob.glob('readings/placa_*/puerto_*.txt')
         print(file_paths)  # Verifica qué archivos se están encontrando
 
-        # Inicializar estructuras de datos para los gráficos
-        data = {}
+        # Inicializar una lista para almacenar los datos
+        data = []
+
         for file_path in file_paths:
             print(file_path)
             # Obtener placa y puerto desde el nombre del archivo
             parts = os.path.basename(file_path).split('_')
             if len(parts) < 4:
                 continue  # Saltar archivos que no cumplen con la estructura esperada
-            placa_id = parts[1]
-            puerto_parts = parts[3].split('.')
-            if len(puerto_parts) < 1:
-                continue  # Saltar archivos que no cumplen con la estructura esperada
-            puerto = puerto_parts[0]
 
             # Leer datos del archivo
             with open(file_path, 'r') as f:
                 lines = f.readlines()
 
-            # Procesar cada línea de datos
-            timestamps = []
-            temperatures = []
             for line in lines:
                 parts = line.strip().split(',')
-                if len(parts) < 3:
+                if len(parts) < 4:
                     continue  # Saltar líneas que no cumplen con la estructura esperada
                 timestamp = datetime.strptime(parts[0], "%Y-%m-%d %H:%M:%S")
                 temperature = float(parts[1])
-                timestamps.append(timestamp)
-                temperatures.append(temperature)
-                placa_id=parts[2]
-                puerto=parts[3]
+                placa_id = parts[2]
+                puerto = parts[3]
+                data.append((timestamp, temperature, placa_id, puerto))
 
-            # Guardar datos en la estructura
-            key = f"{placa_id}_{puerto}"
-            data[key] = {'timestamps': timestamps, 'temperatures': temperatures}
-        
-        # Crear gráficos
-        plots = []
-        for key, values in data.items():
-            placa_id, puerto = key.split('_')
-            plt.figure()
-            plt.plot(values['timestamps'], values['temperatures'], marker='o', linestyle='-', color='b')
-            plt.title(f'Temperaturas - Placa {placa_id}, Puerto {puerto}')
-            plt.xlabel('Tiempo')
-            plt.ylabel('Temperatura (°C)')
-            plt.xticks(rotation=45)
-            plt.gca().xaxis.set_major_formatter(DateFormatter('%Y-%m-%d %H:%M:%S'))
-            plt.tight_layout()
+        # Convertir los datos en un DataFrame de pandas
+        df = pd.DataFrame(data, columns=['timestamp', 'temperature', 'placa_id', 'puerto'])
 
-            # Convertir el gráfico a imagen en formato base64 y pasarla al template
-            buffer = BytesIO()
-            plt.savefig(buffer, format='png')
-            buffer.seek(0)
-            image_base64 = base64.b64encode(buffer.getvalue()).decode()
-            buffer.close()
+        # Crear un gráfico con matplotlib
+        fig, ax = plt.subplots(figsize=(10, 6))
+        for key, grp in df.groupby(['placa_id', 'puerto']):
+            ax.plot(grp['timestamp'], grp['temperature'], label=f'Placa {key[0]} Puerto {key[1]}')
 
-            plots.append({'placa_id': placa_id, 'puerto': puerto, 'image_base64': image_base64})
-            
-            plt.close()  # Cerrar la figura para liberar memoria
-        
-        # Renderizar el template con los gráficos generados
-        return render(request, 'graficos.html', {'plots': plots})
+        ax.set_xlabel('Timestamp')
+        ax.set_ylabel('Temperature')
+        ax.legend(loc='best')
+        plt.xticks(rotation=45)
+
+        # Guardar el gráfico en un objeto BytesIO
+        buf = BytesIO()
+        plt.savefig(buf, format='png')
+        buf.seek(0)
+
+        # Codificar la imagen en base64 para poder insertarla en la plantilla
+        image_base64 = base64.b64encode(buf.getvalue()).decode('utf-8')
+        buf.close()
+
+        # Renderizar la plantilla con el gráfico
+        return render(request, 'graficos.html', {'graph': image_base64})

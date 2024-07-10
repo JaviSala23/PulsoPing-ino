@@ -1,16 +1,12 @@
 <!DOCTYPE html>
-<html>
+<html lang="en">
 <head>
-    <title>Gráficos de Temperatura</title>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Temperature Data</title>
 </head>
 <body>
-    <h1>Gráficos de Temperatura por Placa y Puerto</h1>
-    {% for plot in plots %}
-<div>
-    <h3>Temperaturas - Placa {{ plot.placa_id }}, Puerto {{ plot.puerto }}</h3>
-    <img src="data:image/png;base64,{{ plot.image_base64 }}" alt="Gráfico de Temperaturas">
-</div>
-{% endfor %}
+    <h1>Temperature Data</h1>
+    <img src="data:image/png;base64,{{ graph }}" alt="Temperature Graph">
 </body>
 </html>
-
