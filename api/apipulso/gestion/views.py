@@ -366,4 +366,4 @@ def TemperatureGraphView(request, cuenta, puerto):
         table_data.append({'fecha_hora': date_str, 'temperatura': temp})
 
     # Renderizar la plantilla con el gráfico interactivo y la tabla de datos
-    return render(request, 'monitoreo/graficos_interactivo.html', {'graph': interactive_graph, 'tabla_datos': table_data})
+    return render(request, 'monitoreo/graficos.html', {'graph': interactive_graph, 'tabla_datos': table_data})
