@@ -11,7 +11,7 @@ from django.http import HttpResponse
 
 def TemperatureGraphView(request):
     # Obtener la lista de archivos de texto guardados
-    file_paths = glob.glob('/home/sensor/PulsoPing-ino/api/apipulsoreadings/placa_*/puerto_*.txt')
+    file_paths = glob.glob('/home/sensor/PulsoPing-ino/api/apipulso/readings/placa_*/puerto_*.txt')
     print(f"Archivos encontrados: {file_paths}")  # Verifica qué archivos se están encontrando
 
     # Inicializar una lista para almacenar los datos
