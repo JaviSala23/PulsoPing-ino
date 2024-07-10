@@ -44,8 +44,9 @@
                     <td>{{ item.relacion.puerto }}</td>
                     <td>{{ item.relacion.temp_min }}</td>
                     <td>{{ item.relacion.temp_max }}</td>
-                    <td>{{ item.ultimo_registro.temperatura if item.ultimo_registro else "N/A" }}</td>
-                    <td>{{ item.ultimo_registro.fecha_hora if item.ultimo_registro else "N/A" }}</td>
+
+                    <td>{% if item.ultimo_registro  %} {{ item.ultimo_registro.temperatura }} {% else %} N/A {% endif %}</td>
+                    <td>{% if item.ultimo_registro  %} {{ item.ultimo_registro.fecha_hora }} {% else %} N/A {% endif %}</td>
                     <td>
                         <div class="table-data-feature">
                             <a href="{% url 'nueva_cuenta_has_artefacto' item.relacion.id %}"><i class='fas fa-edit'></i></a>
