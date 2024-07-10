@@ -8,7 +8,6 @@ urlpatterns = [
     path('sensor_readings/<int:pk>/', SensorReadingDetail.as_view(), name='sensor_reading_detail'),
     path('temperature-graph/<int:cuenta>/<int:puerto>/', gestion.TemperatureGraphView, name='temperature_graph'),
 
-    path('admin/', admin.site.urls),
 
     #cuentas
     path('cuentas/<int:tipo>',gestion.listarCuentas,name='cuentas'),
