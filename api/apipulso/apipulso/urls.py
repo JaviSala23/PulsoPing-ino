@@ -1,8 +1,22 @@
-from django.urls import path
+from django.urls import path,include
+from django.contrib.auth.views import *
 from pulso.views import SensorReadingListCreate, SensorReadingDetail
 from gestion import views as gestion
 from django.contrib import admin
+from django.conf import settings
+from django.conf.urls.static import static
+from django.contrib import admin
 urlpatterns = [
+
+
+    path('panel/',gestion.panel,name='panel'),
+    path('adSite/',admin.site.urls),
+  
+
+    #url Autenticacion de usuarios
+    path('login/', LoginView.as_view(), name= 'login'),
+    path('logout/', LogoutView.as_view(), name= 'logout'),
+    path('accounts/', include('django.contrib.auth.urls')),
     path('admin/', admin.site.urls), 
     path('sensor_readings/', SensorReadingListCreate.as_view(), name='sensor_reading_list_create'),
     path('sensor_readings/<int:pk>/', SensorReadingDetail.as_view(), name='sensor_reading_detail'),
