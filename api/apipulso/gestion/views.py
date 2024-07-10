@@ -8,8 +8,8 @@ import base64
 from django.shortcuts import render
 from django.http import HttpResponse
 
-class YourView(View):
-    def get(self, request):
+
+def TemperatureGraphView(self, request):
         # Obtener la lista de archivos de texto guardados
         file_paths = glob.glob('readings/placa_*/puerto_*.txt')
         print(file_paths)  # Verifica qué archivos se están encontrando
