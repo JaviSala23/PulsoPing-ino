@@ -1,8 +1,7 @@
 import os
 import requests
 from rest_framework import generics
-from .models import SensorReading, MessageLog
-from gestion.models import Cuenta_has_Artefacto,artefacto
+from .models import SensorReading, MessageLog, Placa, Cuenta_has_Artefacto, artefacto
 from .serializers import SensorReadingSerializer
 from datetime import datetime, timedelta
 import pytz
@@ -16,7 +15,7 @@ class SensorReadingListCreate(generics.ListCreateAPIView):
         self.save_to_file(serializer.validated_data)
 
         # Obtener el último registro de la base de datos para el mismo puerto
-        last_reading = SensorReading.objects.filter(puerto=serializer.validated_data['puerto']).order_by('timestamp').last()
+        last_reading = SensorReading.objects.filter(placa=serializer.validated_data['placa'], puerto=serializer.validated_data['puerto']).order_by('timestamp').last()
 
         # Verificar si la variación de temperatura es al menos 0.5 grados para el mismo puerto
         if last_reading is None or abs(serializer.validated_data['temperature'] - last_reading.temperature) >= 0.5:
@@ -35,8 +34,8 @@ class SensorReadingListCreate(generics.ListCreateAPIView):
         
         # Nombre del archivo basado en el puerto
         file_path = os.path.join(directory, f"puerto_{puerto}.txt")
-        artefacto1=artefacto.objects.get(placa=placa_id,puerto=puerto)
-        artefacto1.url=file_path
+        artefacto1 = artefacto.objects.get(placa=placa_id, puerto=puerto)
+        artefacto1.url = file_path
         artefacto1.save()
         
         # Asegurar que el timestamp esté presente en los datos
@@ -63,11 +62,11 @@ class SensorReadingListCreate(generics.ListCreateAPIView):
         # Verificar el último mensaje enviado para esta placa y puerto
         last_message = MessageLog.objects.filter(placa=reading.placa, puerto=reading.puerto, message_type="ALERT").last()
 
-        if last_message is None or self.is_time_difference_greater_than(last_message.timestamp, timedelta(minutes=30)) or abs(last_message.temperature-reading.temperature)>=1:
+        if last_message is None or self.is_time_difference_greater_than(last_message.timestamp, timedelta(minutes=30)) or abs(last_message.temperature - reading.temperature) >= 1:
             # Enviar un mensaje de alerta por Telegram
             cuenta_art = Cuenta_has_Artefacto.objects.get(placa_id=reading.placa, puerto=reading.puerto)
             self.send_telegram_message(f"Alerta: La temperatura {reading.temperature}°C excede los límites ({temp_min}°C - {temp_max}°C) para {cuenta_art.artefacto.descripcion}, Cliente: {cuenta_art.cuenta.nombre_cuenta}, Puerto: {reading.puerto}")
-            MessageLog.objects.create(placa=reading.placa, puerto=reading.puerto, temperature= reading.temperature, message_type="ALERT")
+            MessageLog.objects.create(placa=reading.placa, puerto=reading.puerto, temperature=reading.temperature, message_type="ALERT")
 
     def is_time_difference_greater_than(self, last_timestamp, time_difference):
         # Asegurarse de que last_timestamp sea consciente de la zona horaria
@@ -87,7 +86,7 @@ class SensorReadingListCreate(generics.ListCreateAPIView):
         if last_alert and (last_stable is None or last_alert.timestamp > last_stable.timestamp):
             # Enviar un mensaje indicando que la temperatura ha vuelto a los límites normales
             self.send_telegram_message(f"Estable: La temperatura ha vuelto a los límites normales para: {cuenta_art.artefacto.descripcion}, cliente {cuenta_art.cuenta.nombre_cuenta}, Puerto: {reading.puerto}")
-            MessageLog.objects.create(placa=reading.placa, puerto=reading.puerto,temperature=reading.temperature, message_type="STABLE")
+            MessageLog.objects.create(placa=reading.placa, puerto=reading.puerto, temperature=reading.temperature, message_type="STABLE")
 
     def send_telegram_message(self, message):
         # Aquí debes implementar la lógica para enviar el mensaje por Telegram
@@ -100,7 +99,3 @@ class SensorReadingListCreate(generics.ListCreateAPIView):
         }
         response = requests.get(url, params=params)
         return response.json()
-
-class SensorReadingDetail(generics.RetrieveUpdateDestroyAPIView):
-    queryset = SensorReading.objects.all()
-    serializer_class = SensorReadingSerializer
