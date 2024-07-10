@@ -24,93 +24,10 @@
     <link href="{% static 'css/style.css'%}" rel="stylesheet" media="all">
     <!-- Bootstrap core JavaScript-->
     <script src="{% static 'vendor/jquery/jquery.min.js'%}"></script>
+    <script src="https://kit.fontawesome.com/18321adfc1.js" crossorigin="anonymous"></script>
 
 </head>
 <script>
-    $
-    function myFunction() {
-        $(window).on('load', function() {
-            setTimeout(showPage, 700); //wait for page load PLUS two seconds.
-        });
-
-    }
-
-    function showPage() {
-        document.getElementById("loader").style.display = "none";
-        
-        $.ajax({
-                url: {% url 'registroDeuda' %},
-                type: 'GET',
-            })
-            .done(function(data) {
-                if (data[0]['estadoFactura'] == 1) {
-
-                    $("#deuda").html("Estimado usuario, al día de la fecha su suscripción registra deuda. Si ya realizo el pago correspondiente póngase en contacto con MantisTec.")
-                    $("#deuda").css({"background-color": "hsl(36, 100%, 47%)",})
-                }
-                if (data[0]['estadoFactura'] == 2) {
-
-                    $("#deuda").html("Estimado usuario, al día de la fecha su suscripción registra deuda. Si ya realizo el pago correspondiente póngase en contacto con MantisTec.")
-                $("#deuda").css({"background-color": "red", "color":"white"})
-                document.getElementById("mor").style.display = "block";
-                
-                        var end = new Date('2023/12/31 0:0 AM');
-
-                            var _second = 1000;
-                            var _minute = _second * 60;
-                            var _hour = _minute * 60;
-                            var _day = _hour * 24;
-                            var timer;
-
-                            
-                                var now = new Date();
-                                var distance = end - now;
-                                if (distance < 0) {
-
-                                    clearInterval(timer);
-                                    document.getElementById('countdown').innerHTML = '¡Usuario Bloqueado!';
-                                    $('#desblo').hide();                                    return;
-                                }
-                                var days = Math.floor(distance / _day);
-                                var hours = Math.floor((distance % _day) / _hour);
-                                var minutes = Math.floor((distance % _hour) / _minute);
-                                var seconds = Math.floor((distance % _minute) / _second);
-
-                                document.getElementById('countdown').innerHTML = days + 'Dias ';
-                                document.getElementById('countdown').innerHTML += hours + 'hrs ';
-                                document.getElementById('countdown').innerHTML += minutes + 'mins ';
-                                document.getElementById('countdown').innerHTML += seconds + 'secs';
-                           
-
-                            timer = setInterval(showRemaining, 1000);
-
-                }else{
-                    document.getElementById("myDiv").style.display = "block";
-                }
-            })
-            .fail(function(data) {
-                console.log("error");
-            })
-            .always(function() {
-                console.log("complete");
-            });
-    }
-    function cargarBien(){
-        document.getElementById("myDiv").style.display = "block";
-        document.getElementById("mor").style.display = "none";
-    }
-    estado=0
-    function esconder(){
-        $("#accordionSidebar").slideToggle()
-        if (estado==0){
-            $("#iconMenu").removeClass('fas fa-angle-double-left').addClass('fas fa-angle-double-right');
-                estado=1
-            }
-        else{
-            $("#iconMenu").removeClass('fas fa-angle-double-right').addClass('fas fa-angle-double-left');
-                estado=0
-        }
-    }
 </script>
 <style>
     /* Center the loader */
@@ -196,7 +113,7 @@ background: linear-gradient(0deg, rgba(0,128,0,1) 0%, rgba(59,158,59,1) 17%, rgb
 
 
 
-<body id="page-top" onload="myFunction()">
+<body id="page-top">
     
 
    
@@ -224,316 +141,64 @@ background: linear-gradient(0deg, rgba(0,128,0,1) 0%, rgba(59,158,59,1) 17%, rgb
                 <div class="sidebar-brand-text mx-3">Habitat <sup>2</sup></div>
             </a>
             
-            {% for item in Menu %}
+        
            
            
 
             <!-- Nav Item - Dashboard -->
-            {% if item.menu.estadoMenu_id.id == 1 and item.menu.id == 1 %}
+    
 
             <!-- Divider -->
             <hr class="sidebar-divider my-0">
             <div class="sidebar-heading">
-                Caja
+                Cuentas
             </div>
             
             <li class="nav-item ">
                 <a class="nav-link collapsed" href="#" data-toggle="collapse" data-target="#collapseOne" aria-expanded="true" aria-controls="collapseTwo">
-                    <i class="fas fa-calculator"></i>
-                    <span>Caja</span></a>
+                    <i class="fa-solid fa-address-book"></i>
+                    <span>Cuentas</span></a>
                 <div id="collapseOne" class="collapse" aria-labelledby="headingTwo" data-parent="#accordionSidebar">
                     <div class="bg-white py-2 collapse-inner rounded">
-                        {% for item2 in item.SubMenu %}
-                        
-                        {% if item2.estadoMenu_id.id == 1  and item2.id == 1 %}
-                        <a class="collapse-item" href="{% url 'cajaDkr' %}">Caja</a>
-                        
-                        {% endif %}
-                        {% if request.user|has_group:'Administrador' %}
-                        {% if item2.estadoMenu_id.id == 1  and item2.id == 2 %}
-                        <a class="collapse-item" href="{% url 'cajaDkrHistorico'  %}">Caja Historico (Cerradas)</a>
-                        {% endif %}
-                        {% if item2.estadoMenu_id.id == 1  and item2.id == 3 %}
-                        <a class="collapse-item" href="{% url 'comprobantesAnulados' %}">Comprobantes Anulados</a>
-                        <a class="collapse-item" href="{% url 'panelOpcionesEstadisticas' %}">Estadisticas de Caja</a>
-                        {% endif %}
-                        {% if item2.estadoMenu_id.id == 1  and item2.id == 4 %}
-                        <a class="collapse-item" href="{% url 'buscarVendedor' %}">Reporte de Vendedores</a>
-                        {% endif %}
-                        {% endif %}
-                        {% endfor %}
-                        
+                        <a class="collapse-item" href="{% url 'cuentas' tipo=1 %}"><i class="fa-solid fa-star"></i>Clientes</a>
+                        <a class="collapse-item" href="{% url 'cuentas' tipo=2 %}"><i class="fa-solid fa-users"></i>Proveedores</a> 
+                        <a class="collapse-item" href="{% url 'cuentas' tipo=3 %}"><i class="fa-solid fa-truck-fast"></i>Transportistas</a>
                         
                     </div>
                 </div>
             </li>
             </li>
-            
-            {% endif %}
-            {% if item.menu.estadoMenu_id.id == 1 and item.menu.id == 2 %}
-            <!-- Divider -->
-            <hr class="sidebar-divider">
 
-            <!-- Heading -->
+            <hr class="sidebar-divider my-0">
             <div class="sidebar-heading">
-                Gestión
+                Campo
             </div>
-
-            <!-- Nav Item - Pages Collapse Menu -->
-            <li class="nav-item">
+            
+            <li class="nav-item ">
                 <a class="nav-link collapsed" href="#" data-toggle="collapse" data-target="#collapseTwo" aria-expanded="true" aria-controls="collapseTwo">
-                    <i class='fas fa-rocket'></i>
-                    <span>Gestión</span>
-                </a>
+                    <i class="fa-solid fa-address-book"></i>
+                    <span>Campo</span></a>
                 <div id="collapseTwo" class="collapse" aria-labelledby="headingTwo" data-parent="#accordionSidebar">
                     <div class="bg-white py-2 collapse-inner rounded">
-                        <h6 class="collapse-header">Gestión</h6>
-                        {% for item2 in item.SubMenu %}
-                        {% if request.user|has_group:'Administrador' %}
-                        {% if item2.estadoMenu_id.id == 1  and item2.id == 5 %}
-                        <a class="collapse-item" href="{% url 'sucursales' %}"><i class='fas fa-store-alt-slash'></i> Sucursales</a>
-                        {% endif %}
-                        {% if item2.estadoMenu_id.id == 1  and item2.id == 6 %}
-                        <a class="collapse-item" href="{% url 'rubros' %}"><i class='fas fa-cookie'></i> Rubros</a>
-                        {% endif %}
-                        {% if item2.estadoMenu_id.id == 1  and item2.id == 7 %}
-                        <a class="collapse-item" href="{% url 'seccion' %}"><i class='fas fa-cookie-bite'></i> Secciones</a>
-                        {% endif %}
-                        {% if item2.estadoMenu_id.id == 1  and item2.id == 8 %}
-                        <a class="collapse-item" href="{% url 'proveedores' %}"><i class='far fa-address-card'></i></i> Proveedores</a>
-                        {% endif %}
-                        {% if item2.estadoMenu_id.id == 1  and item2.id == 9 %}
-                        <a class="collapse-item" href="{% url 'articulos' tipo=0 tFiltro=5 %}"><i class='fas fa-dolly'></i> Articulos / Stock</a>
-                        {% endif %}
-                        {% endif %}
-                        {% if item2.estadoMenu_id.id == 1  and item2.id == 9 %}
-                        <a class="collapse-item" href="{% url 'articulos' tipo=1 tFiltro=5 %}"><i class='fas fa-desktop'></i> Lista de Precios</a>
-                        {% endif %}
-                        {% if request.user|has_group:'Administrador' %}
-                        {% if item2.estadoMenu_id.id == 1  and item2.id == 10 %}
-                        <a class="collapse-item" href="{% url 'cliente' %}"><i class='fas fa-address-book'></i> Clientes</a>
-                        {% endif %}
-                        {% if item2.estadoMenu_id.id == 1  and item2.id == 18 %}
-                        <a class="collapse-item" href="{% url 'bancos' %}"><i class='fas fa-landmark'></i> Bancos</a>
-                        {% endif %}
-                        {% if item2.estadoMenu_id.id == 1  and item2.id == 11 %}
-                        <a class="collapse-item" href="{% url 'vendedor' %}"><i class='fas fa-user-astronaut'></i> Vendedor</a>
-                        {% endif %}
-                        {% endif %}
-                        {% endfor %}
-                    
-                        </div>
-                </div>
-            </li>
-            {% endif %}
-            {% if request.user|has_group:'Administrador' %}
-            <!-- Divider -->
-            
-            {% if item.menu.estadoMenu_id.id == 1 and item.menu.id == 3 %}
-            <!-- Divider -->
-            <hr class="sidebar-divider my-0">
-            <div class="sidebar-heading">
-                Cuentas Corrientes 
-            </div>
-
-            <!-- Nav Item - Dashboard -->
-            <li class="nav-item ">
-                <a class="nav-link collapsed" href="#" data-toggle="collapse" data-target="#ccCollapse" aria-expanded="true" aria-controls="collapseTwo">
-                    <i class="fas fa-coins"></i>
-                    <span>Cuentas Corrientes</span></a>
-                <div id="ccCollapse" class="collapse" aria-labelledby="headingTwo" data-parent="#accordionSidebar">
-                    <div class="bg-white py-2 collapse-inner rounded">
-                        {% for item2 in item.SubMenu %}
+                        <a class="collapse-item" href="{% url 'cosechas' %}"><i class="fa-solid fa-star"></i>Granos y Cosechas</a>
+                        <a class="collapse-item" href="#"><i class="fa-solid fa-truck-fast"></i> Ticket y Balanza </a>
+                        <a class="collapse-item" href="#"><i class="fa-solid fa-users"></i>Lotes</a> 
+                        <a class="collapse-item" href="#"><i class="fa-solid fa-truck-fast"></i> Almacenamiento </a>
                         
-                        {% if item2.estadoMenu_id.id == 1  and item2.id == 12 %}
-                        <a class="collapse-item" href="{% url 'buscarCuenta' tipo=1 %}"><i class='fas fa-coins'></i>C.C. Clientes</a>
-                        {% endif %}
-                        {% if item2.estadoMenu_id.id == 1  and item2.id == 12 %}
-                        <a class="collapse-item" href="{% url 'buscarCuenta' tipo=2 %}"><i class='fas fa-coins'></i>C.C. Proveedores</a>
-                        {% endif %}
-                        {% if item2.estadoMenu_id.id == 1  and item2.id == 13 %}
-                        <a class="collapse-item" href="{% url 'reporteCC' %}"><i class='fas fa-poll'></i>Reportes de CC</a>
-                        {% endif %}
-                        {% endfor %}
-
                     </div>
                 </div>
             </li>
+            </li>
+            
+       
+           
 
 
             
            
 
 
-            </li>
 
-            {% endif %}
-
-
-            <!-- Divider -->
-            
-            {% if item.menu.estadoMenu_id.id == 1 and item.menu.id == 6 %}
-            <!-- Divider -->
-            <hr class="sidebar-divider my-0">
-            <div class="sidebar-heading">
-                Cuentas Corrientes 
-            </div>
-
-            <!-- Nav Item - Dashboard -->
-            <li class="nav-item ">
-                <a class="nav-link collapsed" href="#" data-toggle="collapse" data-target="#ccbCollapse" aria-expanded="true" aria-controls="collapseTwo">
-                    <i class="fas fa-calculator"></i>
-                    <span>Cuentas Corrientes</span></a>
-                <div id="ccbCollapse" class="collapse" aria-labelledby="headingTwo" data-parent="#accordionSidebar">
-                    <div class="bg-white py-2 collapse-inner rounded">
-                        {% for item2 in item.SubMenu %}
-                        
-                        {% if item2.estadoMenu_id.id == 1  and item2.id == 16 %}
-                        <a class="collapse-item" href="{% url 'buscarCuentaB' tipo=1 %}"><i class='fas fa-calculator'></i>C.C. Clientes</a>
-                        {% endif %}
-                        {% if item2.estadoMenu_id.id == 1  and item2.id == 16 %}
-                        <a class="collapse-item" href="{% url 'buscarCuentaB' tipo=2 %}"><i class='fas fa-calculator'></i>C.C. Proveedores</a>
-                        {% endif %}
-                        {% if item2.estadoMenu_id.id == 1  and item2.id == 17 %}
-                        <a class="collapse-item" href="{% url 'reporteCCB' %}"><i class='fas fa-poll'></i>Reportes de CC</a>
-                        {% endif %}
-                        {% endfor %}
-
-                    </div>
-                </div>
-            </li>
-
-
-            
-           
-
-
-            </li>
-
-            
-            {% endif %}
-
-            {% if item.menu.estadoMenu_id.id == 1 and item.menu.id == 4 %}
-            <!-- Divider -->
-            <hr class="sidebar-divider my-0">
-            <div class="sidebar-heading">
-                Bancos
-            </div>
-
-            <!-- Nav Item - Dashboard -->
-            <li class="nav-item ">
-                <a class="nav-link collapsed" href="#" data-toggle="collapse" data-target="#bancosCollapse" aria-expanded="true" aria-controls="collapseTwo">
-                    <i class="fas fa-landmark"></i>
-                    <span>Bancos</span></a>
-                <div id="bancosCollapse" class="collapse" aria-labelledby="headingTwo" data-parent="#accordionSidebar">
-                    <div class="bg-white py-2 collapse-inner rounded">
-                        {% for item2 in item.SubMenu %}
-                        
-                        {% if item2.estadoMenu_id.id == 1  and item2.id == 14 %}
-                        <a class="collapse-item" href="{% url 'carteraValores' %}?estado=1"><i class='fas fa-briefcase'></i>Cartera de Valores</a>
-                        {% endif %}
-                        {% endfor %}
-                        </div>
-                </div>
-            </li>
-            
-           
-
-
-            
-            {% endif %}
-            {% if item.menu.estadoMenu_id.id == 1 and item.menu.id == 5 %}
-            <!-- Divider -->
-            <hr class="sidebar-divider">
-            <div class="sidebar-heading">
-                Libro IVA
-            </div>
-            <li class="nav-item ">
-                <a class="nav-link collapsed" href="#" data-toggle="collapse" data-target="#ivaCollapse" aria-expanded="true" aria-controls="collapseTwo">
-                    <i class="fas fa-book"></i>
-                    <span>Libro IVA</span></a>
-                <div id="ivaCollapse" class="collapse" aria-labelledby="headingTwo" data-parent="#accordionSidebar">
-                    <div class="bg-white py-2 collapse-inner rounded">
-
-            <!-- Nav Item - Pages Collapse Menu -->
-         
-                <a class="collapse-item" href="{% url 'iva' periodo=0 tipo=1 %}">
-                    <i class='fas fa-book'></i>
-                    <span>Libro Iva</span>
-                </a>
-                <a class="collapse-item" href="{% url 'periodoIVA' %}">
-                    <i class='fas fa-book'></i>
-                    <span>Periodos</span>
-                </a>
-                
-            </li>
-            
-            {% endif %}
-          
-
-            {% if item.menu.estadoMenu_id.id == 1 and item.menu.id == 7 %}
-            <!-- Divider -->
-            <hr class="sidebar-divider">
-            <div class="sidebar-heading">
-                Pedidos
-            </div>
-            <li class="nav-item ">
-                <a class="nav-link collapsed" href="#" data-toggle="collapse" data-target="#presupuestosCollapse" aria-expanded="true" aria-controls="collapseTwo">
-                    <i class="fa fa-clone"></i>
-                    <span>Pedidos</span></a>
-                <div id="presupuestosCollapse" class="collapse" aria-labelledby="headingTwo" data-parent="#accordionSidebar">
-                    <div class="bg-white py-2 collapse-inner rounded">
-
-            <!-- Nav Item - Pages Collapse Menu -->
-         
-                <a class="collapse-item" href="#" hidden>
-                    <i class="fa fa-clone"></i>
-                    <span>Presupuestos</span>
-                </a>
-                <a class="collapse-item" href="{% url 'listaPedidos' %}?nombre=&numero=&estado=1">
-                    <i class="fa fa-clone"></i>
-                    <span>Pedidos</span>
-                </a>
-                
-            </li>
-            {% endif %}
-
-            {% if item.menu.estadoMenu_id.id == 1 and item.menu.id == 8 %}
-            <!-- Divider -->
-            <hr class="sidebar-divider">
-            <div class="sidebar-heading">
-                Costos
-            </div>
-            <li class="nav-item ">
-                <a class="nav-link collapsed" href="#" data-toggle="collapse" data-target="#costosCollapse" aria-expanded="true" aria-controls="collapseTwo">
-                    <i class="fas fa-search-dollar"></i>
-                    <span>Costos</span></a>
-                <div id="costosCollapse" class="collapse" aria-labelledby="headingTwo" data-parent="#accordionSidebar">
-                    <div class="bg-white py-2 collapse-inner rounded">
-            
-            <!-- Nav Item - Pages Collapse Menu -->
-         
-                <a class="collapse-item" href="{% url 'listaMateriales' fproveedor=0 %}">
-                    <i class='fas fa-hammer'></i>
-                    <span>Materiales</span>
-                </a>
-                <a class="collapse-item" href="{% url 'listaCostos' %}">
-                    <i class='fas fa-inbox'></i>
-                    <span>Costos</span>
-                </a>
-                
-                
-            </li>
-            
-            {% endif %}
-
-
-
-
-            {% endif %}
-
-
-            {% endfor %}
 
             
 
@@ -581,9 +246,9 @@ background: linear-gradient(0deg, rgba(0,128,0,1) 0%, rgba(59,158,59,1) 17%, rgb
                                     <i class="fas fa-list fa-sm fa-fw mr-2 text-gray-400"></i> Usuarios
                                 </a>
                                 <div class="dropdown-divider"></div>
-                                <a class="dropdown-item" href="{% url 'logout' %}">
+                            <!--   <a class="dropdown-item" href="">
                                     <i class="fas fa-sign-out-alt fa-sm fa-fw mr-2 text-gray-400"></i> Cerrar Sesion
-                                </a>
+                                </a> -->
                             </div>
                         </li>
 
@@ -591,46 +256,21 @@ background: linear-gradient(0deg, rgba(0,128,0,1) 0%, rgba(59,158,59,1) 17%, rgb
 
                 </nav>
                 <!-- End of Topbar -->
-
+                <div style="margin-left:40px">
+                {% block titulo %}{% endblock %}
+                
+                <hr>
+                </div>
                 <!-- Begin Page Content -->
-                <div class="container-fluid" id="myDiv" style="margin:0;">
-                    <div id="deuda" style="
-                    
-                    color: rgb(0, 0, 0);
-                    font-size: 20px;
-                    " ></div>
-                    
+                <div class="container-fluid"  style="margin:0;">
                     
                     {% block contenido %} {% endblock %}
 
                 </div>
 
-                <div class="loader" id="loader"></div>
+             <!--  <div class="loader" id="loader"></div>--> 
                 
 
-                <div class="container-fluid" id="mor" style="margin:0" >
-                        <!-- 404 Error Text-->
-                        <div class="text-center">
-                            <img src="{% static 'img/sad.png' %}" style="width:150px">
-                            <p class="lead text-gray-800 mb-5" style="font-size: 30px;">Tiempo restante para el blockeo de usuario</p>
-                            <div id="countdown" style="font-size: 35px;">
-                                
-                            </div>
-                            
-                            <p class="lead text-gray-800 mb-5" style="font-size: 35px;color:black">Lo sentimos</p>
-                            <p class="text-gray-500 mb-0" style="font-size: 25px;color:black">Estimado usuario, al día de la fecha su suscripción registra deuda. Si ya realizo el pago correspondiente póngase en contacto con MantisTec.</p>
-                        </div>
-                        <center>
-                        <a onclick="cargarBien()" id="desblo" class="btn btn-info btn-icon-split">
-                                <span class="icon text-white-50">
-                                </span>
-                                <span class="text">Continuar Trabajando</span></center>
-                            </a>
-                        
-                        </div>
-
-                        
-                        <!-- /.container-fluid -->
                                                 
      
   
@@ -693,3 +333,4 @@ background: linear-gradient(0deg, rgba(0,128,0,1) 0%, rgba(59,158,59,1) 17%, rgb
 </body>
 
 </html>
+
