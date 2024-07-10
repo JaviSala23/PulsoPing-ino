@@ -9,9 +9,9 @@ from gestion.models import *
 from django.contrib import messages
 from django.http import JsonResponse
 from gestion.forms import *
+
 from django.utils.dateparse import parse_datetime
 import os
-
 
 def panel(request):
     return render(request,'inicio/panelControl.html')
@@ -132,48 +132,9 @@ def eliminarCuenta(request,tipo,id):
 Crear artefactos
 '''
 
-
-
 def listar_artefactos(request):
     artefactos = artefacto.objects.all()
-    
-    # Obtén el parámetro de URL (ruta del archivo)
-    archivo_path = artefactos.url
-    ultimo_registro = None
-
-    if archivo_path and os.path.isfile(archivo_path):
-        with open(archivo_path, 'r') as file:
-            lines = file.readlines()
-            if lines:
-                last_line = lines[-1].strip()
-                date_str, temp_str, placa, puerto = last_line.split(',')
-                ultimo_registro = {
-                    'fecha_hora': parse_datetime(date_str),
-                    'temperatura': float(temp_str)
-                }
-
-    return render(request, 'artefactos/listar_artefactos.html', {
-        'artefactos': artefactos,
-        'ultimo_registro': ultimo_registro
-    })
-
-def obtener_ultimo_registro(request):
-    archivo_path = request.GET.get('archivo')
-    ultimo_registro = None
-
-    if archivo_path and os.path.isfile(archivo_path):
-        with open(archivo_path, 'r') as file:
-            lines = file.readlines()
-            if lines:
-                last_line = lines[-1].strip()
-                date_str, temp_str, placa, puerto = last_line.split(',')
-                ultimo_registro = {
-                    'fecha_hora': parse_datetime(date_str),
-                    'temperatura': float(temp_str)
-                }
-    
-    return JsonResponse(ultimo_registro)
-
+    return render(request, 'artefactos/listar_artefactos.html', {'artefactos': artefactos})
 
 def nuevo_artefacto(request, id=0):
     if id != 0:
@@ -209,8 +170,57 @@ Cuenta Has Artefacto
 def listar_cuenta_has_artefacto(request):
     relaciones = Cuenta_has_Artefacto.objects.all()
 
+    # Lista para almacenar relaciones junto con sus últimos registros de temperatura
+    relaciones_actualizadas = []
 
-    return render(request, 'artefactos/listar_cuenta_has_artefacto.html', {'relaciones': relaciones})
+    # Itera sobre las relaciones para obtener y agregar el último registro de temperatura
+    for relacion in relaciones:
+        archivo_path = relacion.archivo_registros  # Ajusta esto según tu modelo y campo correspondiente
+        ultimo_registro = obtener_ultimo_registro(archivo_path)
+
+        # Agrega un diccionario con la relación y el último registro de temperatura
+        relaciones_actualizadas.append({
+            'relacion': relacion,
+            'ultimo_registro': ultimo_registro
+        })
+
+    return render(request, 'artefactos/listar_cuenta_has_artefacto.html', {'relaciones_actualizadas': relaciones_actualizadas})
+
+def obtener_ultimo_registro(archivo_path):
+    ultimo_registro = None
+
+    if archivo_path and os.path.isfile(archivo_path):
+        with open(archivo_path, 'r') as file:
+            lines = file.readlines()
+            if lines:
+                last_line = lines[-1].strip()
+                date_str, temp_str, placa, puerto = last_line.split(',')
+                ultimo_registro = {
+                    'fecha_hora': parse_datetime(date_str),
+                    'temperatura': float(temp_str)
+                }
+
+    return ultimo_registro
+
+def actualizar_relaciones(request):
+    relaciones = Cuenta_has_Artefacto.objects.all()
+
+    # Lista para almacenar relaciones junto con sus últimos registros de temperatura
+    relaciones_actualizadas = []
+
+    # Itera sobre las relaciones para obtener y agregar el último registro de temperatura
+    for relacion in relaciones:
+        archivo_path = relacion.url  # Ajusta esto según tu modelo y campo correspondiente
+        ultimo_registro = obtener_ultimo_registro(archivo_path)
+
+        # Agrega un diccionario con la relación y el último registro de temperatura
+        relaciones_actualizadas.append({
+            'relacion': relacion,
+            'ultimo_registro': ultimo_registro
+        })
+
+    return render(request, 'artefactos/listar_cuenta_has_artefacto.html', {'relaciones_actualizadas': relaciones_actualizadas})
+
 
 def nueva_cuenta_has_artefacto(request, id=0):
     if id != 0:
