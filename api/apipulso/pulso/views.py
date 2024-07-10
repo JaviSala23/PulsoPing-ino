@@ -1,7 +1,8 @@
 import os
 import requests
 from rest_framework import generics
-from .models import SensorReading, MessageLog, Placa, Cuenta_has_Artefacto, artefacto
+from .models import SensorReading, MessageLog, Placa
+from gestion.models import  Cuenta_has_Artefacto, artefacto
 from .serializers import SensorReadingSerializer
 from datetime import datetime, timedelta
 import pytz
