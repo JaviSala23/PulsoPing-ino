@@ -40,7 +40,7 @@ def TemperatureGraphView(request):
 
     # Convertir los datos en un DataFrame de pandas
     df = pd.DataFrame(data, columns=['timestamp', 'temperature', 'placa_id', 'puerto'])
-
+    print(df)
     # Crear un gráfico con matplotlib
     fig, ax = plt.subplots(figsize=(10, 6))
     for key, grp in df.groupby(['placa_id', 'puerto']):
