@@ -10,14 +10,6 @@
         </span>
         <span class="text">Nueva</span>
     </a>
-
-    <span class="text"></span>
-    <span class="text"></span>
-    <span class="text"></span>
-    <span class="text"></span>
-    <span class="text"></span>
-    <span class="text"></span>
-    <span class="text"></span>
 </div>
 <small>Aquí podrás dar de alta, modificar y eliminar relaciones.</small>
 {% endblock %}
@@ -27,7 +19,7 @@
     <div class="col-sm-12">
         <table class="table table-bordered dataTable" id="dataTable" width="100%" cellspacing="0" role="grid" aria-describedby="dataTable_info" style="width: 100%;">
             <thead>
-                <tr style="background-color: rgb(211, 227, 250);color:rgb(95, 93, 93)">
+                <tr style="background-color: rgb(211, 227, 250); color: rgb(95, 93, 93)">
                     <th rowspan="1" colspan="1">CUENTA</th>
                     <th rowspan="1" colspan="1">DISPOSITIVO</th>
                     <th rowspan="1" colspan="1">COD. PLACA</th>
@@ -36,13 +28,14 @@
                     <th rowspan="1" colspan="1">PUERTO</th>
                     <th rowspan="1" colspan="1">TEMP. MÍN.</th>
                     <th rowspan="1" colspan="1">TEMP. MÁX.</th>
-                    
+                    <th rowspan="1" colspan="1">ÚLTIMA TEMPERATURA</th>
+                    <th rowspan="1" colspan="1">FECHA/HORA</th>
                     <th rowspan="1" colspan="1"></th>
                 </tr>
             </thead>
             <tbody>
                 {% for relacion in relaciones %}
-                <tr class="odd" style="color:rgb(112, 112, 112)">
+                <tr class="odd" style="color: rgb(112, 112, 112)">
                     <td>{{ relacion.cuenta.nombre_cuenta }}</td>
                     <td>{{ relacion.artefacto.descripcion }}</td>
                     <td>{{ relacion.placa.codigo }}</td>
@@ -51,7 +44,8 @@
                     <td>{{ relacion.puerto }}</td>
                     <td>{{ relacion.temp_min }}</td>
                     <td>{{ relacion.temp_max }}</td>
-              
+                    <td id="ultima_temperatura_{{ relacion.id }}"></td>
+                    <td id="ultima_fecha_{{ relacion.id }}"></td>
                     <td>
                         <div class="table-data-feature">
                             <a href="{% url 'nueva_cuenta_has_artefacto' relacion.id %}"><i class='fas fa-edit'></i></a>
@@ -64,4 +58,25 @@
         </table>
     </div>
 </div>
+
+<script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+<script>
+    function actualizarRegistros() {
+        {% for relacion in relaciones %}
+            $.ajax({
+                url: "{% url 'obtener_ultimo_registro' %}",
+                data: {'archivo': '{{ relacion.archivo_registros }}'},  // Asegúrate de tener el campo correcto en tu modelo
+                success: function(data) {
+                    $('#ultima_fecha_{{ relacion.id }}').text(data.fecha_hora);
+                    $('#ultima_temperatura_{{ relacion.id }}').text(data.temperatura);
+                }
+            });
+        {% endfor %}
+    }
+
+    $(document).ready(function() {
+        actualizarRegistros();
+        setInterval(actualizarRegistros, 60000);  // Actualizar cada 1 minuto (60000 milisegundos)
+    });
+</script>
 {% endblock %}
