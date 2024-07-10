@@ -131,7 +131,7 @@ background: linear-gradient(0deg, rgba(0,128,0,1) 0%, rgba(59,158,59,1) 17%, rgb
         <ul class="navbar-nav bg-gradient-primary sidebar sidebar-dark accordion" id="accordionSidebar" >
 
             <!-- Sidebar - Brand -->
-            <a class="sidebar-brand d-flex align-items-center justify-content-center" href="{% url 'panel' %}">
+            <a class="sidebar-brand d-flex align-items-center justify-content-center" href="#">
                 <img src="{% static 'img/logo.png' %}" style="width:30%;margin-right: 10px;">
                 <div class="sidebar-brand-icon rotate-n-15">
 
@@ -161,35 +161,14 @@ background: linear-gradient(0deg, rgba(0,128,0,1) 0%, rgba(59,158,59,1) 17%, rgb
                 <div id="collapseOne" class="collapse" aria-labelledby="headingTwo" data-parent="#accordionSidebar">
                     <div class="bg-white py-2 collapse-inner rounded">
                         <a class="collapse-item" href="{% url 'cuentas' tipo=1 %}"><i class="fa-solid fa-star"></i>Clientes</a>
-                        <a class="collapse-item" href="{% url 'cuentas' tipo=2 %}"><i class="fa-solid fa-users"></i>Proveedores</a> 
-                        <a class="collapse-item" href="{% url 'cuentas' tipo=3 %}"><i class="fa-solid fa-truck-fast"></i>Transportistas</a>
+                        <a class="collapse-item" href="{% url 'temperature_graph' cuenta=1 puerto=1 %}"><i class="fa-solid fa-star"></i>Monitor</a>
                         
                     </div>
                 </div>
             </li>
             </li>
 
-            <hr class="sidebar-divider my-0">
-            <div class="sidebar-heading">
-                Campo
-            </div>
-            
-            <li class="nav-item ">
-                <a class="nav-link collapsed" href="#" data-toggle="collapse" data-target="#collapseTwo" aria-expanded="true" aria-controls="collapseTwo">
-                    <i class="fa-solid fa-address-book"></i>
-                    <span>Campo</span></a>
-                <div id="collapseTwo" class="collapse" aria-labelledby="headingTwo" data-parent="#accordionSidebar">
-                    <div class="bg-white py-2 collapse-inner rounded">
-                        <a class="collapse-item" href="{% url 'cosechas' %}"><i class="fa-solid fa-star"></i>Granos y Cosechas</a>
-                        <a class="collapse-item" href="#"><i class="fa-solid fa-truck-fast"></i> Ticket y Balanza </a>
-                        <a class="collapse-item" href="#"><i class="fa-solid fa-users"></i>Lotes</a> 
-                        <a class="collapse-item" href="#"><i class="fa-solid fa-truck-fast"></i> Almacenamiento </a>
-                        
-                    </div>
-                </div>
-            </li>
-            </li>
-            
+          
        
            
 
