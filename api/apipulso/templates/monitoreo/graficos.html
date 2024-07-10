@@ -6,6 +6,19 @@
 <div class="container">
     <h1>Gráfico de Temperatura</h1>
 
+    <!-- Filtro por fecha y hora -->
+    <form method="get" action="">
+        <label for="fecha_inicio">Fecha y Hora de Inicio:</label>
+        <input type="datetime-local" id="fecha_inicio" name="fecha_inicio">
+
+        <label for="fecha_fin">Fecha y Hora de Fin:</label>
+        <input type="datetime-local" id="fecha_fin" name="fecha_fin">
+
+        <button type="submit">Filtrar</button>
+    </form>
+
+    <hr>
+
     <!-- Mostrar el gráfico interactivo -->
     <div id="graph-container">
         <img src="data:image/png;base64,{{ graph }}" alt="Gráfico de Temperatura">
@@ -25,13 +38,9 @@
             </thead>
             <tbody>
                 {% for data in tabla_datos %}
-                {% if data.color == 'red' %}
-                <tr style="color: red;">
-                {% else %}
-                <tr style="color: blue;">
-                {% endif %}
+                <tr>
                     <td>{{ data.fecha_hora }}</td>
-                    <td>{{ data.temperatura }}</td>
+                    <td style="color: {{ data.color }}">{{ data.temperatura }}</td>
                 </tr>
                 {% endfor %}
             </tbody>

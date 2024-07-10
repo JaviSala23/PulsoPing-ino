@@ -332,13 +332,25 @@ def TemperatureGraphView(request, cuenta, puerto):
 
     df = pd.DataFrame(data, columns=['timestamp', 'temperature'])
 
-   # Crear un gráfico de línea con etiquetas de fecha, hora y temperatura
+    # Filtrar datos por hora y fecha si se especifican en los parámetros de la solicitud
+    fecha_inicio_str = request.GET.get('fecha_inicio', None)
+    fecha_fin_str = request.GET.get('fecha_fin', None)
+
+    if fecha_inicio_str and fecha_fin_str:
+        try:
+            fecha_inicio = parse_datetime(fecha_inicio_str)
+            fecha_fin = parse_datetime(fecha_fin_str)
+            df = df[(df['timestamp'] >= fecha_inicio) & (df['timestamp'] <= fecha_fin)]
+        except Exception as e:
+            return HttpResponse(f"Error al procesar las fechas: {e}", content_type="text/plain")
+
+    # Crear un gráfico de línea con etiquetas de fecha, hora y temperatura
     fig, ax = plt.subplots(figsize=(10, 6))
     ax.plot(df['timestamp'], df['temperature'], marker='o', linestyle='-', color='blue', label=f'Cuenta: {artefacto1.cuenta.nombre_cuenta}, Puerto {puerto}, {artefacto1.artefacto.descripcion}')
     
     # Formatear etiquetas de fecha y hora
     ax.xaxis.set_major_formatter(plt.matplotlib.dates.DateFormatter('%Y-%m-%d\n%H:%M:%S'))  # \n para separar fecha y hora
-    ax.xaxis.set_tick_params(rotation=45)  # Sin rotación para mostrar fecha arriba y hora abajo
+    ax.xaxis.set_tick_params(rotation=0)  # Sin rotación para mostrar fecha arriba y hora abajo
     
     # Añadir etiquetas sobre los puntos de datos (cada 10 puntos para evitar amontonamiento)
     for i, (date, temp) in enumerate(zip(df['timestamp'], df['temperature'])):
@@ -373,5 +385,4 @@ def TemperatureGraphView(request, cuenta, puerto):
         table_data.append({'fecha_hora': date_str, 'temperatura': temp, 'color': temp_color})
 
     # Renderizar la plantilla con el gráfico interactivo y la tabla de datos
-
     return render(request, 'monitoreo/graficos.html', {'graph': image_base64, 'tabla_datos': table_data})
