@@ -22,7 +22,7 @@ def TemperatureGraphView(request):
         parts = os.path.basename(file_path).split('_')
         if len(parts) < 4:
             continue  # Saltar archivos que no cumplen con la estructura esperada
-        print(file_path)
+        print('cpsp'+file_path)
         # Leer datos del archivo
         with open(file_path, 'r') as f:
             lines = f.readlines()
