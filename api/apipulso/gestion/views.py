@@ -275,6 +275,7 @@ def eliminar_cuenta_has_artefacto(request, id):
 Monitor temperatura grafico
 '''
 
+
 # Diccionarios para traducir nombres de días y meses
 DIAS_ESPANOL = {
     0: 'Lunes', 1: 'Martes', 2: 'Miércoles', 3: 'Jueves',
@@ -323,7 +324,8 @@ def TemperatureGraphView(request, cuenta, puerto):
         try:
             timestamp = datetime.strptime(parts[0], "%Y-%m-%d %H:%M:%S")
             temperature = float(parts[1])
-            data.append((timestamp, temperature))
+            dentro_rango = artefacto1.temp_min <= temperature <= artefacto1.temp_max
+            data.append((timestamp, temperature, dentro_rango))
         except Exception as e:
             continue
 
@@ -331,7 +333,7 @@ def TemperatureGraphView(request, cuenta, puerto):
     if not data:
         return HttpResponse("No se encontraron datos válidos en los archivos.", content_type="text/plain")
 
-    df = pd.DataFrame(data, columns=['timestamp', 'temperature'])
+    df = pd.DataFrame(data, columns=['timestamp', 'temperature', 'dentro_rango'])
 
     # Aplicar filtro por fecha si se proporcionan parámetros
     start_date_str = request.GET.get('start_date')
@@ -349,14 +351,11 @@ def TemperatureGraphView(request, cuenta, puerto):
     fig, ax = plt.subplots(figsize=(10, 6))
     
     # Colores basados en el rango de temperatura
-    temperatures_in_range = (df['temperature'] >= artefacto1.temp_min) & (df['temperature'] <= artefacto1.temp_max)
-    ax.scatter(df['timestamp'][temperatures_in_range], df['temperature'][temperatures_in_range], c='green', label='Dentro de rango')
-    ax.scatter(df['timestamp'][~temperatures_in_range], df['temperature'][~temperatures_in_range], c='red', label='Fuera de rango')
+    ax.scatter(df['timestamp'], df['temperature'], c=df['dentro_rango'].map({True: 'blue', False: 'red'}))
     
     # Etiquetas completas en los ejes (usando la función translate_timestamp)
     ax.set_xlabel('Fecha y Hora')
     ax.set_ylabel('Temperatura')
-    ax.legend(loc='best')
     
     # Aplicar formato personalizado de fecha en el eje x
     ax.set_xticklabels([translate_timestamp(t) for t in df['timestamp']], rotation=45)
@@ -379,4 +378,3 @@ def TemperatureGraphView(request, cuenta, puerto):
 
     # Renderizar la plantilla con el gráfico interactivo y la imagen en base64
     return render(request, 'monitoreo/graficos.html', {'graph': interactive_graph, 'graph_base64': graph_base64})
-
