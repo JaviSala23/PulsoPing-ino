@@ -1,35 +1,31 @@
-{% extends 'layout.html' %}
-{% load static %}
+{% extends 'base.html' %}
 
-{% block title %}
-<h1>Gráfico de Temperatura - Cuenta: {{ cuenta }}, Puerto: {{ puerto }}</h1>
-{% endblock %}
+{% block title %}Gráfico de Temperatura{% endblock %}
 
 {% block content %}
 <div class="container">
-    <form method="get" class="form-inline">
-        <label for="start_date" class="mr-2">Fecha de inicio:</label>
-        <input type="date" id="start_date" name="start_date" class="form-control mr-2">
-        <label for="end_date" class="mr-2">Fecha de fin:</label>
-        <input type="date" id="end_date" name="end_date" class="form-control mr-2">
-        <button type="submit" class="btn btn-primary">Filtrar</button>
-    </form>
-    <hr>
+    <h1>Gráfico de Temperatura</h1>
+
+    <!-- Mostrar el gráfico interactivo -->
     <div id="graph-container">
         <img src="data:image/png;base64,{{ graph }}" alt="Gráfico de Temperatura">
     </div>
-    <div id="tabla_datos">
+
+    <hr>
+
+    <!-- Tabla de datos de temperatura -->
+    <div id="tabla-datos">
         <h2>Datos Tabulados de Temperaturas</h2>
-        <table class="table table-striped">
+        <table class="table table-bordered">
             <thead>
                 <tr>
                     <th>Fecha y Hora</th>
-                    <th>Temperatura</th>
+                    <th>Temperatura (°C)</th>
                 </tr>
             </thead>
             <tbody>
                 {% for data in tabla_datos %}
-                <tr>
+                <tr style="color: {{ data.color }}">
                     <td>{{ data.fecha_hora }}</td>
                     <td>{{ data.temperatura }}</td>
                 </tr>
@@ -38,11 +34,4 @@
         </table>
     </div>
 </div>
-
-<script src="https://cdnjs.cloudflare.com/ajax/libs/mpld3/0.5.7/mpld3.min.js"></script>
-<script>
-    $(document).ready(function() {
-        mpld3.enable_notebook();
-    });
-</script>
 {% endblock %}
