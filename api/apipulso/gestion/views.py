@@ -338,10 +338,6 @@ def TemperatureGraphView(request, cuenta, puerto):
     fig, ax = plt.subplots(figsize=(10, 6))
     ax.plot(df['timestamp'], df['temperature'], marker='o', linestyle='-', color='blue', label=f'Cuenta: {artefacto1.cuenta.nombre_cuenta}, Puerto {puerto}, {artefacto1.artefacto.descripcion}')
     
-    # Formatear etiquetas de fecha
-    ax.xaxis.set_major_formatter(DateFormatter('%Y-%m-%d %H:%M:%S'))
-    ax.xaxis.set_tick_params(rotation=45)
-    
     # Añadir etiquetas sobre los puntos de datos
     for i, (date, temp) in enumerate(zip(df['timestamp'], df['temperature'])):
         ax.text(date, temp, f'{date.strftime("%Y-%m-%d %H:%M:%S")}\n{temp:.2f}', ha='left', va='bottom', fontsize=8, color='black', rotation=0)
@@ -351,24 +347,22 @@ def TemperatureGraphView(request, cuenta, puerto):
     ax.legend(loc='best')
     plt.tight_layout()
 
+    # Generar el gráfico interactivo con mpld3
+    interactive_graph = mpld3.fig_to_html(fig)
+
     # Guardar el gráfico en un objeto BytesIO
     buf = BytesIO()
     plt.savefig(buf, format='png')
     buf.seek(0)
 
     # Codificar la imagen en base64 para poder insertarla en la plantilla
-    image_base64 = base64.b64encode(buf.getvalue()).decode('utf-8')
+    graph_base64 = base64.b64encode(buf.getvalue()).decode('utf-8')
     buf.close()
-
 
     # Preparar datos para la tabla
     table_data = []
-    for date, temp, in_range in zip(df['timestamp'], df['temperature'], df['dentro_rango']):
-        if in_range:
-            color = 'blue'
-        else:
-            color = 'red'
-        table_data.append({'Fecha y Hora': date.strftime("%Y-%m-%d %H:%M:%S"), 'Temperatura': temp, 'Color': color})
+    for date, temp in zip(df['timestamp'], df['temperature']):
+        table_data.append({'Fecha y Hora': date.strftime("%Y-%m-%d %H:%M:%S"), 'Temperatura': temp})
 
     # Renderizar la plantilla con el gráfico interactivo y la imagen en base64
-    return render(request, 'monitoreo/graficos.html', {'graph': interactive_graph, 'graph_base64': graph_base64, 'tabla_html': tabla_html})
+    return render(request, 'monitoreo/graficos.html', {'graph': interactive_graph, 'graph_base64': graph_base64, 'tabla_datos': table_data})
