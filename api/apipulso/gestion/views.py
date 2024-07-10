@@ -14,6 +14,7 @@ from gestion.forms import *
 from django.utils.dateparse import parse_datetime
 import os
 from django.template.loader import render_to_string
+from matplotlib.dates import DateFormatter
 
 
 def panel(request):
@@ -318,13 +319,12 @@ def TemperatureGraphView(request, cuenta, puerto):
     for line in lines:
         parts = line.strip().split(',')
         if len(parts) < 2:
-            continue  # Saltar líneas que no cumplen con la estructura esperada
+            continue
 
         try:
             timestamp = datetime.strptime(parts[0], "%Y-%m-%d %H:%M:%S")
             temperature = float(parts[1])
-            dentro_rango = artefacto1.temp_min <= temperature <= artefacto1.temp_max
-            data.append((timestamp, temperature, dentro_rango))
+            data.append((timestamp, temperature))
         except Exception as e:
             continue
 
@@ -332,60 +332,43 @@ def TemperatureGraphView(request, cuenta, puerto):
     if not data:
         return HttpResponse("No se encontraron datos válidos en los archivos.", content_type="text/plain")
 
-    df = pd.DataFrame(data, columns=['timestamp', 'temperature', 'dentro_rango'])
+    df = pd.DataFrame(data, columns=['timestamp', 'temperature'])
 
-    # Aplicar filtro por fecha si se proporcionan parámetros
-    start_date_str = request.GET.get('start_date')
-    end_date_str = request.GET.get('end_date')
-    
-    try:
-        if start_date_str and end_date_str:
-            start_date = datetime.strptime(start_date_str, "%Y-%m-%d")
-            end_date = datetime.strptime(end_date_str, "%Y-%m-%d")
-            df = df[(df['timestamp'] >= start_date) & (df['timestamp'] <= end_date)]
-    except Exception as e:
-        return HttpResponse(f"Error en el filtro de fechas: {e}", content_type="text/plain")
-
-    # Crear un gráfico de puntos con matplotlib
+    # Crear un gráfico de línea con etiquetas de fecha, hora y temperatura
     fig, ax = plt.subplots(figsize=(10, 6))
+    ax.plot(df['timestamp'], df['temperature'], marker='o', linestyle='-', color='blue', label=f'Cuenta: {artefacto1.cuenta.nombre_cuenta}, Puerto {puerto}, {artefacto1.artefacto.descripcion}')
     
-    # Colores basados en el rango de temperatura
-    scatter = ax.scatter(df['timestamp'], df['temperature'], c=df['dentro_rango'].map({True: 'blue', False: 'red'}))
+    # Formatear etiquetas de fecha
+    ax.xaxis.set_major_formatter(DateFormatter('%Y-%m-%d %H:%M:%S'))
+    ax.xaxis.set_tick_params(rotation=45)
     
-    # Etiquetas completas en los ejes (usando la función translate_timestamp)
-    ax.set_xlabel('Fecha')
+    # Añadir etiquetas sobre los puntos de datos
+    for i, (date, temp) in enumerate(zip(df['timestamp'], df['temperature'])):
+        ax.text(date, temp, f'{date.strftime("%Y-%m-%d %H:%M:%S")}\n{temp:.2f}', ha='left', va='bottom', fontsize=8, color='black', rotation=0)
+    
+    ax.set_xlabel('Fecha y Hora')
     ax.set_ylabel('Temperatura')
-    
-    # Función para formatear el tooltip con información detallada
-    def format_tooltip(labels):
-        tooltip = []
-        for label in labels:
-            timestamp = pd.Timestamp(label)
-            temperatura = df.loc[df['timestamp'] == timestamp, 'temperature'].iloc[0]
-            tooltip.append(f"{translate_timestamp(timestamp)}<br>Temperatura: {temperatura:.2f} °C")
-        return tooltip
+    ax.legend(loc='best')
+    plt.tight_layout()
 
-    # Crear tooltips con mpld3 para mostrar información detallada al pasar el mouse
-    tooltips = mpld3.plugins.PointHTMLTooltip(scatter, labels=format_tooltip(df['timestamp']), voffset=10, hoffset=10)
-    mpld3.plugins.connect(fig, tooltips)
-    
-    # Formatear el eje x para mostrar solo la fecha sin las horas
-    ax.xaxis.set_major_formatter(plt.FuncFormatter(lambda x, _: translate_timestamp(pd.Timestamp(x))))
-    
-    # Convertir el gráfico en formato HTML interactivo con mpld3
-    interactive_graph = mpld3.fig_to_html(fig)
-    
-    # Guardar el gráfico en un objeto BytesIO para insertarlo en la plantilla
+    # Guardar el gráfico en un objeto BytesIO
     buf = BytesIO()
     plt.savefig(buf, format='png')
     buf.seek(0)
-    
+
     # Codificar la imagen en base64 para poder insertarla en la plantilla
-    graph_base64 = base64.b64encode(buf.getvalue()).decode('utf-8')
+    image_base64 = base64.b64encode(buf.getvalue()).decode('utf-8')
     buf.close()
 
-    # Datos tabulados para mostrar debajo del gráfico
-    tabla_html = df.to_html(classes='table table-bordered table-hover', index=False)
+
+    # Preparar datos para la tabla
+    table_data = []
+    for date, temp, in_range in zip(df['Dia/Horario'], df['Temperatura'], df['dentro_rango']):
+        if in_range:
+            color = 'blue'
+        else:
+            color = 'red'
+        table_data.append({'Fecha y Hora': date.strftime("%Y-%m-%d %H:%M:%S"), 'Temperatura': temp, 'Color': color})
 
     # Renderizar la plantilla con el gráfico interactivo y la imagen en base64
     return render(request, 'monitoreo/graficos.html', {'graph': interactive_graph, 'graph_base64': graph_base64, 'tabla_html': tabla_html})
