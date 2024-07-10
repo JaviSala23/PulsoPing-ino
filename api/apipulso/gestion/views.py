@@ -275,7 +275,7 @@ def eliminar_cuenta_has_artefacto(request, id):
 Monitor temperatura grafico
 '''
 
-ddef TemperatureGraphView(request, cuenta, puerto):
+def TemperatureGraphView(request, cuenta, puerto):
     try:
         # Obtener el objeto Cuenta_has_Artefacto correspondiente
         artefacto1 = Cuenta_has_Artefacto.objects.get(cuenta=cuenta, puerto=puerto)
