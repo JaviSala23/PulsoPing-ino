@@ -332,31 +332,32 @@ def TemperatureGraphView(request, cuenta, puerto):
 
     df = pd.DataFrame(data, columns=['timestamp', 'temperature'])
 
-    # Crear un gráfico de línea con etiquetas de fecha, hora y temperatura
+   # Crear un gráfico interactivo con etiquetas emergentes
     fig, ax = plt.subplots(figsize=(10, 6))
     ax.plot(df['timestamp'], df['temperature'], marker='o', linestyle='-', color='blue', label=f'Cuenta: {artefacto1.cuenta.nombre_cuenta}, Puerto {puerto}, {artefacto1.artefacto.descripcion}')
     
-    # Formatear etiquetas de fecha
-    ax.xaxis.set_major_formatter(plt.matplotlib.dates.DateFormatter('%Y-%m-%d %H:%M:%S'))
-    ax.xaxis.set_tick_params(rotation=45)
-    
-    # Añadir etiquetas sobre los puntos de datos
-    for i, (date, temp) in enumerate(zip(df['timestamp'], df['temperature'])):
-        ax.text(date, temp, f'{date.strftime("%Y-%m-%d %H:%M:%S")}\n{temp:.2f}', ha='left', va='bottom', fontsize=8, color='black', rotation=0)
-    
+    # Añadir etiquetas emergentes sobre los puntos de datos
+    labels = []
+    for date, temp in zip(df['timestamp'], df['temperature']):
+        label = f'{date.strftime("%Y-%m-%d %H:%M:%S")}<br>{temp:.2f} °C'
+        labels.append(label)
+
+    tooltip = plugins.PointHTMLTooltip(ax, labels)
+    plugins.connect(fig, tooltip)
+
     ax.set_xlabel('Fecha y Hora')
     ax.set_ylabel('Temperatura')
     ax.legend(loc='best')
     plt.tight_layout()
 
-    # Guardar el gráfico en un objeto BytesIO
-    buf = BytesIO()
-    plt.savefig(buf, format='png')
-    buf.seek(0)
+    # Convertir el gráfico a HTML interactivo
+    interactive_graph = mpld3.fig_to_html(fig)
 
-    # Codificar la imagen en base64 para poder insertarla en la plantilla
-    image_base64 = base64.b64encode(buf.getvalue()).decode('utf-8')
-    buf.close()
+    # Preparar datos para la tabla como lo hiciste antes
+
+
+
+
 
     # Preparar datos para la tabla
     table_data = []
@@ -365,4 +366,4 @@ def TemperatureGraphView(request, cuenta, puerto):
         table_data.append({'fecha_hora': date_str, 'temperatura': temp})
 
     # Renderizar la plantilla con el gráfico interactivo y la tabla de datos
-    return render(request, 'monitoreo/graficos.html', {'graph': image_base64, 'tabla_datos': table_data})
+    return render(request, 'monitoreo/graficos_interactivo.html', {'graph': interactive_graph, 'tabla_datos': table_data})

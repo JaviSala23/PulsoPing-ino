@@ -4,11 +4,11 @@
 
 {% block contenido %}
 <div class="container">
-    <h1>Gráfico de Temperatura</h1>
+    <h1>Gráfico de Temperatura Interactivo</h1>
 
     <!-- Mostrar el gráfico interactivo -->
     <div id="graph-container">
-        <img src="data:image/png;base64,{{ graph }}" alt="Gráfico de Temperatura">
+        {{ graph|safe }}
     </div>
 
     <hr>
@@ -34,4 +34,7 @@
         </table>
     </div>
 </div>
+
+<!-- Incluir el script de mpld3 para funcionalidad adicional -->
+<script src="https://mpld3.github.io/js/mpld3.v0.5.1.min.js"></script>
 {% endblock %}
