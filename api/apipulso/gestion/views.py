@@ -339,13 +339,13 @@ def TemperatureGraphView(request, cuenta, puerto):
     start_date_str = request.GET.get('start_date')
     end_date_str = request.GET.get('end_date')
     
-    if start_date_str and end_date_str:
-        try:
+    try:
+        if start_date_str and end_date_str:
             start_date = datetime.strptime(start_date_str, "%Y-%m-%d")
             end_date = datetime.strptime(end_date_str, "%Y-%m-%d")
             df = df[(df['timestamp'] >= start_date) & (df['timestamp'] <= end_date)]
-        except Exception as e:
-            return HttpResponse(f"Error en el filtro de fechas: {e}", content_type="text/plain")
+    except Exception as e:
+        return HttpResponse(f"Error en el filtro de fechas: {e}", content_type="text/plain")
 
     # Crear un gráfico de puntos con matplotlib
     fig, ax = plt.subplots(figsize=(10, 6))
