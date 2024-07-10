@@ -275,7 +275,6 @@ def eliminar_cuenta_has_artefacto(request, id):
 Monitor temperatura grafico
 '''
 
-
 # Diccionarios para traducir nombres de días y meses
 DIAS_ESPANOL = {
     0: 'Lunes', 1: 'Martes', 2: 'Miércoles', 3: 'Jueves',
@@ -385,5 +384,8 @@ def TemperatureGraphView(request, cuenta, puerto):
     graph_base64 = base64.b64encode(buf.getvalue()).decode('utf-8')
     buf.close()
 
+    # Datos tabulados para mostrar debajo del gráfico
+    tabla_html = df.to_html(classes='table table-bordered table-hover', index=False)
+
     # Renderizar la plantilla con el gráfico interactivo y la imagen en base64
-    return render(request, 'monitoreo/graficos.html', {'graph': interactive_graph, 'graph_base64': graph_base64})
+    return render(request, 'monitoreo/graficos.html', {'graph': interactive_graph, 'graph_base64': graph_base64, 'tabla_html': tabla_html})
