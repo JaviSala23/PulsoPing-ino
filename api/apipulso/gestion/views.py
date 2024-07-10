@@ -338,7 +338,7 @@ def TemperatureGraphView(request, cuenta, puerto):
     
     # Formatear etiquetas de fecha y hora
     ax.xaxis.set_major_formatter(plt.matplotlib.dates.DateFormatter('%Y-%m-%d\n%H:%M:%S'))  # \n para separar fecha y hora
-    ax.xaxis.set_tick_params(rotation=0)  # Sin rotación para mostrar fecha arriba y hora abajo
+    ax.xaxis.set_tick_params(rotation=45)  # Sin rotación para mostrar fecha arriba y hora abajo
     
     # Añadir etiquetas sobre los puntos de datos (cada 10 puntos para evitar amontonamiento)
     for i, (date, temp) in enumerate(zip(df['timestamp'], df['temperature'])):
