@@ -334,7 +334,7 @@ def TemperatureGraphView(request, cuenta, puerto):
 
     # Crear un gráfico con matplotlib
     fig, ax = plt.subplots(figsize=(10, 6))
-    temperatures_in_range = (df['temperature'] >= artefacto1.tempMin) & (df['temperature'] <= artefacto1.tempMax)
+    temperatures_in_range = (df['temperature'] >= artefacto1.temp_min) & (df['temperature'] <= artefacto1.temp_max)
     ax.plot(df['timestamp'][temperatures_in_range], df['temperature'][temperatures_in_range], label='En rango', color='green')
     ax.plot(df['timestamp'][~temperatures_in_range], df['temperature'][~temperatures_in_range], label='Fuera de rango', color='red')
     
