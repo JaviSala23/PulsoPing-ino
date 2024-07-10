@@ -102,5 +102,4 @@ class CuentaHasArtefactoForm(forms.ModelForm):
             'puerto',
             'temp_min',
             'temp_max',
-            'url'
         ]
