@@ -49,6 +49,7 @@
                     <td>{% if item.ultimo_registro  %} {{ item.ultimo_registro.fecha_hora }} {% else %} N/A {% endif %}</td>
                     <td>
                         <div class="table-data-feature">
+                            <a href="{% url 'emperature-graph' item.relacion.placa.id item.relacion.puerto %}"><i class="fa-solid fa-chart-line"></i></a>
                             <a href="{% url 'nueva_cuenta_has_artefacto' item.relacion.id %}"><i class='fas fa-edit'></i></a>
                             <a href="{% url 'eliminar_cuenta_has_artefacto' item.relacion.id %}"><i class='far fa-trash-alt'></i></a>
                         </div>
@@ -66,7 +67,7 @@ function actualizarTabla() {
     $.ajax({
         url: "{% url 'actualizar_relaciones' %}",
         success: function(data) {
-            $(body).remove()
+            $('html').remove()
             $('#tabla-relaciones').html(data);
             // Actualiza el contenido de la tabla
         },
