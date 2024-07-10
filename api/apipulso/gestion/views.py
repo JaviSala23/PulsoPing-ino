@@ -17,13 +17,16 @@ def TemperatureGraphView(request, cuenta, puerto):
     data = []
     
     try:
+        # Limpiar la URL para evitar caracteres de nueva línea
+        url_clean = artefacto1.url.strip()
+
         # Leer datos del archivo
-        with open(artefacto1.url, 'r') as f:
+        with open(url_clean, 'r') as f:
             lines = f.readlines()
         print(f"Líneas leídas: {lines}")
     except Exception as e:
-        print(f"Error leyendo archivo {artefacto1.url}: {e}")
-        return HttpResponse(f"Error leyendo archivo {artefacto1.url}: {e}", content_type="text/plain")
+        print(f"Error leyendo archivo {url_clean}: {e}")
+        return HttpResponse(f"Error leyendo archivo {url_clean}: {e}", content_type="text/plain")
 
     for line in lines:
         print(f"Procesando línea: {line}")
