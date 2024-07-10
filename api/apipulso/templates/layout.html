@@ -161,6 +161,9 @@ background: linear-gradient(0deg, rgba(0,128,0,1) 0%, rgba(59,158,59,1) 17%, rgb
                 <div id="collapseOne" class="collapse" aria-labelledby="headingTwo" data-parent="#accordionSidebar">
                     <div class="bg-white py-2 collapse-inner rounded">
                         <a class="collapse-item" href="{% url 'cuentas' tipo=1 %}"><i class="fa-solid fa-star"></i>Clientes</a>
+                        <a class="collapse-item" href="{% url 'listar_artefactos' %}"><i class="fa-solid fa-star-of-life">Dispositivos</i></a>
+
+                        
                         <a class="collapse-item" href="{% url 'temperature_graph' cuenta=1 puerto=1 %}"><i class="fa-solid fa-star"></i>Monitor</a>
                         
                     </div>
