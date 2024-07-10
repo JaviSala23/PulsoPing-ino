@@ -23,7 +23,7 @@ def TemperatureGraphView(request):
         parts = os.path.basename(file_path).split('_')
         if len(parts) < 4:
             continue  # Saltar archivos que no cumplen con la estructura esperada
-
+        print(parts)
         # Leer datos del archivo
         with open(file_path, 'r') as f:
             lines = f.readlines()
@@ -35,7 +35,7 @@ def TemperatureGraphView(request):
             if len(parts) < 4:
                 continue  # Saltar líneas que no cumplen con la estructura esperada
 
-            
+
             timestamp = datetime.strptime(parts[0], "%Y-%m-%d %H:%M:%S")
             temperature = float(parts[1])
             placa_id = parts[2]
