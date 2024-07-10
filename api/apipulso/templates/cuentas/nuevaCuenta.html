@@ -1,0 +1,108 @@
+{% extends 'layout.html' %}
+{% load static %}
+
+  {% block contenido %}
+
+  <script>
+    function cargarProvincia(){
+        var id = document.getElementById("id_paises").value;
+        if (id){
+        $.ajax(
+        {
+          type:"GET",
+          url: '{% url "traeProvincias" %}',
+          data:{
+                  pais_id: id
+          },
+        
+          success: function( data ) 
+          {
+            $('#id_provincia').empty();
+            $('#id_localidad').empty();
+            $('#id_localidad').html('<option>--Seleccione Localidad--</option>');
+            var html='<option>--Seleccione Provincia--</option>';
+            for (i=0;i<Object.keys(data).length;i++){
+                  html=html+'<option value='+parseInt(data[i].id_provincia)+'>'+data[i].nombre_provincia+'</option>';
+            }
+            $('#id_provincia').html(html);
+          }
+      })
+    }
+    else{
+      $('#id_provincia').html('<option>--Seleccione Provincia--</option>');
+    }
+  
+    }
+  
+    function cargarLocalidad(){
+        var id = document.getElementById("id_provincia").value;
+        if (id){
+        $.ajax(
+        {
+          type:"GET",
+          url: '{% url "traeLocalidad" %}',
+          data:{
+                  provincia_id: id
+          },
+        
+          success: function( data ) 
+          {
+            $('#id_localidad').empty();
+            var html='<option>--Seleccione Localidad--</option>';
+            for (i=0;i<Object.keys(data).length;i++){
+                  html=html+'<option value='+parseInt(data[i].id_localidad)+'>'+data[i].nombre_localidad+'</option>';
+            }
+            $('#id_localidad').html(html);
+          }
+      })
+    }
+    else{
+      $('#id_localidad').html('<option>--Seleccione Localidad--</option>');
+    }
+  
+    }
+  
+  </script>
+  
+<div class="card shadow mb-4">
+    <div class="card-header py-3">
+        <h6 class="m-0 font-weight-bold text-primary">{{funcion}} {{tipoCuenta.descripcion}}</h6>
+    </div>
+    <div class="card-body">
+        <div style="margin-top: 10px;">
+ 
+            <form  class="row form-group" action="{% url 'guardarCuenta' %}" method="POST" style="background-color: white; border-radius: 3px;">
+              <div class="container-fluid" style="width:100%">
+                <div class="row">
+              <div class="col-md-12" id="proveedorFormulario" >
+                
+            
+              {% csrf_token %}
+            
+              {{ form.as_p }}
+              </div>
+              <br>
+              <div class="col col-sm-12" style="margin: 10px;width:100%">
+              <input type="submit" class="btn btn-primary" value="Guardar"  />
+              <a href="#" class="btn btn-secondary">Cancelar</a>
+              
+            </div>
+            </div>
+             
+            
+            </form>
+            
+            </div>
+            
+            <br>
+            
+    </div>
+</div>
+
+  
+        
+</div>
+</div>
+        
+{% endblock %}  
+        

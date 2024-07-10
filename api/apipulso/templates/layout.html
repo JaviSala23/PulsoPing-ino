@@ -1,0 +1,757 @@
+{% load static %}{% load auth_extras  %} {% if user.is_authenticated %}
+
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+
+    <meta charset="utf-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+    <meta name="description" content="">
+    <meta name="author" content="Mantis Tec">
+
+
+
+    <title>Habitat - Online</title>
+
+    <!-- Custom fonts for this template-->
+    <link href="{% static 'vendor/fontawesome-free/css/all.min.css'%}" rel="stylesheet" type="text/css">
+    <link href="https://fonts.googleapis.com/css?family=Nunito:200,200i,300,300i,400,400i,600,600i,700,700i,800,800i,900,900i" rel="stylesheet">
+
+    <!-- Custom styles for this template-->
+    <link href="{% static 'css/sb-admin-2.min.css'%}" rel="stylesheet">
+    <link href="{% static 'css/style.css'%}" rel="stylesheet" media="all">
+    <!-- Bootstrap core JavaScript-->
+    <script src="{% static 'vendor/jquery/jquery.min.js'%}"></script>
+
+</head>
+<script>
+    $
+    function myFunction() {
+        $(window).on('load', function() {
+            setTimeout(showPage, 700); //wait for page load PLUS two seconds.
+        });
+
+    }
+
+    function showPage() {
+        document.getElementById("loader").style.display = "none";
+        
+        $.ajax({
+                url: {% url 'registroDeuda' %},
+                type: 'GET',
+            })
+            .done(function(data) {
+                if (data[0]['estadoFactura'] == 1) {
+
+                    $("#deuda").html("Estimado usuario, al día de la fecha su suscripción registra deuda. Si ya realizo el pago correspondiente póngase en contacto con MantisTec.")
+                    $("#deuda").css({"background-color": "hsl(36, 100%, 47%)",})
+                }
+                if (data[0]['estadoFactura'] == 2) {
+
+                    $("#deuda").html("Estimado usuario, al día de la fecha su suscripción registra deuda. Si ya realizo el pago correspondiente póngase en contacto con MantisTec.")
+                $("#deuda").css({"background-color": "red", "color":"white"})
+                document.getElementById("mor").style.display = "block";
+                
+                        var end = new Date('2023/12/31 0:0 AM');
+
+                            var _second = 1000;
+                            var _minute = _second * 60;
+                            var _hour = _minute * 60;
+                            var _day = _hour * 24;
+                            var timer;
+
+                            
+                                var now = new Date();
+                                var distance = end - now;
+                                if (distance < 0) {
+
+                                    clearInterval(timer);
+                                    document.getElementById('countdown').innerHTML = '¡Usuario Bloqueado!';
+                                    $('#desblo').hide();                                    return;
+                                }
+                                var days = Math.floor(distance / _day);
+                                var hours = Math.floor((distance % _day) / _hour);
+                                var minutes = Math.floor((distance % _hour) / _minute);
+                                var seconds = Math.floor((distance % _minute) / _second);
+
+                                document.getElementById('countdown').innerHTML = days + 'Dias ';
+                                document.getElementById('countdown').innerHTML += hours + 'hrs ';
+                                document.getElementById('countdown').innerHTML += minutes + 'mins ';
+                                document.getElementById('countdown').innerHTML += seconds + 'secs';
+                           
+
+                            timer = setInterval(showRemaining, 1000);
+
+                }else{
+                    document.getElementById("myDiv").style.display = "block";
+                }
+            })
+            .fail(function(data) {
+                console.log("error");
+            })
+            .always(function() {
+                console.log("complete");
+            });
+    }
+    function cargarBien(){
+        document.getElementById("myDiv").style.display = "block";
+        document.getElementById("mor").style.display = "none";
+    }
+    estado=0
+    function esconder(){
+        $("#accordionSidebar").slideToggle()
+        if (estado==0){
+            $("#iconMenu").removeClass('fas fa-angle-double-left').addClass('fas fa-angle-double-right');
+                estado=1
+            }
+        else{
+            $("#iconMenu").removeClass('fas fa-angle-double-right').addClass('fas fa-angle-double-left');
+                estado=0
+        }
+    }
+</script>
+<style>
+    /* Center the loader */
+    
+    .loader {
+        width: 16px;
+        height: 16px;
+        position: fixed;
+        left: 55%;
+        top: 45%;
+        border-radius: 50%;
+        color: rgb(0, 0, 0);
+        background: currentColor;
+        box-shadow: 32px 0, -32px 0, 64px 0;
+    }
+    
+    .loader::after {
+        content: '';
+        position: absolute;
+        left: -32px;
+        top: 0;
+        width: 16px;
+        height: 16px;
+        border-radius: 10px;
+        background: #00a550;
+        animation: move 3s linear infinite alternate;
+    }
+    
+    @keyframes move {
+        0%,
+        5% {
+            left: -32px;
+            width: 16px;
+        }
+        15%,
+        20% {
+            left: -32px;
+            width: 48px;
+        }
+        30%,
+        35% {
+            left: 0px;
+            width: 16px;
+        }
+        45%,
+        50% {
+            left: 0px;
+            width: 48px;
+        }
+        60%,
+        65% {
+            left: 32px;
+            width: 16px;
+        }
+        75%,
+        80% {
+            left: 32px;
+            width: 48px;
+        }
+        95%,
+        100% {
+            left: 64px;
+            width: 16px;
+        }
+    }
+    
+    #myDiv {
+        display: none;
+    }
+    #mor {
+        display: none;
+    }
+
+    .argentina{
+        background: rgb(0,212,255);
+background: linear-gradient(90deg, rgba(0,212,255,1) 0%, rgba(255,255,255,1) 32%, rgba(252,239,0,1) 48%, rgba(255,255,255,1) 62%, rgba(0,212,255,1) 100%);
+    }
+    .normal{
+        background: rgb(0,128,0);
+background: linear-gradient(0deg, rgba(0,128,0,1) 0%, rgba(59,158,59,1) 17%, rgba(71,164,71,1) 23%, rgba(104,180,104,1) 36%, rgba(161,208,161,1) 58%, rgba(199,227,199,1) 74%, rgba(255,255,255,1) 100%);
+    }
+</style>
+
+
+
+<body id="page-top" onload="myFunction()">
+    
+
+   
+    <script>
+        $(document).ready(function() {
+            $(".sidebar").toggleClass("toggled");
+        });
+    </script>
+
+    <!-- Page Wrapper -->
+    
+    <div id="wrapper">
+        
+        <!-- Sidebar -->
+        <ul class="navbar-nav bg-gradient-primary sidebar sidebar-dark accordion" id="accordionSidebar" >
+
+            <!-- Sidebar - Brand -->
+            <a class="sidebar-brand d-flex align-items-center justify-content-center" href="{% url 'panel' %}">
+                <img src="{% static 'img/logo.png' %}" style="width:30%;margin-right: 10px;">
+                <div class="sidebar-brand-icon rotate-n-15">
+
+                    <!--
+            <i class="fas fa-laugh-wink"></i>-->
+                </div>
+                <div class="sidebar-brand-text mx-3">Habitat <sup>2</sup></div>
+            </a>
+            
+            {% for item in Menu %}
+           
+           
+
+            <!-- Nav Item - Dashboard -->
+            {% if item.menu.estadoMenu_id.id == 1 and item.menu.id == 1 %}
+
+            <!-- Divider -->
+            <hr class="sidebar-divider my-0">
+            <div class="sidebar-heading">
+                Caja
+            </div>
+            
+            <li class="nav-item ">
+                <a class="nav-link collapsed" href="#" data-toggle="collapse" data-target="#collapseOne" aria-expanded="true" aria-controls="collapseTwo">
+                    <i class="fas fa-calculator"></i>
+                    <span>Caja</span></a>
+                <div id="collapseOne" class="collapse" aria-labelledby="headingTwo" data-parent="#accordionSidebar">
+                    <div class="bg-white py-2 collapse-inner rounded">
+                        {% for item2 in item.SubMenu %}
+                        
+                        {% if item2.estadoMenu_id.id == 1  and item2.id == 1 %}
+                        <a class="collapse-item" href="{% url 'cajaDkr' %}">Caja</a>
+                        
+                        {% endif %}
+                        {% if request.user|has_group:'Administrador' %}
+                        {% if item2.estadoMenu_id.id == 1  and item2.id == 2 %}
+                        <a class="collapse-item" href="{% url 'cajaDkrHistorico'  %}">Caja Historico (Cerradas)</a>
+                        {% endif %}
+                        {% if item2.estadoMenu_id.id == 1  and item2.id == 3 %}
+                        <a class="collapse-item" href="{% url 'comprobantesAnulados' %}">Comprobantes Anulados</a>
+                        <a class="collapse-item" href="{% url 'panelOpcionesEstadisticas' %}">Estadisticas de Caja</a>
+                        {% endif %}
+                        {% if item2.estadoMenu_id.id == 1  and item2.id == 4 %}
+                        <a class="collapse-item" href="{% url 'buscarVendedor' %}">Reporte de Vendedores</a>
+                        {% endif %}
+                        {% endif %}
+                        {% endfor %}
+                        
+                        
+                    </div>
+                </div>
+            </li>
+            </li>
+            
+            {% endif %}
+            {% if item.menu.estadoMenu_id.id == 1 and item.menu.id == 2 %}
+            <!-- Divider -->
+            <hr class="sidebar-divider">
+
+            <!-- Heading -->
+            <div class="sidebar-heading">
+                Gestión
+            </div>
+
+            <!-- Nav Item - Pages Collapse Menu -->
+            <li class="nav-item">
+                <a class="nav-link collapsed" href="#" data-toggle="collapse" data-target="#collapseTwo" aria-expanded="true" aria-controls="collapseTwo">
+                    <i class='fas fa-rocket'></i>
+                    <span>Gestión</span>
+                </a>
+                <div id="collapseTwo" class="collapse" aria-labelledby="headingTwo" data-parent="#accordionSidebar">
+                    <div class="bg-white py-2 collapse-inner rounded">
+                        <h6 class="collapse-header">Gestión</h6>
+                        {% for item2 in item.SubMenu %}
+                        {% if request.user|has_group:'Administrador' %}
+                        {% if item2.estadoMenu_id.id == 1  and item2.id == 5 %}
+                        <a class="collapse-item" href="{% url 'sucursales' %}"><i class='fas fa-store-alt-slash'></i> Sucursales</a>
+                        {% endif %}
+                        {% if item2.estadoMenu_id.id == 1  and item2.id == 6 %}
+                        <a class="collapse-item" href="{% url 'rubros' %}"><i class='fas fa-cookie'></i> Rubros</a>
+                        {% endif %}
+                        {% if item2.estadoMenu_id.id == 1  and item2.id == 7 %}
+                        <a class="collapse-item" href="{% url 'seccion' %}"><i class='fas fa-cookie-bite'></i> Secciones</a>
+                        {% endif %}
+                        {% if item2.estadoMenu_id.id == 1  and item2.id == 8 %}
+                        <a class="collapse-item" href="{% url 'proveedores' %}"><i class='far fa-address-card'></i></i> Proveedores</a>
+                        {% endif %}
+                        {% if item2.estadoMenu_id.id == 1  and item2.id == 9 %}
+                        <a class="collapse-item" href="{% url 'articulos' tipo=0 tFiltro=5 %}"><i class='fas fa-dolly'></i> Articulos / Stock</a>
+                        {% endif %}
+                        {% endif %}
+                        {% if item2.estadoMenu_id.id == 1  and item2.id == 9 %}
+                        <a class="collapse-item" href="{% url 'articulos' tipo=1 tFiltro=5 %}"><i class='fas fa-desktop'></i> Lista de Precios</a>
+                        {% endif %}
+                        {% if request.user|has_group:'Administrador' %}
+                        {% if item2.estadoMenu_id.id == 1  and item2.id == 10 %}
+                        <a class="collapse-item" href="{% url 'cliente' %}"><i class='fas fa-address-book'></i> Clientes</a>
+                        {% endif %}
+                        {% if item2.estadoMenu_id.id == 1  and item2.id == 18 %}
+                        <a class="collapse-item" href="{% url 'bancos' %}"><i class='fas fa-landmark'></i> Bancos</a>
+                        {% endif %}
+                        {% if item2.estadoMenu_id.id == 1  and item2.id == 11 %}
+                        <a class="collapse-item" href="{% url 'vendedor' %}"><i class='fas fa-user-astronaut'></i> Vendedor</a>
+                        {% endif %}
+                        {% endif %}
+                        {% endfor %}
+                    
+                        </div>
+                </div>
+            </li>
+            {% endif %}
+            {% if request.user|has_group:'Administrador' %}
+            <!-- Divider -->
+            
+            {% if item.menu.estadoMenu_id.id == 1 and item.menu.id == 3 %}
+            <!-- Divider -->
+            <hr class="sidebar-divider my-0">
+            <div class="sidebar-heading">
+                Cuentas Corrientes 
+            </div>
+
+            <!-- Nav Item - Dashboard -->
+            <li class="nav-item ">
+                <a class="nav-link collapsed" href="#" data-toggle="collapse" data-target="#ccCollapse" aria-expanded="true" aria-controls="collapseTwo">
+                    <i class="fas fa-coins"></i>
+                    <span>Cuentas Corrientes</span></a>
+                <div id="ccCollapse" class="collapse" aria-labelledby="headingTwo" data-parent="#accordionSidebar">
+                    <div class="bg-white py-2 collapse-inner rounded">
+                        {% for item2 in item.SubMenu %}
+                        
+                        {% if item2.estadoMenu_id.id == 1  and item2.id == 12 %}
+                        <a class="collapse-item" href="{% url 'buscarCuenta' tipo=1 %}"><i class='fas fa-coins'></i>C.C. Clientes</a>
+                        {% endif %}
+                        {% if item2.estadoMenu_id.id == 1  and item2.id == 12 %}
+                        <a class="collapse-item" href="{% url 'buscarCuenta' tipo=2 %}"><i class='fas fa-coins'></i>C.C. Proveedores</a>
+                        {% endif %}
+                        {% if item2.estadoMenu_id.id == 1  and item2.id == 13 %}
+                        <a class="collapse-item" href="{% url 'reporteCC' %}"><i class='fas fa-poll'></i>Reportes de CC</a>
+                        {% endif %}
+                        {% endfor %}
+
+                    </div>
+                </div>
+            </li>
+
+
+            
+           
+
+
+            </li>
+
+            {% endif %}
+
+
+            <!-- Divider -->
+            
+            {% if item.menu.estadoMenu_id.id == 1 and item.menu.id == 6 %}
+            <!-- Divider -->
+            <hr class="sidebar-divider my-0">
+            <div class="sidebar-heading">
+                Cuentas Corrientes 
+            </div>
+
+            <!-- Nav Item - Dashboard -->
+            <li class="nav-item ">
+                <a class="nav-link collapsed" href="#" data-toggle="collapse" data-target="#ccbCollapse" aria-expanded="true" aria-controls="collapseTwo">
+                    <i class="fas fa-calculator"></i>
+                    <span>Cuentas Corrientes</span></a>
+                <div id="ccbCollapse" class="collapse" aria-labelledby="headingTwo" data-parent="#accordionSidebar">
+                    <div class="bg-white py-2 collapse-inner rounded">
+                        {% for item2 in item.SubMenu %}
+                        
+                        {% if item2.estadoMenu_id.id == 1  and item2.id == 16 %}
+                        <a class="collapse-item" href="{% url 'buscarCuentaB' tipo=1 %}"><i class='fas fa-calculator'></i>C.C. Clientes</a>
+                        {% endif %}
+                        {% if item2.estadoMenu_id.id == 1  and item2.id == 16 %}
+                        <a class="collapse-item" href="{% url 'buscarCuentaB' tipo=2 %}"><i class='fas fa-calculator'></i>C.C. Proveedores</a>
+                        {% endif %}
+                        {% if item2.estadoMenu_id.id == 1  and item2.id == 17 %}
+                        <a class="collapse-item" href="{% url 'reporteCCB' %}"><i class='fas fa-poll'></i>Reportes de CC</a>
+                        {% endif %}
+                        {% endfor %}
+
+                    </div>
+                </div>
+            </li>
+
+
+            
+           
+
+
+            </li>
+
+            
+            {% endif %}
+
+            {% if item.menu.estadoMenu_id.id == 1 and item.menu.id == 4 %}
+            <!-- Divider -->
+            <hr class="sidebar-divider my-0">
+            <div class="sidebar-heading">
+                Bancos
+            </div>
+
+            <!-- Nav Item - Dashboard -->
+            <li class="nav-item ">
+                <a class="nav-link collapsed" href="#" data-toggle="collapse" data-target="#bancosCollapse" aria-expanded="true" aria-controls="collapseTwo">
+                    <i class="fas fa-landmark"></i>
+                    <span>Bancos</span></a>
+                <div id="bancosCollapse" class="collapse" aria-labelledby="headingTwo" data-parent="#accordionSidebar">
+                    <div class="bg-white py-2 collapse-inner rounded">
+                        {% for item2 in item.SubMenu %}
+                        
+                        {% if item2.estadoMenu_id.id == 1  and item2.id == 14 %}
+                        <a class="collapse-item" href="{% url 'carteraValores' %}?estado=1"><i class='fas fa-briefcase'></i>Cartera de Valores</a>
+                        {% endif %}
+                        {% endfor %}
+                        </div>
+                </div>
+            </li>
+            
+           
+
+
+            
+            {% endif %}
+            {% if item.menu.estadoMenu_id.id == 1 and item.menu.id == 5 %}
+            <!-- Divider -->
+            <hr class="sidebar-divider">
+            <div class="sidebar-heading">
+                Libro IVA
+            </div>
+            <li class="nav-item ">
+                <a class="nav-link collapsed" href="#" data-toggle="collapse" data-target="#ivaCollapse" aria-expanded="true" aria-controls="collapseTwo">
+                    <i class="fas fa-book"></i>
+                    <span>Libro IVA</span></a>
+                <div id="ivaCollapse" class="collapse" aria-labelledby="headingTwo" data-parent="#accordionSidebar">
+                    <div class="bg-white py-2 collapse-inner rounded">
+
+            <!-- Nav Item - Pages Collapse Menu -->
+         
+                <a class="collapse-item" href="{% url 'iva' periodo=0 tipo=1 %}">
+                    <i class='fas fa-book'></i>
+                    <span>Libro Iva</span>
+                </a>
+                <a class="collapse-item" href="{% url 'periodoIVA' %}">
+                    <i class='fas fa-book'></i>
+                    <span>Periodos</span>
+                </a>
+                
+            </li>
+            
+            {% endif %}
+          
+
+            {% if item.menu.estadoMenu_id.id == 1 and item.menu.id == 7 %}
+            <!-- Divider -->
+            <hr class="sidebar-divider">
+            <div class="sidebar-heading">
+                Pedidos
+            </div>
+            <li class="nav-item ">
+                <a class="nav-link collapsed" href="#" data-toggle="collapse" data-target="#presupuestosCollapse" aria-expanded="true" aria-controls="collapseTwo">
+                    <i class="fa fa-clone"></i>
+                    <span>Pedidos</span></a>
+                <div id="presupuestosCollapse" class="collapse" aria-labelledby="headingTwo" data-parent="#accordionSidebar">
+                    <div class="bg-white py-2 collapse-inner rounded">
+
+            <!-- Nav Item - Pages Collapse Menu -->
+         
+                <a class="collapse-item" href="#" hidden>
+                    <i class="fa fa-clone"></i>
+                    <span>Presupuestos</span>
+                </a>
+                <a class="collapse-item" href="{% url 'listaPedidos' %}?nombre=&numero=&estado=1">
+                    <i class="fa fa-clone"></i>
+                    <span>Pedidos</span>
+                </a>
+                
+            </li>
+            {% endif %}
+
+            {% if item.menu.estadoMenu_id.id == 1 and item.menu.id == 8 %}
+            <!-- Divider -->
+            <hr class="sidebar-divider">
+            <div class="sidebar-heading">
+                Costos
+            </div>
+            <li class="nav-item ">
+                <a class="nav-link collapsed" href="#" data-toggle="collapse" data-target="#costosCollapse" aria-expanded="true" aria-controls="collapseTwo">
+                    <i class="fas fa-search-dollar"></i>
+                    <span>Costos</span></a>
+                <div id="costosCollapse" class="collapse" aria-labelledby="headingTwo" data-parent="#accordionSidebar">
+                    <div class="bg-white py-2 collapse-inner rounded">
+            
+            <!-- Nav Item - Pages Collapse Menu -->
+         
+                <a class="collapse-item" href="{% url 'listaMateriales' fproveedor=0 %}">
+                    <i class='fas fa-hammer'></i>
+                    <span>Materiales</span>
+                </a>
+                <a class="collapse-item" href="{% url 'listaCostos' %}">
+                    <i class='fas fa-inbox'></i>
+                    <span>Costos</span>
+                </a>
+                
+                
+            </li>
+            
+            {% endif %}
+
+
+
+
+            {% endif %}
+
+
+            {% endfor %}
+
+            
+
+        </ul>
+        <!-- End of Sidebar -->
+
+        <!-- Content Wrapper -->
+        <div id="content-wrapper" class="d-flex flex-column">
+            
+            <!-- Main Content -->
+            <div id="content">
+                
+                <!-- Topbar -->
+                <nav class="navbar navbar-expand navbar-light bg-white topbar mb-4 static-top shadow ">
+                    <button type="button" class="btn btn-primary" onclick="esconder()" id="botonMenu" style="padding-left:-20px; margin-left: -20px;height: 100%; background-color:#596152"><i class="fas fa-angle-double-left" id="iconMenu"></i></button>
+                    <!-- Sidebar Toggle (Topbar) -->
+                    <button id="sidebarToggleTop" class="btn btn-link d-md-none rounded-circle mr-3">
+                        <i class="fa fa-bars"></i>
+                    </button>
+
+                   
+
+                    <!-- Topbar Navbar -->
+                    <ul class="navbar-nav ml-auto">
+º       
+                        
+
+                        <!-- Nav Item - User Information -->
+
+                        <li class="nav-item dropdown no-arrow">
+                            
+                            <a class="nav-link dropdown-toggle" href="#" id="userDropdown" role="button" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+                                <span class="mr-2 d-none d-lg-inline text-gray-600 small">    Hola  {{user}}</span>
+                                <!-- <img class="img-profile rounded-circle" src="{%  static 'img/undraw_profile.svg' %}">-->
+                            </a>
+                            <!-- Dropdown - User Information -->
+                            <div class="dropdown-menu dropdown-menu-right shadow animated--grow-in" aria-labelledby="userDropdown">
+                                <a class="dropdown-item" href="#">
+                                    <i class="fas fa-user fa-sm fa-fw mr-2 text-gray-400"></i> Perfil
+                                </a>
+                                <a class="dropdown-item" href="#">
+                                    <i class="fas fa-cogs fa-sm fa-fw mr-2 text-gray-400"></i> Configuracion
+                                </a>
+                                <a class="dropdown-item" href="#">
+                                    <i class="fas fa-list fa-sm fa-fw mr-2 text-gray-400"></i> Usuarios
+                                </a>
+                                <div class="dropdown-divider"></div>
+                                <a class="dropdown-item" href="{% url 'logout' %}">
+                                    <i class="fas fa-sign-out-alt fa-sm fa-fw mr-2 text-gray-400"></i> Cerrar Sesion
+                                </a>
+                            </div>
+                        </li>
+
+                    </ul>
+
+                </nav>
+                <!-- End of Topbar -->
+
+                <!-- Begin Page Content -->
+                <div class="container-fluid" id="myDiv" style="margin:0;">
+                    <div id="deuda" style="
+                    
+                    color: rgb(0, 0, 0);
+                    font-size: 20px;
+                    " ></div>
+                    
+                    
+                    {% block contenido %} {% endblock %}
+
+                </div>
+
+                <div class="loader" id="loader"></div>
+                
+
+                <div class="container-fluid" id="mor" style="margin:0" >
+                        <!-- 404 Error Text-->
+                        <div class="text-center">
+                            <img src="{% static 'img/sad.png' %}" style="width:150px">
+                            <p class="lead text-gray-800 mb-5" style="font-size: 30px;">Tiempo restante para el blockeo de usuario</p>
+                            <div id="countdown" style="font-size: 35px;">
+                                
+                            </div>
+                            
+                            <p class="lead text-gray-800 mb-5" style="font-size: 35px;color:black">Lo sentimos</p>
+                            <p class="text-gray-500 mb-0" style="font-size: 25px;color:black">Estimado usuario, al día de la fecha su suscripción registra deuda. Si ya realizo el pago correspondiente póngase en contacto con MantisTec.</p>
+                        </div>
+                        <center>
+                        <a onclick="cargarBien()" id="desblo" class="btn btn-info btn-icon-split">
+                                <span class="icon text-white-50">
+                                </span>
+                                <span class="text">Continuar Trabajando</span></center>
+                            </a>
+                        
+                        </div>
+
+                        
+                        <!-- /.container-fluid -->
+                                                
+     
+  
+
+               
+            </div>
+        </div>
+    </div>
+
+    <!-- End of Main Content -->
+
+    <!-- Footer -->
+    <footer class="sticky-footer bg-white">
+        <div class="container my-auto">
+            <div class="copyright text-center my-auto">
+                <span>Copyright &copy; <a href="https://mantistec.com.ar/">Mantis Tec</span>
+            </div>
+        </div>
+    </footer>
+    <!-- End of Footer -->
+
+    </div>
+    <!-- End of Content Wrapper -->
+
+    </div>
+    <!-- End of Page Wrapper -->
+
+    <!-- Scroll to Top Button-->
+    <a class="scroll-to-top rounded" href="#page-top">
+        <i class="fas fa-angle-up"></i>
+    </a>
+
+ 
+
+
+
+
+    <!-- MOROSO Modal-->
+    <!-- Full screen modal -->
+    
+    
+
+
+    <script src="{% static 'vendor/bootstrap/js/bootstrap.bundle.min.js'%}"></script>
+
+    <!-- Core plugin JavaScript-->
+    <script src="{% static 'vendor/jquery-easing/jquery.easing.min.js'%}"></script>
+
+    <!-- Custom scripts for all pages-->
+    <script src="{% static 'js/sb-admin-2.min.js'%}"></script>
+
+    <!-- Page level plugins -->
+    <script src="{% static 'vendor/chart.js/Chart.min.js'%}"></script>
+
+    <!-- Page level custom scripts -->
+    <script src="{% static 'js/demo/chart-area-demo.js'%}"></script>
+    <script src="{% static 'js/demo/chart-pie-demo.js'%}"></script>
+
+    </div>
+</body>
+
+</html>
+
+{% else %}
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+
+    <meta charset="utf-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+    <meta name="description" content="">
+    <meta name="author" content="">
+
+    <title>Habitat - Online</title>
+
+    <!-- Custom fonts for this template-->
+    <link href="{% static 'vendor/fontawesome-free/css/all.min.css'%}" rel="stylesheet" type="text/css">
+    <link href="https://fonts.googleapis.com/css?family=Nunito:200,200i,300,300i,400,400i,600,600i,700,700i,800,800i,900,900i" rel="stylesheet">
+
+    <!-- Custom styles for this template-->
+    <link href="{% static 'css/sb-admin-2.min.css'%}" rel="stylesheet">
+    <link href="{% static 'css/style.css'%}" rel="stylesheet" media="all">
+    <!-- Bootstrap core JavaScript-->
+    <script src="{% static 'vendor/jquery/jquery.min.js'%}"></script>
+
+</head>
+
+
+<body id="page-top">
+    <!-- 404 Error Text-->
+    <div class="text-center" style="margin:30px">
+        <img src="{% static 'img/mantis-religiosa.png' %}" style="width:150px">
+        <div class="error mx-auto" data-text="403">403</div>
+        <p class="lead text-gray-800 mb-5">Usted no tiene acceso a esta pagina</p>
+
+        <p class="text-gray-500 mb-0">Por favor primero identifiquese</p>
+        <a href="{% url 'login' %}" class="btn btn-success">Identificate</a>
+
+    </div>
+
+    </div>
+    <!-- /.container-fluid -->
+    <script src="{% static 'vendor/bootstrap/js/bootstrap.bundle.min.js'%}"></script>
+
+    <!-- Core plugin JavaScript-->
+    <script src="{% static 'vendor/jquery-easing/jquery.easing.min.js'%}"></script>
+
+    <!-- Custom scripts for all pages-->
+    <script src="{% static 'js/sb-admin-2.min.js'%}"></script>
+
+    <!-- Page level plugins -->
+    <script src="{% static 'vendor/chart.js/Chart.min.js'%}"></script>
+
+    <!-- Page level custom scripts -->
+    <script src="{% static 'js/demo/chart-area-demo.js'%}"></script>
+    <script src="{% static 'js/demo/chart-pie-demo.js'%}"></script>
+
+
+
+</body>
+
+</html>{% endif %}

@@ -1,0 +1,173 @@
+{% extends 'layout.html' %} {% block titulo %}
+
+<script>
+    function cargarProvincia(){
+        var id = document.getElementById("id_paises").value;
+        if (id){
+        $.ajax(
+        {
+          type:"GET",
+          url: '{% url "traeProvincias" %}',
+          data:{
+                  pais_id: id
+          },
+        
+          success: function( data ) 
+          {
+            $('#id_provincia').empty();
+            $('#id_localidad').empty();
+            $('#id_localidad').html('<option>--Seleccione Localidad--</option>');
+            var html='<option>--Seleccione Provincia--</option>';
+            for (i=0;i<Object.keys(data).length;i++){
+                  html=html+'<option value='+parseInt(data[i].id_provincia)+'>'+data[i].nombre_provincia+'</option>';
+            }
+            $('#id_provincia').html(html);
+          }
+      })
+    }
+    else{
+      $('#id_provincia').html('<option>--Seleccione Provincia--</option>');
+    }
+  
+    }
+  
+    function cargarLocalidad(){
+        var id = document.getElementById("id_provincia").value;
+        if (id){
+        $.ajax(
+        {
+          type:"GET",
+          url: '{% url "traeLocalidad" %}',
+          data:{
+                  provincia_id: id
+          },
+        
+          success: function( data ) 
+          {
+            $('#id_localidad').empty();
+            var html='<option>--Seleccione Localidad--</option>';
+            for (i=0;i<Object.keys(data).length;i++){
+                  html=html+'<option value='+parseInt(data[i].id_localidad)+'>'+data[i].nombre_localidad+'</option>';
+            }
+            $('#id_localidad').html(html);
+          }
+      })
+    }
+    else{
+      $('#id_localidad').html('<option>--Seleccione Localidad--</option>');
+    }
+  
+    }
+  
+  </script>
+
+    <div class="d-sm-flex align-items-center justify-content-between mb-4">
+        <h2 class="title-1">Gestion de {{tipoCuenta.descripcion}} </h2>
+        
+        <a href="{% url 'nuevaCuenta' tipo=tipoCuenta.id_tipo_cuenta id=0 %}" class="btn btn-success btn-icon-split">
+            <span class="icon text-white-50">
+                <i class='fas fa-plus'></i>
+            </span>
+            <span class="text">Nueva</span>
+        </a>
+
+        <a href="#" class="btn btn-primary btn-icon-split">
+            <span class="icon text-white-50">
+                <i class='fas fa-download'></i>
+            </span>
+            <span class="text">Decargar Listado PDF</span>
+        </a>
+        <span class="text"></span>
+        <span class="text"></span>
+        <span class="text"></span>
+        <span class="text"></span>
+        <span class="text"></span>
+        <span class="text"></span>
+        <span class="text"></span>
+        <span class="text"></span>
+    </div>
+    <small>Aquí podrás dar de alta, modificiar y eliminar, {{tipoCuenta.descripcion}}.</small>
+
+
+
+{% endblock %} {% block contenido %}
+   
+<div class="card shadow mb-4">
+    <div class="card-header py-3">
+        <h6 class="m-0 font-weight-bold text-primary">Listado de {{tipoCuenta.descripcion}}</h6>
+    </div>
+    <div class="card-body">
+        <div class="table-responsive">
+            <div id="dataTable_wrapper" class="dataTables_wrapper dt-bootstrap4">
+                <div class="row">
+                    <div class="col-sm-12 col-md-6">
+                        <div id="dataTable_filter" class="dataTables_filter">
+                            <form class="form-header" action="#" method="GET">
+                                <label>Buscar {{tipoCuenta.descripcion}}:
+                        
+                        <input type="search" class="form-control form-control-sm" placeholder="" aria-controls="dataTable" name="buscarCliente"></label>
+
+                                <button type="submit" class="btn btn-primary btn-icon-split">
+                        <span class="icon text-white-50">
+                            
+                            <i class='fas fa-search' style="color:white" ></i>
+                        </span>
+                        
+                    </button>
+                            </form>
+                        </div>
+                    </div>
+                </div>
+                {% if messages %}
+                <ul class="messages">
+                    {% for message in messages %}
+                    <li{% if message.tags %} class="{{ message.tags }}" {% endif %}>{{ message }}</li>
+                        {% endfor %}
+                </ul>
+                {% endif %}
+                <div class="row">
+                    <div class="col-sm-12">
+                        <table class="table table-bordered dataTable" id="dataTable" width="100%" cellspacing="0" role="grid" aria-describedby="dataTable_info" style="width: 100%;">
+                            <thead>
+                                <tr style="background-color: rgb(211, 227, 250);color:rgb(95, 93, 93)">
+                                    <th rowspan="1" colspan="1">NOMBRE</th>
+                                    <th rowspan="1" colspan="1">DUCUMENTO</th>
+                                    <th rowspan="1" colspan="1">CELULAR</th>
+                                    <th rowspan="1" colspan="1">TELEFONO</th>
+                                    <th rowspan="1" colspan="1">EMAIL</th>
+                                    <th rowspan="1" colspan="1"></th>
+                                </tr>
+                            </thead>
+
+                            <tbody>
+
+                                {% for cuenta in cuentas %}
+                                <tr class="odd" style="color:rgb(112, 112, 112)">
+                                    <td>{{cuenta.nombre}}</td>
+                                    <td>{{cuenta.numero_documento}}</td>
+                                    <td><a href="tel:{{cuenta.celular_cuenta}}">{{cuenta.celular}}</a></td>
+                                    <td><a href="tel:{{cuenta.celular_cuenta}}">{{cuenta.telefono}}</a></td>
+                                    <td><a href="mailto: {{cuenta.email_cuenta}}">{{cuenta.email}}</a></td>
+
+
+                                    <td>
+                                        <div class="table-data-feature"><a href="{% url 'nuevaCuenta' tipo=tipoCuenta.id_tipo_cuenta id=cuenta.id %}"><i class='fas fa-edit'></i></a><a href="{% url 'eliminarCuenta' tipo=tipoCuenta.id_tipo_cuenta id=cuenta.id %}"><i class='far fa-trash-alt'></i></a></div>
+                                    </td>
+                                    </form>
+                                </tr>
+                                {% endfor %}</tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+
+
+
+
+
+
+{% endblock %}
