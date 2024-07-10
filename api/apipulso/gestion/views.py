@@ -358,6 +358,7 @@ def TemperatureGraphView(request, cuenta, puerto):
     ax.set_ylabel('Temperatura')
     
     # Aplicar formato personalizado de fecha en el eje x
+    ax.set_xticks(df['timestamp'])
     ax.set_xticklabels([translate_timestamp(t) for t in df['timestamp']], rotation=45)
     
     # Agregar tooltips con mpld3 para mostrar temperaturas al pasar el mouse por encima
