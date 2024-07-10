@@ -15,6 +15,7 @@ from django.utils.dateparse import parse_datetime
 import os
 from django.template.loader import render_to_string
 from matplotlib.dates import DateFormatter
+from mpld3 import fig_to_html, plugins
 
 
 def panel(request):
@@ -276,6 +277,7 @@ def eliminar_cuenta_has_artefacto(request, id):
 Monitor temperatura grafico
 '''
 
+
 # Diccionarios para traducir nombres de días y meses
 DIAS_ESPANOL = {
     0: 'Lunes', 1: 'Martes', 2: 'Miércoles', 3: 'Jueves',
@@ -338,6 +340,10 @@ def TemperatureGraphView(request, cuenta, puerto):
     fig, ax = plt.subplots(figsize=(10, 6))
     ax.plot(df['timestamp'], df['temperature'], marker='o', linestyle='-', color='blue', label=f'Cuenta: {artefacto1.cuenta.nombre_cuenta}, Puerto {puerto}, {artefacto1.artefacto.descripcion}')
     
+    # Formatear etiquetas de fecha
+    ax.xaxis.set_major_formatter(DateFormatter('%Y-%m-%d %H:%M:%S'))
+    ax.xaxis.set_tick_params(rotation=45)
+    
     # Añadir etiquetas sobre los puntos de datos
     for i, (date, temp) in enumerate(zip(df['timestamp'], df['temperature'])):
         ax.text(date, temp, f'{date.strftime("%Y-%m-%d %H:%M:%S")}\n{temp:.2f}', ha='left', va='bottom', fontsize=8, color='black', rotation=0)
@@ -347,22 +353,22 @@ def TemperatureGraphView(request, cuenta, puerto):
     ax.legend(loc='best')
     plt.tight_layout()
 
-    # Generar el gráfico interactivo con mpld3
-    interactive_graph = mpld3.fig_to_html(fig)
-
     # Guardar el gráfico en un objeto BytesIO
     buf = BytesIO()
     plt.savefig(buf, format='png')
     buf.seek(0)
 
     # Codificar la imagen en base64 para poder insertarla en la plantilla
-    graph_base64 = base64.b64encode(buf.getvalue()).decode('utf-8')
+    image_base64 = base64.b64encode(buf.getvalue()).decode('utf-8')
     buf.close()
 
     # Preparar datos para la tabla
     table_data = []
     for date, temp in zip(df['timestamp'], df['temperature']):
-        table_data.append({'Fecha y Hora': date.strftime("%Y-%m-%d %H:%M:%S"), 'Temperatura': temp})
+        date_str = translate_timestamp(date)  # Traducir la fecha y hora a español
+        table_data.append({'fecha_hora': date_str, 'temperatura': temp})
 
-    # Renderizar la plantilla con el gráfico interactivo y la imagen en base64
-    return render(request, 'monitoreo/graficos.html', {'graph': interactive_graph, 'graph_base64': graph_base64, 'tabla_datos': table_data})
+    # Renderizar la plantilla con el gráfico interactivo y la tabla de datos
+    return render(request, 'monitoreo/graficos.html', {'graph': image_base64, 'tabla_datos': table_data})
+
+Explicación de los cambios:
