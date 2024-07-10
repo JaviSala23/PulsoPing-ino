@@ -1,5 +1,5 @@
 from django.urls import path
-from pulso.views import SensorReadingListCreate, SensorReadingDetail
+from pulso.views import SensorReadingListCreate
 from gestion import views as gestion
 from django.contrib import admin
 urlpatterns = [
