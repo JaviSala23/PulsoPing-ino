@@ -14,6 +14,7 @@ from gestion.forms import *
 from django.utils.dateparse import parse_datetime
 import os
 from django.template.loader import render_to_string
+import calendar
 
 def panel(request):
     return render(request,'inicio/panelControl.html')
@@ -268,6 +269,8 @@ def eliminar_cuenta_has_artefacto(request, id):
 
 
 
+def obtener_nombre_dia(dia):
+    return calendar.day_name[dia]
 
 
 
@@ -335,12 +338,18 @@ def TemperatureGraphView(request, cuenta, puerto):
     # Crear un gráfico con matplotlib
     fig, ax = plt.subplots(figsize=(10, 6))
     temperatures_in_range = (df['temperature'] >= artefacto1.temp_min) & (df['temperature'] <= artefacto1.temp_max)
-    ax.plot(df['timestamp'][temperatures_in_range], df['temperature'][temperatures_in_range], label='En rango', color='green')
-    ax.plot(df['timestamp'][~temperatures_in_range], df['temperature'][~temperatures_in_range], label='Fuera de rango', color='red')
     
-    ax.set_xlabel('Timestamp')
-    ax.set_ylabel('Temperature')
+    # Gráfico de puntos
+    ax.scatter(df['timestamp'][temperatures_in_range], df['temperature'][temperatures_in_range], label='En rango', color='green')
+    ax.scatter(df['timestamp'][~temperatures_in_range], df['temperature'][~temperatures_in_range], label='Fuera de rango', color='red')
+    
+    ax.set_xlabel('Fecha')
+    ax.set_ylabel('Temperatura')
     ax.legend(loc='best')
+    
+    # Formatear el eje x con nombres de días en español
+    ax.set_xticklabels([obtener_nombre_dia(dia.weekday()) for dia in df['timestamp']])
+    
     plt.xticks(rotation=45)
     plt.tight_layout()
 
