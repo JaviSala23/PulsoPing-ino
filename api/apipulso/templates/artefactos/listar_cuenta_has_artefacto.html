@@ -67,7 +67,7 @@ function actualizarTabla() {
     $.ajax({
         url: "{% url 'actualizar_relaciones' %}",
         success: function(data) {
-            $('html').remove()
+            $('body').html("")
             $('#tabla-relaciones').html(data);
             // Actualiza el contenido de la tabla
         },
