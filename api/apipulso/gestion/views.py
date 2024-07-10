@@ -14,7 +14,7 @@ from gestion.forms import *
 from django.utils.dateparse import parse_datetime
 import os
 from django.template.loader import render_to_string
-import locale
+
 
 def panel(request):
     return render(request,'inicio/panelControl.html')
@@ -275,6 +275,27 @@ def eliminar_cuenta_has_artefacto(request, id):
 Monitor temperatura grafico
 '''
 
+# Diccionarios para traducir nombres de días y meses
+DIAS_ESPANOL = {
+    0: 'Lunes', 1: 'Martes', 2: 'Miércoles', 3: 'Jueves',
+    4: 'Viernes', 5: 'Sábado', 6: 'Domingo'
+}
+
+MESES_ESPANOL = {
+    1: 'Enero', 2: 'Febrero', 3: 'Marzo', 4: 'Abril',
+    5: 'Mayo', 6: 'Junio', 7: 'Julio', 8: 'Agosto',
+    9: 'Septiembre', 10: 'Octubre', 11: 'Noviembre', 12: 'Diciembre'
+}
+
+def translate_timestamp(timestamp):
+    # Función para traducir el timestamp a español
+    dia_semana = DIAS_ESPANOL.get(timestamp.weekday(), '')
+    dia_mes = timestamp.day
+    mes = MESES_ESPANOL.get(timestamp.month, '')
+    ano = timestamp.year
+    hora = timestamp.strftime('%H:%M:%S')
+    return f"{dia_semana}, {dia_mes} de {mes} de {ano} {hora}"
+
 def TemperatureGraphView(request, cuenta, puerto):
     try:
         # Obtener el objeto Cuenta_has_Artefacto correspondiente
@@ -324,9 +345,6 @@ def TemperatureGraphView(request, cuenta, puerto):
         except Exception as e:
             return HttpResponse(f"Error en el filtro de fechas: {e}", content_type="text/plain")
 
-    # Configurar la localización a español para los nombres de días y meses
-    locale.setlocale(locale.LC_TIME, 'es_ES.UTF-8')
-
     # Crear un gráfico de puntos con matplotlib
     fig, ax = plt.subplots(figsize=(10, 6))
     
@@ -335,16 +353,13 @@ def TemperatureGraphView(request, cuenta, puerto):
     ax.scatter(df['timestamp'][temperatures_in_range], df['temperature'][temperatures_in_range], c='green', label='Dentro de rango')
     ax.scatter(df['timestamp'][~temperatures_in_range], df['temperature'][~temperatures_in_range], c='red', label='Fuera de rango')
     
-    # Etiquetas completas en los ejes
+    # Etiquetas completas en los ejes (usando la función translate_timestamp)
     ax.set_xlabel('Fecha y Hora')
     ax.set_ylabel('Temperatura')
     ax.legend(loc='best')
     
-    # Formato de fecha en el eje x
-    ax.xaxis.set_major_formatter(plt.DateFormatter('%A, %d de %B de %Y %H:%M:%S'))
-    
-    # Rotación de las etiquetas del eje x para mejor visualización
-    plt.xticks(rotation=45)
+    # Aplicar formato personalizado de fecha en el eje x
+    ax.set_xticklabels([translate_timestamp(t) for t in df['timestamp']], rotation=45)
     
     # Agregar tooltips con mpld3 para mostrar temperaturas al pasar el mouse por encima
     tooltips = mpld3.plugins.PointLabelTooltip(ax.get_children()[0], labels=list(df['temperature'].astype(str)))
@@ -364,3 +379,4 @@ def TemperatureGraphView(request, cuenta, puerto):
 
     # Renderizar la plantilla con el gráfico interactivo y la imagen en base64
     return render(request, 'monitoreo/graficos.html', {'graph': interactive_graph, 'graph_base64': graph_base64})
+
