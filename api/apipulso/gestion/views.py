@@ -7,7 +7,7 @@ from io import BytesIO
 import base64
 from django.shortcuts import render
 from django.http import HttpResponse
-
+import re
 
 def TemperatureGraphView(request):
     # Obtener la lista de archivos de texto guardados
@@ -19,12 +19,16 @@ def TemperatureGraphView(request):
 
     for file_path in file_paths:
         print(f"Procesando archivo: {file_path}")
-        # Obtener placa y puerto desde el nombre del archivo
-        parts = os.path.basename(file_path).split('_')
-        if len(parts) < 4:
+        
+        # Usar expresión regular para obtener placa y puerto desde el nombre del archivo
+        match = re.search(r'placa_(\d+)/puerto_(\d+)', file_path)
+        if not match:
             print(f"Nombre de archivo no válido: {file_path}")
             continue  # Saltar archivos que no cumplen con la estructura esperada
-
+        
+        placa_id = match.group(1)
+        puerto = match.group(2)
+        
         try:
             # Leer datos del archivo
             with open(file_path, 'r') as f:
@@ -37,15 +41,13 @@ def TemperatureGraphView(request):
         for line in lines:
             print(f"Procesando línea: {line}")
             parts = line.strip().split(',')
-            if len(parts) < 4:
+            if len(parts) < 2:
                 print(f"Línea no válida: {line}")
                 continue  # Saltar líneas que no cumplen con la estructura esperada
 
             try:
                 timestamp = datetime.strptime(parts[0], "%Y-%m-%d %H:%M:%S")
                 temperature = float(parts[1])
-                placa_id = parts[2]
-                puerto = parts[3]
                 data.append((timestamp, temperature, placa_id, puerto))
             except Exception as e:
                 print(f"Error procesando línea {line}: {e}")
