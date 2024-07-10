@@ -349,8 +349,14 @@ def TemperatureGraphView(request, cuenta, puerto):
     ax.legend(loc='best')
     plt.tight_layout()
 
-    # Crear el gráfico interactivo con mpld3
-    interactive_graph = mpld3.fig_to_html(fig)
+    # Guardar el gráfico en un objeto BytesIO
+    buf = BytesIO()
+    plt.savefig(buf, format='png')
+    buf.seek(0)
+
+    # Codificar la imagen en base64 para poder insertarla en la plantilla
+    image_base64 = base64.b64encode(buf.getvalue()).decode('utf-8')
+    buf.close()
 
     # Preparar datos para la tabla
     table_data = []
@@ -359,5 +365,4 @@ def TemperatureGraphView(request, cuenta, puerto):
         table_data.append({'fecha_hora': date_str, 'temperatura': temp})
 
     # Renderizar la plantilla con el gráfico interactivo y la tabla de datos
-    return render(request, 'monitoreo/graficos.html', {'graph': interactive_graph, 'tabla_datos': table_data})
-
+    return render(request, 'monitoreo/graficos.html', {'graph': image_base64, 'tabla_datos': table_data})
