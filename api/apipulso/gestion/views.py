@@ -52,7 +52,7 @@ def TemperatureGraphView(request, cuenta, puerto):
 
     # Crear un gráfico con matplotlib
     fig, ax = plt.subplots(figsize=(10, 6))
-    ax.plot(df['timestamp'], df['temperature'], label=f'Cuenta {cuenta} Puerto {puerto}')
+    ax.plot(df['timestamp'], df['temperature'], label=f'Cuenta: {artefacto1.cuenta.nombre_cuenta}, Puerto {puerto}, {artefacto1.artefacto.descripcion}')
     ax.set_xlabel('Timestamp')
     ax.set_ylabel('Temperature')
     ax.legend(loc='best')
