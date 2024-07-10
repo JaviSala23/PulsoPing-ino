@@ -193,4 +193,4 @@ def TemperatureGraphView(request, cuenta, puerto):
     buf.close()
 
     # Renderizar la plantilla con el gráfico
-    return render(request, 'graficos.html', {'graph': image_base64})
+    return render(request, 'monitoreo/graficos.html', {'graph': image_base64})
