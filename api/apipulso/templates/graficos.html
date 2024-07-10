@@ -7,6 +7,10 @@
 </head>
 <body>
     <h1>Temperature Data</h1>
-    <img src="data:image/png;base64,{{ graph }}" alt="Temperature Graph">
+    {% for graph in graphs %}
+        <div>
+            <img src="data:image/png;base64,{{ graph }}" alt="Temperature Graph">
+        </div>
+    {% endfor %}
 </body>
 </html>

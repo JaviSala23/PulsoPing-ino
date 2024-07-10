@@ -60,24 +60,27 @@ def TemperatureGraphView(request):
     df = pd.DataFrame(data, columns=['timestamp', 'temperature', 'placa_id', 'puerto'])
     print(df)
 
-    # Crear un gráfico con matplotlib
-    fig, ax = plt.subplots(figsize=(10, 6))
+    # Crear un gráfico para cada combinación de placa_id y puerto
+    graph_images = []
     for key, grp in df.groupby(['placa_id', 'puerto']):
+        fig, ax = plt.subplots(figsize=(10, 6))
         ax.plot(grp['timestamp'], grp['temperature'], label=f'Placa {key[0]} Puerto {key[1]}')
+        ax.set_xlabel('Timestamp')
+        ax.set_ylabel('Temperature')
+        ax.legend(loc='best')
+        plt.xticks(rotation=45)
 
-    ax.set_xlabel('Timestamp')
-    ax.set_ylabel('Temperature')
-    ax.legend(loc='best')
-    plt.xticks(rotation=45)
+        # Guardar el gráfico en un objeto BytesIO
+        buf = BytesIO()
+        plt.savefig(buf, format='png')
+        buf.seek(0)
 
-    # Guardar el gráfico en un objeto BytesIO
-    buf = BytesIO()
-    plt.savefig(buf, format='png')
-    buf.seek(0)
+        # Codificar la imagen en base64 para poder insertarla en la plantilla
+        image_base64 = base64.b64encode(buf.getvalue()).decode('utf-8')
+        buf.close()
+        
+        # Añadir la imagen a la lista de gráficos
+        graph_images.append(image_base64)
 
-    # Codificar la imagen en base64 para poder insertarla en la plantilla
-    image_base64 = base64.b64encode(buf.getvalue()).decode('utf-8')
-    buf.close()
-
-    # Renderizar la plantilla con el gráfico
-    return render(request, 'graficos.html', {'graph': image_base64})
+    # Renderizar la plantilla con los gráficos
+    return render(request, 'graficos.html', {'graphs': graph_images})
