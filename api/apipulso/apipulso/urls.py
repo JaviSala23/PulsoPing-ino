@@ -24,4 +24,3 @@ urlpatterns = [
     path('auxiliar/traeTipoIva',gestion.traeTipoIva,name='traeTipoIva'),
 ]
 
-]
