@@ -24,6 +24,7 @@ urlpatterns = [
 
     #instalaciones
     path('cuenta_has_artefacto/', gestion.listar_cuenta_has_artefacto, name='listar_cuenta_has_artefacto'),
+    path('obtener_ultimo_registro/', gestion.obtener_ultimo_registro, name='obtener_ultimo_registro'),
     path('cuenta_has_artefacto/nuevo/<int:id>/', gestion.nueva_cuenta_has_artefacto, name='nueva_cuenta_has_artefacto'),
     path('cuenta_has_artefacto/eliminar/<int:id>/', gestion.eliminar_cuenta_has_artefacto, name='eliminar_cuenta_has_artefacto'),
 
