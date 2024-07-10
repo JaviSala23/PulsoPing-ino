@@ -119,7 +119,7 @@ class cuenta (models.Model):
         blank=False,
         on_delete=models.PROTECT)
     
-    tipo_cuenta_id_tipo_cuenta = models.ForeignKey( 
+    tipo_cuenta= models.ForeignKey( 
         tipo_cuenta,
         null=True, 
         blank=False,

@@ -5,9 +5,10 @@ import base64
 from datetime import datetime
 from django.shortcuts import render
 from django.http import HttpResponse
-from .models import *
+from gestion.models import *
 from django.contrib import messages
 from django.http import JsonResponse
+from gestion.forms import *
 
 def panel(request):
     return render(request,'inicio/panelControl.html')
