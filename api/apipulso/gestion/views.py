@@ -19,7 +19,7 @@ from mpld3 import fig_to_html, plugins
 
 
 def panel(request):
-    return render(request,'inicio/panelControl.html')
+    return render(request,'panel/panelControl.html')
 
 
 
