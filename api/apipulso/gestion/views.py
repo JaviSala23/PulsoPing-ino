@@ -371,4 +371,3 @@ def TemperatureGraphView(request, cuenta, puerto):
 
     # Renderizar la plantilla con el gráfico interactivo y la tabla de datos
     return render(request, 'monitoreo/graficos.html', {'graph': image_base64, 'tabla_datos': table_data})
-
