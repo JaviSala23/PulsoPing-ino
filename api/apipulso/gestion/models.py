@@ -169,8 +169,8 @@ class Cuenta_has_Artefacto(models.Model):
     temp_max=models.FloatField(blank=False,
         null=False)
     url=models.TextField(
-        null=False, 
-        blank=False, max_length=400)
+        null=True, 
+        blank=True, max_length=400)
 
     
 

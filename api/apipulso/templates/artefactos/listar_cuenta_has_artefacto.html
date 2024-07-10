@@ -1,0 +1,63 @@
+{% extends 'layout.html' %}
+
+{% block titulo %}
+<div class="d-sm-flex align-items-center justify-content-between mb-4">
+    <h2 class="title-1">Relaciones Cuenta-Artefacto</h2>
+    
+    <a href="{% url 'nueva_cuenta_has_artefacto' 0 %}" class="btn btn-success btn-icon-split">
+        <span class="icon text-white-50">
+            <i class='fas fa-plus'></i>
+        </span>
+        <span class="text">Nueva</span>
+    </a>
+
+    <span class="text"></span>
+    <span class="text"></span>
+    <span class="text"></span>
+    <span class="text"></span>
+    <span class="text"></span>
+    <span class="text"></span>
+    <span class="text"></span>
+</div>
+<small>Aquí podrás dar de alta, modificar y eliminar relaciones.</small>
+{% endblock %}
+
+{% block contenido %}
+<div class="row">
+    <div class="col-sm-12">
+        <table class="table table-bordered dataTable" id="dataTable" width="100%" cellspacing="0" role="grid" aria-describedby="dataTable_info" style="width: 100%;">
+            <thead>
+                <tr style="background-color: rgb(211, 227, 250);color:rgb(95, 93, 93)">
+                    <th rowspan="1" colspan="1">CUENTA</th>
+                    <th rowspan="1" colspan="1">ARTEFACTO</th>
+                    <th rowspan="1" colspan="1">PLACA</th>
+                    <th rowspan="1" colspan="1">PUERTO</th>
+                    <th rowspan="1" colspan="1">TEMP. MÍN.</th>
+                    <th rowspan="1" colspan="1">TEMP. MÁX.</th>
+                    <th rowspan="1" colspan="1">URL</th>
+                    <th rowspan="1" colspan="1"></th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for relacion in relaciones %}
+                <tr class="odd" style="color:rgb(112, 112, 112)">
+                    <td>{{ relacion.cuenta.nombre_cuenta }}</td>
+                    <td>{{ relacion.artefacto.descripcion }}</td>
+                    <td>{{ relacion.placa }}</td>
+                    <td>{{ relacion.puerto }}</td>
+                    <td>{{ relacion.temp_min }}</td>
+                    <td>{{ relacion.temp_max }}</td>
+                    <td>{{ relacion.url }}</td>
+                    <td>
+                        <div class="table-data-feature">
+                            <a href="{% url 'nueva_cuenta_has_artefacto' relacion.id %}"><i class='fas fa-edit'></i></a>
+                            <a href="{% url 'eliminar_cuenta_has_artefacto' relacion.id %}"><i class='far fa-trash-alt'></i></a>
+                        </div>
+                    </td>
+                </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    </div>
+</div>
+{% endblock %}

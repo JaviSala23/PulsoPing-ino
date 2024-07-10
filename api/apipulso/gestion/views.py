@@ -159,6 +159,40 @@ def eliminar_artefacto(request, id):
     return redirect('listar_artefactos')
 
 
+'''
+Cuenta Has Artefacto
+'''
+
+
+def listar_cuenta_has_artefacto(request):
+    relaciones = Cuenta_has_Artefacto.objects.all()
+    return render(request, 'artefactos/listar_cuenta_has_artefacto.html', {'relaciones': relaciones})
+
+def nueva_cuenta_has_artefacto(request, id=0):
+    if id != 0:
+        relacion = get_object_or_404(Cuenta_has_Artefacto, pk=id)
+        form = CuentaHasArtefactoForm(instance=relacion)
+        funcion = "Modificar"
+    else:
+        relacion = None
+        form = CuentaHasArtefactoForm()
+        funcion = "Agregar"
+    if request.method == 'POST':
+        form = CuentaHasArtefactoForm(request.POST, instance=relacion)
+        if form.is_valid():
+            form.save()
+            messages.success(request, f'Se ha {funcion.lower()}do la relación correctamente')
+            return redirect('listar_cuenta_has_artefacto')
+        else:
+            messages.error(request, 'No se pudo guardar la relación')
+    return render(request, 'cuenta_has_artefacto/nueva_cuenta_has_artefacto.html', {'form': form, 'funcion': funcion})
+
+def eliminar_cuenta_has_artefacto(request, id):
+    relacion = get_object_or_404(Cuenta_has_Artefacto, pk=id)
+    relacion.delete()
+    messages.success(request, f'Se ha eliminado la relación')
+    return redirect('listar_cuenta_has_artefacto')
+
 
 
 

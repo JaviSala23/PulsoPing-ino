@@ -84,3 +84,19 @@ class ArtefactoForm(forms.ModelForm):
     class Meta:
         model = artefacto
         fields = ['descripcion']
+
+
+
+
+class CuentaHasArtefactoForm(forms.ModelForm):
+    class Meta:
+        model = Cuenta_has_Artefacto
+        fields = [
+            'cuenta',
+            'artefacto',
+            'placa',
+            'puerto',
+            'temp_min',
+            'temp_max',
+            'url'
+        ]
