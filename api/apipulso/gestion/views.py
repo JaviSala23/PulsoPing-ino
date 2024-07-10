@@ -273,12 +273,6 @@ def eliminar_cuenta_has_artefacto(request, id):
 
 
 
-'''
-Monitor temperatura grafico
-'''
-
-
-
 # Diccionarios para traducir nombres de días y meses
 DIAS_ESPANOL = {
     0: 'Lunes', 1: 'Martes', 2: 'Miércoles', 3: 'Jueves',
@@ -341,10 +335,6 @@ def TemperatureGraphView(request, cuenta, puerto):
     fig, ax = plt.subplots(figsize=(10, 6))
     ax.plot(df['timestamp'], df['temperature'], marker='o', linestyle='-', color='blue', label=f'Cuenta: {artefacto1.cuenta.nombre_cuenta}, Puerto {puerto}, {artefacto1.artefacto.descripcion}')
     
-    # Formatear etiquetas de fecha
-    ax.xaxis.set_major_formatter(DateFormatter('%Y-%m-%d %H:%M:%S'))
-    ax.xaxis.set_tick_params(rotation=45)
-    
     # Añadir etiquetas sobre los puntos de datos
     for i, (date, temp) in enumerate(zip(df['timestamp'], df['temperature'])):
         ax.text(date, temp, f'{date.strftime("%Y-%m-%d %H:%M:%S")}\n{temp:.2f}', ha='left', va='bottom', fontsize=8, color='black', rotation=0)
@@ -352,6 +342,8 @@ def TemperatureGraphView(request, cuenta, puerto):
     ax.set_xlabel('Fecha y Hora')
     ax.set_ylabel('Temperatura')
     ax.legend(loc='best')
+    ax.xaxis.set_major_formatter(DateFormatter('%Y-%m-%d %H:%M:%S'))
+    ax.xaxis.set_tick_params(rotation=45)
     plt.tight_layout()
 
     # Guardar el gráfico en un objeto BytesIO
@@ -367,7 +359,12 @@ def TemperatureGraphView(request, cuenta, puerto):
     table_data = []
     for date, temp in zip(df['timestamp'], df['temperature']):
         date_str = translate_timestamp(date)  # Traducir la fecha y hora a español
-        table_data.append({'fecha_hora': date_str, 'temperatura': temp})
+        # Verificar si la temperatura está dentro del rango permitido
+        if artefacto1.temp_min <= temp <= artefacto1.temp_max:
+            color = 'blue'
+        else:
+            color = 'red'
+        table_data.append({'fecha_hora': date_str, 'temperatura': temp, 'color': color})
 
     # Renderizar la plantilla con el gráfico interactivo y la tabla de datos
     return render(request, 'monitoreo/graficos.html', {'graph': image_base64, 'tabla_datos': table_data})
