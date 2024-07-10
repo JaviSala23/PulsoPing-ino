@@ -27,6 +27,7 @@ def TemperatureGraphView(request):
         # Leer datos del archivo
         with open(file_path, 'r') as f:
             lines = f.readlines()
+            print(lines)
 
         for line in lines:
             print(line)
