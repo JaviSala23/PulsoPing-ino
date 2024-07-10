@@ -4,37 +4,32 @@
 
 {% block contenido %}
 <div class="container">
-    <h1>Gráfico de Temperatura Interactivo</h1>
-
-    <!-- Mostrar el gráfico interactivo -->
+    <form method="get" class="form-inline">
+        <label for="start_date" class="mr-2">Fecha de inicio:</label>
+        <input type="date" id="start_date" name="start_date" class="form-control mr-2">
+        <label for="end_date" class="mr-2">Fecha de fin:</label>
+        <input type="date" id="end_date" name="end_date" class="form-control mr-2">
+        <button type="submit" class="btn btn-primary">Filtrar</button>
+    </form>
+    <hr>
     <div id="graph-container">
         {{ graph|safe }}
     </div>
-
-    <hr>
-
-    <!-- Tabla de datos de temperatura -->
-    <div id="tabla-datos">
+    <div id="tabla_datos">
         <h2>Datos Tabulados de Temperaturas</h2>
-        <table class="table table-bordered">
-            <thead>
-                <tr>
-                    <th>Fecha y Hora</th>
-                    <th>Temperatura (°C)</th>
-                </tr>
-            </thead>
-            <tbody>
-                {% for data in tabla_datos %}
-                <tr>
-                    <td>{{ data.fecha_hora }}</td>
-                    <td>{{ data.temperatura }}</td>
-                </tr>
-                {% endfor %}
-            </tbody>
-        </table>
+        {{ tabla_html | safe }}
     </div>
 </div>
 
-<!-- Incluir el script de mpld3 para funcionalidad adicional -->
+<!-- Incluir las bibliotecas necesarias -->
+<script src="https://cdnjs.cloudflare.com/ajax/libs/d3/3.5.17/d3.min.js"></script>
 <script src="https://mpld3.github.io/js/mpld3.v0.5.1.min.js"></script>
+
+<!-- Script para habilitar la interactividad de mpld3 -->
+<script>
+    $(document).ready(function() {
+        // Habilitar la interactividad de mpld3
+        mpld3.enable_notebook();
+    });
+</script>
 {% endblock %}
