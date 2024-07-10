@@ -332,13 +332,13 @@ def TemperatureGraphView(request, cuenta, puerto):
 
     df = pd.DataFrame(data, columns=['timestamp', 'temperature'])
 
-    # Crear un gráfico de línea con etiquetas de fecha, hora y temperatura
-    fig, ax = plt.subplots(figsize=(12, 6))  # Aumentar el tamaño del gráfico
+   # Crear un gráfico de línea con etiquetas de fecha, hora y temperatura
+    fig, ax = plt.subplots(figsize=(10, 6))
     ax.plot(df['timestamp'], df['temperature'], marker='o', linestyle='-', color='blue', label=f'Cuenta: {artefacto1.cuenta.nombre_cuenta}, Puerto {puerto}, {artefacto1.artefacto.descripcion}')
     
-    # Formatear etiquetas de fecha
-    ax.xaxis.set_major_formatter(DateFormatter('%Y-%m-%d %H:%M:%S'))
-    ax.xaxis.set_tick_params(rotation=45)
+    # Formatear etiquetas de fecha y hora
+    ax.xaxis.set_major_formatter(plt.matplotlib.dates.DateFormatter('%Y-%m-%d\n%H:%M:%S'))  # \n para separar fecha y hora
+    ax.xaxis.set_tick_params(rotation=0)  # Sin rotación para mostrar fecha arriba y hora abajo
     
     # Añadir etiquetas sobre los puntos de datos (cada 10 puntos para evitar amontonamiento)
     for i, (date, temp) in enumerate(zip(df['timestamp'], df['temperature'])):
