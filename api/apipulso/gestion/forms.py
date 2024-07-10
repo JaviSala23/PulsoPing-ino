@@ -89,6 +89,10 @@ class ArtefactoForm(forms.ModelForm):
 
 
 class CuentaHasArtefactoForm(forms.ModelForm):
+    cuenta = forms.ModelChoiceField(queryset=cuenta.objects.all(), label='Cuenta')
+    artefacto = forms.ModelChoiceField(queryset=artefacto.objects.all(), label='Artefacto')
+    placa = forms.ModelChoiceField(queryset=Placa.objects.all(), label='Placa', required=False)
+
     class Meta:
         model = Cuenta_has_Artefacto
         fields = [
