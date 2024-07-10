@@ -185,7 +185,7 @@ def nueva_cuenta_has_artefacto(request, id=0):
             return redirect('listar_cuenta_has_artefacto')
         else:
             messages.error(request, 'No se pudo guardar la relación')
-    return render(request, 'cuenta_has_artefacto/nueva_cuenta_has_artefacto.html', {'form': form, 'funcion': funcion})
+    return render(request, 'artefactos/nueva_cuenta_has_artefacto.html', {'form': form, 'funcion': funcion})
 
 def eliminar_cuenta_has_artefacto(request, id):
     relacion = get_object_or_404(Cuenta_has_Artefacto, pk=id)
