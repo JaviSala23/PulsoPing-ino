@@ -175,7 +175,7 @@ def listar_cuenta_has_artefacto(request):
 
     # Itera sobre las relaciones para obtener y agregar el último registro de temperatura
     for relacion in relaciones:
-        archivo_path = relacion.archivo_registros  # Ajusta esto según tu modelo y campo correspondiente
+        archivo_path = relacion.url  # Ajusta esto según tu modelo y campo correspondiente
         ultimo_registro = obtener_ultimo_registro(archivo_path)
 
         # Agrega un diccionario con la relación y el último registro de temperatura
