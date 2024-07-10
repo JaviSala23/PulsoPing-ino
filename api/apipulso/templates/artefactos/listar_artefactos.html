@@ -4,7 +4,7 @@
 <div class="d-sm-flex align-items-center justify-content-between mb-4">
     <h2 class="title-1">Dispositivos</h2>
     
-    <a href="{% url 'nuevo_artefacto' 0 %}}" class="btn btn-success btn-icon-split">
+    <a href="{% url 'nuevo_artefacto' 0 %}" class="btn btn-success btn-icon-split">
         <span class="icon text-white-50">
             <i class='fas fa-plus'></i>
         </span>
@@ -21,7 +21,7 @@
     <span class="text"></span>
     <span class="text"></span>
 </div>
-<small>Aquí podrás dar de alta, modificiar y eliminar, {{tipoCuenta.descripcion}}.</small>
+<small>Aquí podrás dar de alta, modificiar y eliminar.</small>
 
 
 
@@ -44,7 +44,7 @@
 
             <tbody>
                 {% for artefacto in artefactos %}
-                {{ artefacto.descripcion }}
+                
                 <tr class="odd" style="color:rgb(112, 112, 112)">
                     <td>{{ artefacto.descripcion }}</td>
                     <td>
