@@ -333,16 +333,17 @@ def TemperatureGraphView(request, cuenta, puerto):
     df = pd.DataFrame(data, columns=['timestamp', 'temperature'])
 
     # Crear un gráfico de línea con etiquetas de fecha, hora y temperatura
-    fig, ax = plt.subplots(figsize=(10, 6))
+    fig, ax = plt.subplots(figsize=(12, 6))  # Aumentar el tamaño del gráfico
     ax.plot(df['timestamp'], df['temperature'], marker='o', linestyle='-', color='blue', label=f'Cuenta: {artefacto1.cuenta.nombre_cuenta}, Puerto {puerto}, {artefacto1.artefacto.descripcion}')
     
     # Formatear etiquetas de fecha
     ax.xaxis.set_major_formatter(DateFormatter('%Y-%m-%d %H:%M:%S'))
     ax.xaxis.set_tick_params(rotation=45)
     
-    # Añadir etiquetas sobre los puntos de datos
-    for date, temp in zip(df['timestamp'], df['temperature']):
-        ax.text(date, temp, f'{date.strftime("%Y-%m-%d %H:%M:%S")}\n{temp:.2f}', ha='left', va='bottom', fontsize=8, color='black', rotation=0)
+    # Añadir etiquetas sobre los puntos de datos (cada 10 puntos para evitar amontonamiento)
+    for i, (date, temp) in enumerate(zip(df['timestamp'], df['temperature'])):
+        if i % 10 == 0:  # Mostrar etiqueta cada 10 puntos
+            ax.text(date, temp, f'{date.strftime("%Y-%m-%d %H:%M:%S")}\n{temp:.2f}', ha='left', va='bottom', fontsize=8, color='black', rotation=0)
     
     ax.set_xlabel('Fecha y Hora')
     ax.set_ylabel('Temperatura')
@@ -363,14 +364,13 @@ def TemperatureGraphView(request, cuenta, puerto):
     for date, temp in zip(df['timestamp'], df['temperature']):
         date_str = translate_timestamp(date)  # Traducir la fecha y hora a español
         
-        # Determinar el color de la temperatura en la tabla
-        if temp < 18.0 or temp > 30.0:  # Ejemplo de rango, ajusta según tus necesidades
+        # Determinar el color de la temperatura en la tabla según los rangos definidos
+        if temp < artefacto1.temp_min or temp > artefacto1.temp_max:
             temp_color = 'red'
         else:
             temp_color = 'blue'
         
         table_data.append({'fecha_hora': date_str, 'temperatura': temp, 'color': temp_color})
-    
-      # Renderizar la plantilla con el gráfico interactivo y la tabla de datos
-    return render(request, 'monitoreo/graficos.html', {'graph': image_base64, 'tabla_datos': table_data})
 
+    # Renderizar la plantilla con el gráfico interactivo y la tabla de datos
+    return render(request, 'monitoreo/graficos.html', {'graph': image_base64, 'tabla_datos': table_data})
