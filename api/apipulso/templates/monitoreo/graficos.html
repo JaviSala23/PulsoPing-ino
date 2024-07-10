@@ -7,7 +7,7 @@
     <h1>Gráfico de Temperatura</h1>
         Cuenta: {{datos.cuenta.nombre_cuenta}} - Dispositivo: {{datos.artefacto.descripcion}} - Placa:{{ datos.placa.descripcion }} - Puerto: {{datos.puerto}}
  <!-- Formulario para filtrar por fecha y hora -->
- <form method="get" action="{% url 'temperature_graph' cuenta=datos.idcuenta.id_cuenta puerto=datos.puerto %}">
+ <form method="get" action="{% url 'temperature_graph' cuenta=datos.cuenta.id_cuenta puerto=datos.puerto %}">
     <div class="form-group">
         <label for="fecha_inicio">Fecha y Hora de Inicio:</label>
         <input type="datetime-local" id="fecha_inicio" name="fecha_inicio" class="form-control">
