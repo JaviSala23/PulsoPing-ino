@@ -351,19 +351,27 @@ def TemperatureGraphView(request, cuenta, puerto):
     fig, ax = plt.subplots(figsize=(10, 6))
     
     # Colores basados en el rango de temperatura
-    ax.scatter(df['timestamp'], df['temperature'], c=df['dentro_rango'].map({True: 'blue', False: 'red'}))
+    scatter = ax.scatter(df['timestamp'], df['temperature'], c=df['dentro_rango'].map({True: 'blue', False: 'red'}))
     
     # Etiquetas completas en los ejes (usando la función translate_timestamp)
-    ax.set_xlabel('Fecha y Hora')
+    ax.set_xlabel('Fecha')
     ax.set_ylabel('Temperatura')
     
-    # Aplicar formato personalizado de fecha en el eje x
-    ax.set_xticks(df['timestamp'])
-    ax.set_xticklabels([translate_timestamp(t) for t in df['timestamp']], rotation=45)
-    
-    # Agregar tooltips con mpld3 para mostrar temperaturas al pasar el mouse por encima
-    tooltips = mpld3.plugins.PointLabelTooltip(ax.get_children()[0], labels=list(df['temperature'].astype(str)))
+    # Función para formatear el tooltip con información detallada
+    def format_tooltip(labels):
+        tooltip = []
+        for label in labels:
+            timestamp = pd.Timestamp(label)
+            temperatura = df.loc[df['timestamp'] == timestamp, 'temperature'].iloc[0]
+            tooltip.append(f"{translate_timestamp(timestamp)}<br>Temperatura: {temperatura:.2f} °C")
+        return tooltip
+
+    # Crear tooltips con mpld3 para mostrar información detallada al pasar el mouse
+    tooltips = mpld3.plugins.PointHTMLTooltip(scatter, labels=format_tooltip(df['timestamp']), voffset=10, hoffset=10)
     mpld3.plugins.connect(fig, tooltips)
+    
+    # Formatear el eje x para mostrar solo la fecha sin las horas
+    ax.xaxis.set_major_formatter(plt.FuncFormatter(lambda x, _: translate_timestamp(pd.Timestamp(x))))
     
     # Convertir el gráfico en formato HTML interactivo con mpld3
     interactive_graph = mpld3.fig_to_html(fig)
