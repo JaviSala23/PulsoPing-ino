@@ -66,7 +66,9 @@ function actualizarTabla() {
     $.ajax({
         url: "{% url 'actualizar_relaciones' %}",
         success: function(data) {
-            $('#tabla-relaciones').html(data);  // Actualiza el contenido de la tabla
+            $(html).remove()
+            $('#tabla-relaciones').html(data);
+            // Actualiza el contenido de la tabla
         },
         error: function(xhr, status, error) {
             console.error("Error al actualizar la tabla:", error);
