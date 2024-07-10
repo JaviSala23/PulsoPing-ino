@@ -9,7 +9,7 @@ from django.shortcuts import render
 from django.http import HttpResponse
 
 
-def TemperatureGraphView(self, request):
+def TemperatureGraphView(self):
         # Obtener la lista de archivos de texto guardados
         file_paths = glob.glob('readings/placa_*/puerto_*.txt')
         print(file_paths)  # Verifica qué archivos se están encontrando
