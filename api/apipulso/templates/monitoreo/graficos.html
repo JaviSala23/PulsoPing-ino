@@ -103,13 +103,12 @@
                         return `Temperatura: ${context.raw}°C`;
                     },
                     title: function(context) {
-                        return `Fecha: ${context[0].label}`;
+                        return `Fecha: ${context.label}`;
                     }
                 }
             }
         }
     }
-
 });
 </script>
 {% endblock %}
