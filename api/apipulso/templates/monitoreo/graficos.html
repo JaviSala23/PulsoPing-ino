@@ -67,16 +67,21 @@
         data: {
             labels: timestamps,
             datasets: [{
-                label: 'Temperatura',
-                data: temperatures,
-                borderColor: 'blue',
-                backgroundColor: 'rgba(0, 0, 255, 0.1)',
-                fill: false,
-                tension: 0.1,
-                pointRadius: 5,
-                pointHoverRadius: 7,
-                pointHoverBackgroundColor: 'red'
-            }]
+            label: 'Temperatura',
+            data: temperatures,
+            borderColor: 'blue',
+            backgroundColor: 'rgba(0, 0, 255, 0.1)',
+            fill: false,
+            tension: 0.1,
+            pointRadius: 5,
+            pointHoverRadius: 7,
+            pointHoverBackgroundColor: 'red',
+            pointBackgroundColor: function(context) {
+                // Determinar el color del punto según el valor de temperatura
+                const temp = context.dataset.data[context.dataIndex];
+                return (temp < artefacto1.temp_min || temp > artefacto1.temp_max) ? 'red' : 'blue';
+            }
+        }]
         },
         options: {
             scales: {
