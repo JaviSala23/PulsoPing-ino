@@ -53,11 +53,6 @@
 </div>
 
 <script>
-
-    // Verificar que los datos se hayan pasado correctamente al template
-    console.log('Timestamps:', {{ timestamps|safe }});
-    console.log('Temperatures:', {{ temperatures|safe }});
-
     const timestamps = JSON.parse('{{ timestamps|escapejs }}');
     const temperatures = JSON.parse('{{ temperatures|escapejs }}');
 
@@ -75,15 +70,22 @@
                 tension: 0.1,
                 pointRadius: 5,
                 pointHoverRadius: 7,
-                pointHoverBackgroundColor: 'red'
+                pointHoverBackgroundColor: 'red'  // Color de los puntos hover
             }]
         },
         options: {
             scales: {
                 x: {
+                    type: 'time',
+                    time: {
+                        tooltipFormat: 'DD/MM HH:mm',
+                        displayFormats: {
+                            hour: 'DD/MM HH:mm'
+                        }
+                    },
                     title: {
                         display: true,
-                        text: 'Fecha'
+                        text: 'Fecha y Hora'
                     }
                 },
                 y: {
