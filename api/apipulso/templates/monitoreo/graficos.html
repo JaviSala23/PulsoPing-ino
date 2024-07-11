@@ -57,6 +57,10 @@
     // Verificar que los datos se hayan pasado correctamente al template
     console.log('Timestamps:', {{ timestamps|safe }});
     console.log('Temperatures:', {{ temperatures|safe }});
+    console.log('Temp_min:', {{ datos.temp_min }});
+    console.log('Temp_max:', {{ datos.temp_max }});
+
+    
 
     const timestamps = JSON.parse('{{ timestamps|escapejs }}');
     const temperatures = JSON.parse('{{ temperatures|escapejs }}');
