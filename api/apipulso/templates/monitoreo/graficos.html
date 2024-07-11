@@ -3,8 +3,6 @@
 {% block titulo %}Gráfico de Temperatura{% endblock %}
 
 {% block contenido %}
-<script src="https://cdnjs.cloudflare.com/ajax/libs/moment.js/2.29.1/moment.min.js"></script>
-<script src="https://cdn.jsdelivr.net/npm/chartjs-adapter-moment"></script>
 <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
 <div class="container">
     <h1>Gráfico de Temperatura</h1>
@@ -57,61 +55,51 @@
 <script>
     const timestamps = JSON.parse('{{ timestamps|escapejs }}');
     const temperatures = JSON.parse('{{ temperatures|escapejs }}');
-
     const ctx = document.getElementById('temperatureChart').getContext('2d');
     const temperatureChart = new Chart(ctx, {
-    type: 'line',
-    data: {
-        labels: timestamps,
-        datasets: [{
-            label: 'Temperatura',
-            data: temperatures,
-            borderColor: 'blue',
-            backgroundColor: 'rgba(0, 0, 255, 0.1)',
-            fill: false,
-            tension: 0.1,
-            pointRadius: 5,
-            pointHoverRadius: 7,
-            pointHoverBackgroundColor: 'red'
-        }]
-    },
-    options: {
-        scales: {
-            x: {
-                type: 'time',
-                time: {
-                    unit: 'hour',
-                    tooltipFormat: 'DD/MM HH:mm', // Formato del tooltip
-                    displayFormats: {
-                        hour: 'DD/MM HH:mm' // Formato de visualización de las horas en el eje X
+        type: 'line',
+        data: {
+            labels: timestamps,
+            datasets: [{
+                label: 'Temperatura',
+                data: temperatures,
+                borderColor: 'blue',
+                backgroundColor: 'rgba(0, 0, 255, 0.1)',
+                fill: false,
+                tension: 0.1,
+                pointRadius: 5,
+                pointHoverRadius: 7,
+                pointHoverBackgroundColor: 'red'
+            }]
+        },
+        options: {
+            scales: {
+                x: {
+                    title: {
+                        display: true,
+                        text: 'Fecha'
                     }
                 },
-                title: {
-                    display: true,
-                    text: 'Fecha y Hora'
-                }
-            },
-            y: {
-                title: {
-                    display: true,
-                    text: 'Temperatura (°C)'
-                }
-            }
-        },
-        plugins: {
-            tooltip: {
-                callbacks: {
-                    label: function(context) {
-                        return `Temperatura: ${context.raw}°C`;
-                    },
-                    title: function(context) {
-                        return `Fecha: ${context.label}`;
+                y: {
+                    title: {
+                        display: true,
+                        text: 'Temperatura (°C)'
+                    }
+                },
+                plugins: {
+                    tooltip: {
+                        callbacks: {
+                            label: function(context) {
+                                return `Temperatura: ${context.raw}°C`;
+                            },
+                            title: function(context) {
+                                return `Fecha: ${context[0].label}`;
+                            }
+                        }
                     }
                 }
             }
         }
-    }
-
     });
 </script>
 {% endblock %}
