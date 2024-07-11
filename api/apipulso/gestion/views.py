@@ -16,7 +16,7 @@ import os
 from django.template.loader import render_to_string
 from matplotlib.dates import DateFormatter
 from mpld3 import fig_to_html, plugins
-import mplcursors
+import json
 
 def panel(request):
     return render(request,'panel/panelControl.html')
@@ -291,9 +291,7 @@ def translate_timestamp(timestamp):
     dia_semana = DIAS_ESPANOL.get(timestamp.weekday(), '')
     dia_mes = timestamp.day
     mes = MESES_ESPANOL.get(timestamp.month, '')
-    ano = timestamp.year
-    hora = timestamp.strftime('%H:%M:%S')
-    return f"{dia_semana}, {dia_mes} de {mes} de {ano} {hora}"
+    return f"{dia_semana}, {dia_mes} de {mes}"
 
 def TemperatureGraphView(request, cuenta, puerto):
     try:
@@ -344,33 +342,12 @@ def TemperatureGraphView(request, cuenta, puerto):
         except Exception as e:
             return HttpResponse(f"Error al procesar las fechas: {e}", content_type="text/plain")
 
-    # Crear un gráfico de línea con etiquetas de fecha, hora y temperatura
-    fig, ax = plt.subplots(figsize=(10, 6))
-    
-    line, = ax.plot(df['timestamp'], df['temperature'], marker='o', linestyle='-', color='blue', label=f'Cuenta: {artefacto1.cuenta.nombre_cuenta}, Puerto {puerto}, {artefacto1.artefacto.descripcion}')
-    
-    # Usar mplcursors para mostrar las etiquetas al pasar el puntero sobre los puntos
-    cursor = mplcursors.cursor(line, hover=True)
+    # Ordenar los datos de más recientes a más antiguos
+    df = df.sort_values(by='timestamp', ascending=False)
 
-    @cursor.connect("add")
-    def on_add(sel):
-        date = df['timestamp'][sel.target.index]
-        temp = df['temperature'][sel.target.index]
-        sel.annotation.set(text=f'{date.strftime("%d-%m %H:%M")}\n{temp:.2f}', ha='left', va='bottom', fontsize=8, color='black')
-    
-    ax.set_xlabel('Fecha y Hora')
-    ax.set_ylabel('Temperatura')
-    ax.legend(loc='best')
-    plt.tight_layout()
-
-    # Guardar el gráfico en un objeto BytesIO
-    buf = BytesIO()
-    plt.savefig(buf, format='png')
-    buf.seek(0)
-
-    # Codificar la imagen en base64 para poder insertarla en la plantilla
-    image_base64 = base64.b64encode(buf.getvalue()).decode('utf-8')
-    buf.close()
+    # Preparar datos para el gráfico
+    timestamps = [translate_timestamp(ts) for ts in df['timestamp']]
+    temperatures = df['temperature'].tolist()
 
     # Preparar datos para la tabla
     table_data = []
@@ -385,5 +362,13 @@ def TemperatureGraphView(request, cuenta, puerto):
         
         table_data.append({'fecha_hora': date_str, 'temperatura': temp, 'color': temp_color})
 
-    # Renderizar la plantilla con el gráfico interactivo y la tabla de datos
-    return render(request, 'monitoreo/graficos.html', {'graph': image_base64, 'tabla_datos': table_data, 'datos': artefacto1})
+    # Renderizar la plantilla con los datos del gráfico
+    return render(request, 'monitoreo/graficos.html', {
+        'timestamps': json.dumps(timestamps),
+        'temperatures': json.dumps(temperatures),
+        'cuenta': artefacto1.cuenta.nombre_cuenta,
+        'puerto': puerto,
+        'descripcion': artefacto1.artefacto.descripcion,
+        'tabla_datos': table_data,
+        'datos': artefacto1
+    })

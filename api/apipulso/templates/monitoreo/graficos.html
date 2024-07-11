@@ -3,27 +3,29 @@
 {% block titulo %}Gráfico de Temperatura{% endblock %}
 
 {% block contenido %}
+<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
 <div class="container">
     <h1>Gráfico de Temperatura</h1>
-        Cuenta: {{datos.cuenta.nombre_cuenta}} - Dispositivo: {{datos.artefacto.descripcion}} - Placa:{{ datos.placa.descripcion }} - Puerto: {{datos.puerto}}
- <!-- Formulario para filtrar por fecha y hora -->
- <form method="get" action="{% url 'temperature_graph' cuenta=datos.cuenta.id_cuenta puerto=datos.puerto %}">
-    <div class="form-group">
-        <label for="fecha_inicio">Fecha y Hora de Inicio:</label>
-        <input type="datetime-local" id="fecha_inicio" name="fecha_inicio" class="form-control">
-    </div>
-    <div class="form-group">
-        <label for="fecha_fin">Fecha y Hora de Fin:</label>
-        <input type="datetime-local" id="fecha_fin" name="fecha_fin" class="form-control">
-    </div>
-    <button type="submit" class="btn btn-primary">Filtrar</button>
-</form>
+    Cuenta: {{ datos.cuenta.nombre_cuenta }} - Dispositivo: {{ datos.artefacto.descripcion }} - Placa: {{ datos.placa.descripcion }} - Puerto: {{ datos.puerto }}
+
+    <!-- Formulario para filtrar por fecha y hora -->
+    <form method="get" action="{% url 'temperature_graph' cuenta=datos.cuenta.id_cuenta puerto=datos.puerto %}">
+        <div class="form-group">
+            <label for="fecha_inicio">Fecha y Hora de Inicio:</label>
+            <input type="datetime-local" id="fecha_inicio" name="fecha_inicio" class="form-control">
+        </div>
+        <div class="form-group">
+            <label for="fecha_fin">Fecha y Hora de Fin:</label>
+            <input type="datetime-local" id="fecha_fin" name="fecha_fin" class="form-control">
+        </div>
+        <button type="submit" class="btn btn-primary">Filtrar</button>
+    </form>
 
     <hr>
 
     <!-- Mostrar el gráfico interactivo -->
     <div id="graph-container">
-        <img src="data:image/png;base64,{{ graph }}" alt="Gráfico de Temperatura">
+        <canvas id="temperatureChart" width="400" height="200"></canvas>
     </div>
 
     <hr>
@@ -49,4 +51,55 @@
         </table>
     </div>
 </div>
+
+<script>
+    const timestamps = JSON.parse('{{ timestamps|escapejs }}');
+    const temperatures = JSON.parse('{{ temperatures|escapejs }}');
+    const ctx = document.getElementById('temperatureChart').getContext('2d');
+    const temperatureChart = new Chart(ctx, {
+        type: 'line',
+        data: {
+            labels: timestamps,
+            datasets: [{
+                label: 'Temperatura',
+                data: temperatures,
+                borderColor: 'blue',
+                backgroundColor: 'rgba(0, 0, 255, 0.1)',
+                fill: false,
+                tension: 0.1,
+                pointRadius: 5,
+                pointHoverRadius: 7,
+                pointHoverBackgroundColor: 'red'
+            }]
+        },
+        options: {
+            scales: {
+                x: {
+                    title: {
+                        display: true,
+                        text: 'Fecha'
+                    }
+                },
+                y: {
+                    title: {
+                        display: true,
+                        text: 'Temperatura (°C)'
+                    }
+                },
+                plugins: {
+                    tooltip: {
+                        callbacks: {
+                            label: function(context) {
+                                return `Temperatura: ${context.raw}°C`;
+                            },
+                            title: function(context) {
+                                return `Fecha: ${context[0].label}`;
+                            }
+                        }
+                    }
+                }
+            }
+        }
+    });
+</script>
 {% endblock %}
