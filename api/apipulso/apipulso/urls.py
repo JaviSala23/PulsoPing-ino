@@ -8,7 +8,7 @@ from django.conf.urls.static import static
 from django.contrib import admin
 urlpatterns = [
 
-
+    path('',gestion.panel,name='panel'),
     path('panel/',gestion.panel,name='panel'),
     path('adSite/',admin.site.urls),
   
@@ -17,7 +17,6 @@ urlpatterns = [
     path('login/', LoginView.as_view(), name= 'login'),
     path('logout/', LogoutView.as_view(), name= 'logout'),
     path('accounts/', include('django.contrib.auth.urls')),
-    path('admin/', admin.site.urls), 
     path('sensor_readings/', SensorReadingListCreate.as_view(), name='sensor_reading_list_create'),
     path('sensor_readings/<int:pk>/', SensorReadingDetail.as_view(), name='sensor_reading_detail'),
     path('temperature-graph/<int:cuenta>/<int:puerto>/', gestion.TemperatureGraphView, name='temperature_graph'),
