@@ -288,10 +288,7 @@ MESES_ESPANOL = {
 
 def translate_timestamp(timestamp):
     # Función para traducir el timestamp a español
-    dia_semana = DIAS_ESPANOL.get(timestamp.weekday(), '')
-    dia_mes = timestamp.day
-    mes = MESES_ESPANOL.get(timestamp.month, '')
-    return f"{dia_semana}, {dia_mes} de {mes}"
+    return timestamp.strftime('%d/%m %H:%M')
 
 def TemperatureGraphView(request, cuenta, puerto):
     try:
@@ -336,8 +333,8 @@ def TemperatureGraphView(request, cuenta, puerto):
 
     if fecha_inicio_str and fecha_fin_str:
         try:
-            fecha_inicio = parse_datetime(fecha_inicio_str)
-            fecha_fin = parse_datetime(fecha_fin_str)
+            fecha_inicio = datetime.fromisoformat(fecha_inicio_str)
+            fecha_fin = datetime.fromisoformat(fecha_fin_str)
             df = df[(df['timestamp'] >= fecha_inicio) & (df['timestamp'] <= fecha_fin)]
         except Exception as e:
             return HttpResponse(f"Error al procesar las fechas: {e}", content_type="text/plain")
