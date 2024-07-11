@@ -79,7 +79,7 @@
             pointBackgroundColor: function(context) {
                 // Determinar el color del punto según el valor de temperatura
                 const temp = context.dataset.data[context.dataIndex];
-                return (temp < artefacto1.temp_min || temp > artefacto1.temp_max) ? 'red' : 'blue';
+                return (temp < datos.temp_min || temp > datos.temp_max) ? 'red' : 'blue';
             }
         }]
         },
