@@ -53,8 +53,14 @@
 </div>
 
 <script>
+
+    // Verificar que los datos se hayan pasado correctamente al template
+    console.log('Timestamps:', {{ timestamps|safe }});
+    console.log('Temperatures:', {{ temperatures|safe }});
+
     const timestamps = JSON.parse('{{ timestamps|escapejs }}');
     const temperatures = JSON.parse('{{ temperatures|escapejs }}');
+
     const ctx = document.getElementById('temperatureChart').getContext('2d');
     const temperatureChart = new Chart(ctx, {
         type: 'line',
@@ -85,16 +91,16 @@
                         display: true,
                         text: 'Temperatura (°C)'
                     }
-                },
-                plugins: {
-                    tooltip: {
-                        callbacks: {
-                            label: function(context) {
-                                return `Temperatura: ${context.raw}°C`;
-                            },
-                            title: function(context) {
-                                return `Fecha: ${context[0].label}`;
-                            }
+                }
+            },
+            plugins: {
+                tooltip: {
+                    callbacks: {
+                        label: function(context) {
+                            return `Temperatura: ${context.raw}°C`;
+                        },
+                        title: function(context) {
+                            return `Fecha: ${context[0].label}`;
                         }
                     }
                 }
