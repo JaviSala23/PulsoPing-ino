@@ -350,12 +350,12 @@ def TemperatureGraphView(request, cuenta, puerto):
     ax.plot(df['timestamp'], df['temperature'], marker='o', linestyle='-', color='blue', label=f'Cuenta: {artefacto1.cuenta.nombre_cuenta}, Puerto {puerto}, {artefacto1.artefacto.descripcion}')
     
     # Formatear etiquetas de fecha y hora
-    ax.xaxis.set_major_formatter(plt.matplotlib.dates.DateFormatter('%m-%d'))  # \n para separar fecha y hora
+    ax.xaxis.set_major_formatter(plt.matplotlib.dates.DateFormatter('%m-%d\n%H:%M'))  # \n para separar fecha y hora
     ax.xaxis.set_tick_params(rotation=0)  # Sin rotación para mostrar fecha arriba y hora abajo
     
     # Añadir etiquetas sobre los puntos de datos (cada 10 puntos para evitar amontonamiento)
     for i, (date, temp) in enumerate(zip(df['timestamp'], df['temperature'])):
-        if i % 10 == 0:  # Mostrar etiqueta cada 10 puntos
+        if i % 20 == 0:  # Mostrar etiqueta cada 10 puntos
             ax.text(date, temp, f'{date.strftime("%H:%M")}\n{temp:.2f}', ha='left', va='bottom', fontsize=8, color='black', rotation=0)
     
     ax.set_xlabel('Fecha y Hora')
