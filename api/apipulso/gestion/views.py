@@ -359,7 +359,7 @@ def TemperatureGraphView(request, cuenta, puerto):
     df['time'] = df['timestamp'].dt.strftime('%H:%M')
     for i, (date, temp) in enumerate(zip(df['time'], df['temperature'])):
         if i % 10 == 0:  # Mostrar etiqueta cada 10 puntos
-            ax.text(date, temp, f'{date.strftime("%Y-%m-%d %H:%M:%S")}\n{temp:.2f}', ha='left', va='bottom', fontsize=8, color='black', rotation=0)
+            ax.text(date, temp, f'{date.strftime("%H:%M")}\n{temp:.2f}', ha='left', va='bottom', fontsize=8, color='black', rotation=0)
     
     ax.set_xlabel('Fecha y Hora')
     ax.set_ylabel('Temperatura')
