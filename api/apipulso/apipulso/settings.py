@@ -92,12 +92,14 @@ DATABASES = {
     'default': { 
         'ENGINE': 'django.db.backends.mysql', 
         'NAME': 'sensor',
-        'USER': 'root',
-        'PASSWORD': 'Celeste14',
+        'USER': 'mantis',
+        'PASSWORD': 'JuanPaula2',
         'HOST': 'localhost',
-        'PORT': '3306'
-        }
-    
+        'PORT': '3306',
+        'OPTIONS': {
+            'charset': 'utf8mb4',
+        },
+    }
 }
 
     
