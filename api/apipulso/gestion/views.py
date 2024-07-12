@@ -233,6 +233,7 @@ def actualizar_relaciones(request):
 
 
 def nueva_cuenta_has_artefacto(request, id=0):
+    relacion = None
     if id != 0:
         relacion = get_object_or_404(Cuenta_has_Artefacto, pk=id)
         form = CuentaHasArtefactoForm(instance=relacion)
@@ -240,14 +241,20 @@ def nueva_cuenta_has_artefacto(request, id=0):
     else:
         form = CuentaHasArtefactoForm()
         funcion = "Agregar"
+        
     if request.method == 'POST':
-        form = CuentaHasArtefactoForm(request.POST, instance=relacion)
+        if relacion is not None:
+            form = CuentaHasArtefactoForm(request.POST, instance=relacion)
+        else:
+            form = CuentaHasArtefactoForm(request.POST)
+        
         if form.is_valid():
             form.save()
             messages.success(request, f'Se ha {funcion.lower()}do la relación correctamente')
             return redirect('listar_cuenta_has_artefacto')
         else:
             messages.error(request, 'No se pudo guardar la relación')
+            
     return render(request, 'artefactos/nueva_cuenta_has_artefacto.html', {'form': form, 'funcion': funcion})
 
 def eliminar_cuenta_has_artefacto(request, id):
