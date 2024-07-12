@@ -91,7 +91,7 @@ WSGI_APPLICATION = 'apipulso.wsgi.application'
 DATABASES = {
     'default': { 
         'ENGINE': 'django.db.backends.mysql', 
-        'NAME': 'sensor',
+        'NAME': 'mantis_sensor',
         'USER': 'root',
         'PASSWORD': 'Celeste14',
         'HOST': 'localhost',
