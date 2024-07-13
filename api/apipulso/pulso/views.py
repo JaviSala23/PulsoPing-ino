@@ -89,18 +89,30 @@ class SensorReadingListCreate(generics.ListCreateAPIView):
             self.send_telegram_message(f"Estable: La temperatura ha vuelto a los límites normales para: {cuenta_art.artefacto.descripcion}, cliente {cuenta_art.cuenta.nombre_cuenta}, Puerto: {reading.puerto}")
             MessageLog.objects.create(placa=reading.placa, puerto=reading.puerto,temperature=reading.temperature, message_type="STABLE")
 
-    def send_telegram_message(self, message):
-        # Aquí debes implementar la lógica para enviar el mensaje por Telegram
+    def send_telegram_message(message, telegram_token, chat_ids):
+        chat_ids = ['6476665770','7307403963']
         telegram_token = '7157402657:AAHIiCK42UKAslXGH0SU0HDpyBwEjjo0xo4'
-        chat_id = '6476665770'
         url = f"https://api.telegram.org/bot{telegram_token}/sendMessage"
-        params = {
-            'chat_id': chat_id,
-            'text': message
-        }
-        response = requests.get(url, params=params)
-        return response.json()
+        results = []
+
+        for chat_id in chat_ids:
+            params = {
+                'chat_id': chat_id,
+                'text': message
+            }
+
+            try:
+                response = requests.post(url, params=params)
+                response.raise_for_status()
+                results.append((chat_id, True))  # Assuming success, you can modify based on actual response
+            except requests.exceptions.RequestException as e:
+                print(f"An error occurred sending to chat ID {chat_id}: {e}")
+                results.append((chat_id, False))
+
+        return results
 
 class SensorReadingDetail(generics.RetrieveUpdateDestroyAPIView):
     queryset = SensorReading.objects.all()
     serializer_class = SensorReadingSerializer
+
+
