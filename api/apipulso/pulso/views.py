@@ -89,7 +89,7 @@ class SensorReadingListCreate(generics.ListCreateAPIView):
             self.send_telegram_message(f"Estable: La temperatura ha vuelto a los límites normales para: {cuenta_art.artefacto.descripcion}, cliente {cuenta_art.cuenta.nombre_cuenta}, Puerto: {reading.puerto}")
             MessageLog.objects.create(placa=reading.placa, puerto=reading.puerto,temperature=reading.temperature, message_type="STABLE")
 
-    def send_telegram_message(message, telegram_token, chat_ids):
+    def send_telegram_message(self,message):
         chat_ids = ['6476665770','7307403963']
         telegram_token = '7157402657:AAHIiCK42UKAslXGH0SU0HDpyBwEjjo0xo4'
         url = f"https://api.telegram.org/bot{telegram_token}/sendMessage"
