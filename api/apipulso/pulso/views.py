@@ -101,15 +101,10 @@ class SensorReadingListCreate(generics.ListCreateAPIView):
                 'text': message
             }
 
-            try:
-                response = requests.post(url, params=params)
-                response.raise_for_status()
-                results.append((chat_id, True))  # Assuming success, you can modify based on actual response
-            except requests.exceptions.RequestException as e:
-                print(f"An error occurred sending to chat ID {chat_id}: {e}")
-                results.append((chat_id, False))
+           response = requests.get(url, params=params)
+            
 
-        return results
+        return response.json()
 
 class SensorReadingDetail(generics.RetrieveUpdateDestroyAPIView):
     queryset = SensorReading.objects.all()
