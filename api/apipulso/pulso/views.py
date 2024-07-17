@@ -101,7 +101,7 @@ class SensorReadingListCreate(generics.ListCreateAPIView):
                 'text': message
             }
 
-           response = requests.get(url, params=params)
+            response = requests.get(url, params=params)
             
 
         return response.json()
