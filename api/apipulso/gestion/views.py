@@ -17,6 +17,7 @@ from django.template.loader import render_to_string
 from matplotlib.dates import DateFormatter
 from mpld3 import fig_to_html, plugins
 import json
+from datetime import datetime, timedelta
 
 def panel(request):
     return render(request,'panel/panelControl.html')
@@ -339,11 +340,14 @@ def TemperatureGraphView(request, cuenta, puerto):
     fecha_inicio_str = request.GET.get('fecha_inicio', None)
     fecha_fin_str = request.GET.get('fecha_fin', None)
 
-    if fecha_inicio_str and fecha_fin_str:
+    if not fecha_inicio_str and not fecha_fin_str:
+        # Calcular fecha_inicio y fecha_fin si no están especificadas
+        fecha_fin = datetime.now()  # Fecha actual
+        fecha_inicio = fecha_fin - timedelta(hours=4)  # 4 horas antes de la fecha actual
+    else:
         try:
             fecha_inicio = datetime.fromisoformat(fecha_inicio_str)
             fecha_fin = datetime.fromisoformat(fecha_fin_str)
-            df = df[(df['timestamp'] >= fecha_inicio) & (df['timestamp'] <= fecha_fin)]
         except Exception as e:
             return HttpResponse(f"Error al procesar las fechas: {e}", content_type="text/plain")
 
