@@ -353,12 +353,14 @@ def TemperatureGraphView(request, cuenta, puerto):
 
     df = df[(df['timestamp'] >= fecha_inicio) & (df['timestamp'] <= fecha_fin)]
 
-    # Ordenar los datos de más recientes a más antiguos
-    df = df.sort_values(by='timestamp', ascending=False)
+    
 
     # Preparar datos para el gráfico
     timestamps = [translate_timestamp(ts) for ts in df['timestamp']]
     temperatures = df['temperature'].tolist()
+
+      # Ordenar los datos de más recientes a más antiguos
+    df = df.sort_values(by='timestamp', ascending=False)
 
     # Preparar datos para la tabla
     table_data = []
