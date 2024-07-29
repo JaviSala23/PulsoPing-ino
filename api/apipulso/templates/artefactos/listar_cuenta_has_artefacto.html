@@ -17,53 +17,55 @@
 {% block contenido %}
 <div class="row">
     <div class="col-sm-12">
-        <table class="table table-bordered dataTable" id="dataTable" width="100%" cellspacing="0" role="grid" aria-describedby="dataTable_info" style="width: 100%;">
-            <thead>
-                <tr style="background-color: rgb(211, 227, 250); color: rgb(95, 93, 93)">
-                    <th>CUENTA</th>
-                    <th>DISPOSITIVO</th>
-                    <th>CÓD. PLACA</th>
-                    <th>FIRMWARE</th>
-                    <th>PLACA</th>
-                    <th>PUERTO</th>
-                    <th>TEMP. MÍN.</th>
-                    <th>TEMP. MÁX.</th>
-                    <th>ÚLT. TEMP.</th>
-                    <th>FECHA/HORA</th>
-                    <th>PUERTA</th>
-                    <th>COMPRESOR</th>
-                    <th>ACCIÓN</th>
-                </tr>
-            </thead>
-            <tbody id="tabla-relaciones">
-                {% for item in relaciones_actualizadas %}
-                <tr class="odd" style="color: rgb(112, 112, 112)">
-                    <td>{{ item.relacion.cuenta.nombre_cuenta }}</td>
-                    <td>{{ item.relacion.artefacto.descripcion }}</td>
-                    <td>{{ item.relacion.placa.codigo }}</td>
-                    <td>{{ item.relacion.placa.firmware.descripcion }}</td>
-                    <td>{{ item.relacion.placa.descripcion }}</td>
-                    <td>{{ item.relacion.puerto }}</td>
-                    <td>{{ item.relacion.temp_min }}</td>
-                    <td>{{ item.relacion.temp_max }}</td>
+        <div class="table-responsive">
+            <table class="table table-bordered dataTable" id="dataTable" width="100%" cellspacing="0" role="grid" aria-describedby="dataTable_info">
+                <thead>
+                    <tr style="background-color: rgb(211, 227, 250); color: rgb(95, 93, 93)">
+                        <th>CUENTA</th>
+                        <th>DISPOSITIVO</th>
+                        <th>CÓD. PLACA</th>
+                        <th>FIRMWARE</th>
+                        <th>PLACA</th>
+                        <th>PUERTO</th>
+                        <th>TEMP. MÍN.</th>
+                        <th>TEMP. MÁX.</th>
+                        <th>ÚLT. TEMP.</th>
+                        <th>FECHA/HORA</th>
+                        <th>PUERTA</th>
+                        <th>COMPRESOR</th>
+                        <th>ACCIÓN</th>
+                    </tr>
+                </thead>
+                <tbody id="tabla-relaciones">
+                    {% for item in relaciones_actualizadas %}
+                    <tr class="odd" style="color: rgb(112, 112, 112)">
+                        <td>{{ item.relacion.cuenta.nombre_cuenta }}</td>
+                        <td>{{ item.relacion.artefacto.descripcion }}</td>
+                        <td>{{ item.relacion.placa.codigo }}</td>
+                        <td>{{ item.relacion.placa.firmware.descripcion }}</td>
+                        <td>{{ item.relacion.placa.descripcion }}</td>
+                        <td>{{ item.relacion.puerto }}</td>
+                        <td>{{ item.relacion.temp_min }}</td>
+                        <td>{{ item.relacion.temp_max }}</td>
 
-                    <td>{% if item.ultimo_registro %} {{ item.ultimo_registro.temperatura }} {% else %} N/A {% endif %}</td>
-                    <td>{% if item.ultimo_registro %} {{ item.ultimo_registro.fecha_hora|date:"Y-m-d H:i:s" }} {% else %} N/A {% endif %}</td>
-                    <td>{% if item.ultimo_registro %} {% if item.ultimo_registro.puerta == 1 %} Abierta {% else %} Cerrada {% endif %} {% else %} N/A {% endif %}</td>
-                    <td>{% if item.ultimo_registro %} {% if item.ultimo_registro.compresor == 1 %} Prendido {% else %} Apagado {% endif %} {% else %} N/A {% endif %}</td>
-                    <td>
-                        <div class="table-data-feature">
-                            {% if item.ultimo_registro %}
-                            <a href="{% url 'temperature_graph' item.relacion.cuenta.id_cuenta item.relacion.puerto %}" class="btn btn-info btn-sm"><i class="fa-solid fa-chart-line"></i></a>
-                            {% endif %}
-                            <a href="{% url 'nueva_cuenta_has_artefacto' item.relacion.id %}" class="btn btn-warning btn-sm"><i class='fas fa-edit'></i></a>
-                            <a href="{% url 'eliminar_cuenta_has_artefacto' item.relacion.id %}" class="btn btn-danger btn-sm"><i class='far fa-trash-alt'></i></a>
-                        </div>
-                    </td>
-                </tr>
-                {% endfor %}
-            </tbody>
-        </table>
+                        <td>{% if item.ultimo_registro %} {{ item.ultimo_registro.temperatura }} {% else %} N/A {% endif %}</td>
+                        <td>{% if item.ultimo_registro %} {{ item.ultimo_registro.fecha_hora|date:"Y-m-d H:i:s" }} {% else %} N/A {% endif %}</td>
+                        <td>{% if item.ultimo_registro %} {% if item.ultimo_registro.puerta == 1 %} Abierta {% else %} Cerrada {% endif %} {% else %} N/A {% endif %}</td>
+                        <td>{% if item.ultimo_registro %} {% if item.ultimo_registro.compresor == 1 %} Prendido {% else %} Apagado {% endif %} {% else %} N/A {% endif %}</td>
+                        <td>
+                            <div class="table-data-feature">
+                                {% if item.ultimo_registro %}
+                                <a href="{% url 'temperature_graph' item.relacion.cuenta.id_cuenta item.relacion.puerto %}" class="btn btn-info btn-sm"><i class="fa-solid fa-chart-line"></i></a>
+                                {% endif %}
+                                <a href="{% url 'nueva_cuenta_has_artefacto' item.relacion.id %}" class="btn btn-warning btn-sm"><i class='fas fa-edit'></i></a>
+                                <a href="{% url 'eliminar_cuenta_has_artefacto' item.relacion.id %}" class="btn btn-danger btn-sm"><i class='far fa-trash-alt'></i></a>
+                            </div>
+                        </td>
+                    </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
     </div>
 </div>
 
