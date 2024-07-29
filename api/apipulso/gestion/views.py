@@ -283,18 +283,6 @@ def eliminar_cuenta_has_artefacto(request, id):
 
 
 
-# Diccionarios para traducir nombres de días y meses
-DIAS_ESPANOL = {
-    0: 'Lunes', 1: 'Martes', 2: 'Miércoles', 3: 'Jueves',
-    4: 'Viernes', 5: 'Sábado', 6: 'Domingo'
-}
-
-MESES_ESPANOL = {
-    1: 'Enero', 2: 'Febrero', 3: 'Marzo', 4: 'Abril',
-    5: 'Mayo', 6: 'Junio', 7: 'Julio', 8: 'Agosto',
-    9: 'Septiembre', 10: 'Octubre', 11: 'Noviembre', 12: 'Diciembre'
-}
-
 def translate_timestamp(timestamp):
     # Función para traducir el timestamp a español
     return timestamp.strftime('%d/%m %H:%M')
@@ -335,31 +323,29 @@ def TemperatureGraphView(request, cuenta, puerto):
         return HttpResponse("No se encontraron datos válidos en los archivos.", content_type="text/plain")
 
     df = pd.DataFrame(data, columns=['timestamp', 'temperature'])
-
+    
     # Filtrar datos por hora y fecha si se especifican en los parámetros de la solicitud
     fecha_inicio_str = request.GET.get('fecha_inicio', None)
     fecha_fin_str = request.GET.get('fecha_fin', None)
 
     if not fecha_inicio_str and not fecha_fin_str:
-        # Calcular fecha_inicio y fecha_fin si no están especificadas
-        fecha_fin = datetime.now()  # Fecha actual
-        fecha_inicio = fecha_fin - timedelta(hours=4)  # 4 horas antes de la fecha actual
+        # Si no se especifican fechas, tomar solo las últimas 4 entradas
+        df = df.sort_values(by='timestamp', ascending=False).head(4)
     else:
+        # Si se especifican fechas, usarlas para filtrar
         try:
             fecha_inicio = datetime.fromisoformat(fecha_inicio_str)
             fecha_fin = datetime.fromisoformat(fecha_fin_str)
         except Exception as e:
             return HttpResponse(f"Error al procesar las fechas: {e}", content_type="text/plain")
 
-    df = df[(df['timestamp'] >= fecha_inicio) & (df['timestamp'] <= fecha_fin)]
-
-    
+        df = df[(df['timestamp'] >= fecha_inicio) & (df['timestamp'] <= fecha_fin)]
 
     # Preparar datos para el gráfico
     timestamps = [translate_timestamp(ts) for ts in df['timestamp']]
     temperatures = df['temperature'].tolist()
 
-      # Ordenar los datos de más recientes a más antiguos
+    # Ordenar los datos de más recientes a más antiguos
     df = df.sort_values(by='timestamp', ascending=False)
 
     # Preparar datos para la tabla
