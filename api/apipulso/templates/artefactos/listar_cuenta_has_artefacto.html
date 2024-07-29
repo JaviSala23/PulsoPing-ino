@@ -54,7 +54,7 @@
                     <td>
                         <div class="table-data-feature">
                             {% if item.ultimo_registro %}
-                            <a href="" class="btn btn-info btn-sm"><i class="fa-solid fa-chart-line"></i></a>
+                            <a href="{% url 'temperature_graph' item.relacion.cuenta.id_cuenta item.relacion.puerto %}" class="btn btn-info btn-sm"><i class="fa-solid fa-chart-line"></i></a>
                             {% endif %}
                             <a href="{% url 'nueva_cuenta_has_artefacto' item.relacion.id %}" class="btn btn-warning btn-sm"><i class='fas fa-edit'></i></a>
                             <a href="{% url 'eliminar_cuenta_has_artefacto' item.relacion.id %}" class="btn btn-danger btn-sm"><i class='far fa-trash-alt'></i></a>
