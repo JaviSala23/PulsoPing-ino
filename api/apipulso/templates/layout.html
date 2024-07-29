@@ -28,9 +28,18 @@
 
 </head>
 <script>
-    $(document).ready(function() {
-        $(".sidebar").toggleClass("toggled");
-    });
+    estado=0
+    function esconder(){
+        $("#accordionSidebar").slideToggle()
+        if (estado==0){
+            $("#iconMenu").removeClass('fas fa-angle-double-left').addClass('fas fa-angle-double-right');
+                estado=1
+            }
+        else{
+            $("#iconMenu").removeClass('fas fa-angle-double-right').addClass('fas fa-angle-double-left');
+                estado=0
+        }
+    }
 </script>
 <style>
     /* Center the loader */
