@@ -20,7 +20,7 @@
         <div class="table-responsive">
             <table class="table table-bordered dataTable" id="dataTable" width="100%" cellspacing="0" role="grid" aria-describedby="dataTable_info">
                 <thead>
-                    <tr style="background-color: rgb(211, 227, 250); color: rgb(95, 93, 93)">
+                    <tr style="background-color: rgb(211, 227, 250); color: rgb(95, 93, 93);font-size: 0.875rem;">
                         <th>CUENTA</th>
                         <th>DISPOSITIVO</th>
                         <th>CÓD. PLACA</th>
@@ -36,7 +36,7 @@
                         <th>ACCIÓN</th>
                     </tr>
                 </thead>
-                <tbody id="tabla-relaciones">
+                <tbody id="tabla-relaciones" style="font-size: 0.875rem;">
                     {% for item in relaciones_actualizadas %}
                     <tr class="odd" style="color: rgb(112, 112, 112)">
                         <td>{{ item.relacion.cuenta.nombre_cuenta }}</td>
