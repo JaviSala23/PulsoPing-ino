@@ -20,17 +20,19 @@
         <table class="table table-bordered dataTable" id="dataTable" width="100%" cellspacing="0" role="grid" aria-describedby="dataTable_info" style="width: 100%;">
             <thead>
                 <tr style="background-color: rgb(211, 227, 250); color: rgb(95, 93, 93)">
-                    <th rowspan="1" colspan="1">CUENTA</th>
-                    <th rowspan="1" colspan="1">DISPOSITIVO</th>
-                    <th rowspan="1" colspan="1">COD. PLACA</th>
-                    <th rowspan="1" colspan="1">FIRMWARE PLACA</th>
-                    <th rowspan="1" colspan="1">PLACA</th>
-                    <th rowspan="1" colspan="1">PUERTO</th>
-                    <th rowspan="1" colspan="1">TEMP. MÍN.</th>
-                    <th rowspan="1" colspan="1">TEMP. MÁX.</th>
-                    <th rowspan="1" colspan="1">ÚLTIMA TEMPERATURA</th>
-                    <th rowspan="1" colspan="1">FECHA/HORA</th>
-                    <th rowspan="1" colspan="1"></th>
+                    <th>CUENTA</th>
+                    <th>DISPOSITIVO</th>
+                    <th>CÓD. PLACA</th>
+                    <th>FIRMWARE PLACA</th>
+                    <th>PLACA</th>
+                    <th>PUERTO</th>
+                    <th>TEMP. MÍN.</th>
+                    <th>TEMP. MÁX.</th>
+                    <th>ÚLTIMA TEMPERATURA</th>
+                    <th>FECHA/HORA</th>
+                    <th>ESTADO PUERTA</th>
+                    <th>ESTADO COMPRESOR</th>
+                    <th>ACCIÓN</th>
                 </tr>
             </thead>
             <tbody id="tabla-relaciones">
@@ -45,15 +47,17 @@
                     <td>{{ item.relacion.temp_min }}</td>
                     <td>{{ item.relacion.temp_max }}</td>
 
-                    <td>{% if item.ultimo_registro  %} {{ item.ultimo_registro.temperatura }} {% else %} N/A {% endif %}</td>
-                    <td>{% if item.ultimo_registro  %} {{ item.ultimo_registro.fecha_hora }} {% else %} N/A {% endif %}</td>
+                    <td>{% if item.ultimo_registro %} {{ item.ultimo_registro.temperatura }} {% else %} N/A {% endif %}</td>
+                    <td>{% if item.ultimo_registro %} {{ item.ultimo_registro.fecha_hora|date:"Y-m-d H:i:s" }} {% else %} N/A {% endif %}</td>
+                    <td>{% if item.ultimo_registro %} {% if item.ultimo_registro.puerta == 1 %} Abierta {% else %} Cerrada {% endif %} {% else %} N/A {% endif %}</td>
+                    <td>{% if item.ultimo_registro %} {% if item.ultimo_registro.compresor == 1 %} Prendido {% else %} Apagado {% endif %} {% else %} N/A {% endif %}</td>
                     <td>
                         <div class="table-data-feature">
-                            {% if item.ultimo_registro   %}
-                            <a href="{% url 'temperature_graph' item.relacion.cuenta.id_cuenta item.relacion.puerto %}"><i class="fa-solid fa-chart-line"></i></a>
+                            {% if item.ultimo_registro %}
+                            <a href="{% url 'temperature_graph' item.relacion.cuenta.id item.relacion.puerto %}" class="btn btn-info btn-sm"><i class="fa-solid fa-chart-line"></i></a>
                             {% endif %}
-                            <a href="{% url 'nueva_cuenta_has_artefacto' item.relacion.id %}"><i class='fas fa-edit'></i></a>
-                            <a href="{% url 'eliminar_cuenta_has_artefacto' item.relacion.id %}"><i class='far fa-trash-alt'></i></a>
+                            <a href="{% url 'nueva_cuenta_has_artefacto' item.relacion.id %}" class="btn btn-warning btn-sm"><i class='fas fa-edit'></i></a>
+                            <a href="{% url 'eliminar_cuenta_has_artefacto' item.relacion.id %}" class="btn btn-danger btn-sm"><i class='far fa-trash-alt'></i></a>
                         </div>
                     </td>
                 </tr>
@@ -76,8 +80,11 @@ function actualizarTabla() {
         }
     });
 }
+
 // Actualiza la tabla cada 1 minuto
 setInterval(actualizarTabla, 60000);  // 60000 milisegundos = 1 minuto
-</script>
 
-{% endblock %}
+// También puedes actualizar la tabla cuando la página se carga por primera vez
+$(document).ready(function() {
+    actualizarTabla();
+});

@@ -203,10 +203,12 @@ def obtener_ultimo_registro(archivo_path):
             lines = file.readlines()
             if lines:
                 last_line = lines[-1].strip()
-                date_str, temp_str, placa, puerto = last_line.split(',')
+                date_str, temp_str, placa, puerto, compresor, puerta = last_line.split(',')
                 ultimo_registro = {
                     'fecha_hora': parse_datetime(date_str),
                     'temperatura': float(temp_str)
+                    'compresor': float(compresor)
+                    'puerta': float(puerta)
                 }
 
     return ultimo_registro
@@ -335,7 +337,7 @@ def TemperatureGraphView(request, cuenta, puerto):
         return HttpResponse("No se encontraron datos válidos en los archivos.", content_type="text/plain")
 
     df = pd.DataFrame(data, columns=['timestamp', 'temperature'])
-    
+
     # Filtrar datos por hora y fecha si se especifican en los parámetros de la solicitud
     fecha_inicio_str = request.GET.get('fecha_inicio', None)
     fecha_fin_str = request.GET.get('fecha_fin', None)
