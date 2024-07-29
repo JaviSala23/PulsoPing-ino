@@ -206,8 +206,8 @@ def obtener_ultimo_registro(archivo_path):
                 date_str, temp_str, placa, puerto, compresor, puerta = last_line.split(',')
                 ultimo_registro = {
                     'fecha_hora': parse_datetime(date_str),
-                    'temperatura': float(temp_str)
-                    'compresor': float(compresor)
+                    'temperatura': float(temp_str),
+                    'compresor': float(compresor),
                     'puerta': float(puerta)
                 }
 
