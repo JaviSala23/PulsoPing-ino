@@ -11,7 +11,7 @@ class SensorReadingSerializer(serializers.ModelSerializer):
 
     class Meta:
         model = SensorReading
-        fields = ['temperature', 'placa', 'puerto','timestamp']
+        fields = ['temperature', 'placa', 'puerto', 'timestamp', 'compresor_status', 'puerta_status']
         read_only_fields = ('timestamp',)
 
     def to_representation(self, instance):
@@ -20,7 +20,5 @@ class SensorReadingSerializer(serializers.ModelSerializer):
         return representation
 
     def create(self, validated_data):
-        # No necesitas extraer placa_id, simplemente usa validated_data
         sensor_reading = SensorReading.objects.create(**validated_data)
         return sensor_reading
-
