@@ -18,12 +18,13 @@
         height: 250px; /* Ajusta la altura según sea necesario */
     }
     .clock {
-        background: url("{% static 'images/clock-face.png' %}") no-repeat center center;
+        background-color:#37af00;
         background-size: cover;
         width: 100%;
         height: 100%;
         position: relative;
-        border: 2px solid #346dff; /* Opcional: Añade un borde para ver la dimensión del contenedor */
+        border: 2px solid #000000; /* Opcional: Añade un borde para ver la dimensión del contenedor */
+        border-radius: 12px;
     }
     .temperature {
         position: absolute;
@@ -40,7 +41,7 @@
         left: 50%;
         transform: translateX(-50%);
         font-size: 16px;
-        color: #00ff1e;
+        color: #dde802;
         text-align: center;
     }
 </style>
@@ -55,7 +56,8 @@
             <!-- Ejemplo de múltiples relojes -->
             <div class="clock-container">
                 <div class="clock">
-                    <div class="temperature" id="temp-1">-</div>
+                    Temperatura:
+                    <div class="temperature" id="temp-1"></div>
                     <div class="status">
                         <div id="door-status-1">Puerta: Cerrada</div>
                         <div id="compressor-status-1">Compresor: Apagado</div>
