@@ -1,0 +1,40 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>{% block title %}Panel con jQuery Mobile{% endblock %}</title>
+    <!-- Incluir CSS de jQuery Mobile -->
+    <link rel="stylesheet" href="{% static 'jqueryMobile/css/jquery.mobile-1.4.5.min.css' %}">
+    <!-- Incluir jQuery -->
+    <script src="{% static 'jqueryMobile/js/jquery-1.11.1.min.js' %}"></script>
+    <!-- Incluir JS de jQuery Mobile -->
+    <script src="{% static 'jqueryMobile/js/jquery.mobile-1.4.5.min.js' %}"></script>
+</head>
+<body>
+
+    <div data-role="page" id="main-page">
+        <div data-role="header">
+            <h1>{% block header_title %}Mi Panel{% endblock %}</h1>
+            <a href="#panel" data-role="button" data-icon="bars" data-iconpos="notext">Menu</a>
+        </div>
+
+        <div data-role="panel" id="panel" data-display="overlay">
+            <h2>Panel de Navegación</h2>
+            <ul data-role="listview">
+                <li><a href="#main-page">Inicio</a></li>
+                <li><a href="#another-page">Otra Página</a></li>
+            </ul>
+        </div>
+
+        <div data-role="content">
+            {% block content %}
+            <p>Contenido principal.</p>
+            {% endblock %}
+        </div>
+
+        <div data-role="footer">
+            <h4>{% block footer_text %}Pie de página{% endblock %}</h4>
+        </div>
+    </div>
+
+</body>
+</html>

@@ -43,7 +43,8 @@ INSTALLED_APPS = [
     'django.contrib.staticfiles',
     'rest_framework',
     'pulso',
-    'gestion'
+    'gestion',
+    'mobile'
 ]
 
 LOGIN_REDIRECT_URL = reverse_lazy('panel')

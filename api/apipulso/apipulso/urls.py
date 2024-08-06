@@ -6,6 +6,7 @@ from django.contrib import admin
 from django.conf import settings
 from django.conf.urls.static import static
 from django.contrib import admin
+from mobile import views as mobile 
 urlpatterns = [
 
     path('',gestion.panel,name='panel'),
@@ -48,5 +49,9 @@ urlpatterns = [
     path('auxiliar/traeLocalidad',gestion.traeLocalidad,name='traeLocalidad'),
     path('auxiliar/traeTipoDocumento',gestion.traeTipoDocumento,name='traeTipoDocumento'),
     path('auxiliar/traeTipoIva',gestion.traeTipoIva,name='traeTipoIva'),
+
+
+    #mobile
+    path('mobile/panel',mobile.panel_view,name='panelMobile'),
 ]
 
