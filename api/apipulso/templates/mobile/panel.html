@@ -33,8 +33,56 @@
         border: 2px solid #000000; /* Opcional: Añade un borde para ver la dimensión del contenedor */
         border-radius: 100px;
         -webkit-box-shadow: 0px -1px 40px 1px rgba(0,0,0,0.75);
--moz-box-shadow: 0px -1px 40px 1px rgba(0,0,0,0.75);
-box-shadow: 0px -1px 40px 1px rgba(0,0,0,0.75);
+        -moz-box-shadow: 0px -1px 40px 1px rgba(0,0,0,0.75);
+        box-shadow: 0px -1px 40px 1px rgba(0,0,0,0.75);
+    }
+    .cuenta{
+        font-family: "Share Tech Mono", monospace;
+        font-weight: 100;
+        font-style: normal;
+        position: absolute;
+        top: 10%;
+        left: 30%;
+        transform: translate(-50%, -50%);
+        font-size: 12px;
+        color: #f3fb00;
+        text-align: center;
+    }
+    .artefacto{
+        font-family: "Share Tech Mono", monospace;
+        font-weight: 100;
+        font-style: normal;
+        position: absolute;
+        top: 15%;
+        left: 40%;
+        transform: translate(-50%, -50%);
+        font-size: 12px;
+        color: #f3fb00;
+        text-align: center;
+    }
+    .puerto{
+        font-family: "Share Tech Mono", monospace;
+        font-weight: 100;
+        font-style: normal;
+        position: absolute;
+        top: 20%;
+        left: 40%;
+        transform: translate(-50%, -50%);
+        font-size: 12px;
+        color: #f3fb00;
+        text-align: center;
+    }
+    .decha{
+        font-family: "Share Tech Mono", monospace;
+        font-weight: 100;
+        font-style: normal;
+        position: absolute;
+        top: 25%;
+        left: 40%;
+        transform: translate(-50%, -50%);
+        font-size: 12px;
+        color: #f3fb00;
+        text-align: center;
     }
     .temperature {
         font-family: "Share Tech Mono", monospace;
@@ -42,7 +90,7 @@ box-shadow: 0px -1px 40px 1px rgba(0,0,0,0.75);
         font-style: normal;
         position: absolute;
         top: 30%;
-        left: 50%;
+        left: 10%;
         transform: translate(-50%, -50%);
         font-size: 70px;
         color: #f3fb00;
@@ -81,13 +129,19 @@ box-shadow: 0px -1px 40px 1px rgba(0,0,0,0.75);
                 </div>
             </div>
             <div class="clock-container">
-                <div class="clock">
-                    <div class="temperature" id="temp-2">-</div>
-                    <div class="status">
-                        <div id="door-status-2">Puerta: Cerrada</div>
-                        <div id="compressor-status-2">Compresor: Apagado</div>
+                {% for item in relaciones_actualizadas %}
+                    <div class="clock">
+                        <div class="cuenta" id="cuenta">{{ item.relacion.cuenta.nombre_cuenta }}</div>
+                        <div class="artefacto" id="art">{{ item.relacion.artefacto.descripcion }}</div>
+                        <div class="puerto" id="puerto">{{ item.relacion.puerto }}</div>
+                        <div class="fecha" id="fecha">{% if item.ultimo_registro %} {{ item.ultimo_registro.fecha_hora|date:"Y-m-d H:i:s" }} {% else %} N/A {% endif %}</div>
+                        <div class="temperature" id="temp-2">{% if item.ultimo_registro %} {{ item.ultimo_registro.temperatura }} {% else %} N/A {% endif %}</div>
+                        <div class="status">
+                            <div id="door-status-2">{% if item.ultimo_registro %} {% if item.ultimo_registro.puerta == 1 %} Abierta {% else %} Cerrada {% endif %} {% else %} N/A {% endif %}</div>
+                            <div id="compressor-status-2">{% if item.ultimo_registro %} {% if item.ultimo_registro.compresor == 1 %} Prendido {% else %} Apagado {% endif %} {% else %} N/A {% endif %}</div>
+                        </div>
                     </div>
-                </div>
+                {% endfor %}
             </div>
             <!-- Añade más relojes según sea necesario -->
         </div>
@@ -101,13 +155,10 @@ box-shadow: 0px -1px 40px 1px rgba(0,0,0,0.75);
 <!-- JavaScript para actualizar los datos -->
 <script>
     $(document).ready(function() {
+
+    
         function updateData() {
-            // Ejemplo de datos; en una aplicación real, estos vendrían de una API o base de datos
-            const devices = [
-                { temp: 4, isDoorOpen: false, isCompressorOn: true },
-                { temp: 7, isDoorOpen: true, isCompressorOn: false }
-                // Añade más dispositivos según sea necesario
-            ];
+                       
 
             devices.forEach((device, index) => {
                 $(`#temp-${index + 1}`).text(device.temp+"°");
@@ -116,7 +167,12 @@ box-shadow: 0px -1px 40px 1px rgba(0,0,0,0.75);
             });
         }
 
-        updateData();
     });
+
+    
+      // 60000 milisegundos = 1 minuto
+
+// También puedes actualizar la tabla cuando la página se carga por primera vez
+
 </script>
 {% endblock %}
