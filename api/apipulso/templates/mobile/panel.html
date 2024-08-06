@@ -3,10 +3,7 @@
 
 {% block title %}Panel con jQuery Mobile{% endblock %}
 
-{% block header_title %}Dispositivos{% endblock %}
-
 {% block content %}
-
 <style>
     /* CSS personalizado para el diseño del reloj */
     .clock-container {
@@ -41,7 +38,7 @@
         text-align: center;
     }
 </style>
-    
+
 <div data-role="page" id="dashboard">
     <div data-role="header" class="navbar navbar-expand-lg navbar-light bg-light">
         <a class="navbar-brand" href="#">Dashboard</a>
@@ -59,25 +56,25 @@
                 </div>
             </div>
         </div>
-    </div>>
+    </div>
 </div>
 
-     <!-- JavaScript para actualizar los datos -->
-     <script>
-        $(document).ready(function() {
-            // Simulación de actualización de datos
-            function updateData() {
-                // Ejemplo de datos; en una aplicación real, estos vendrían de una API o base de datos
-                const temperature = 4; // Grados Celsius
-                const isDoorOpen = false; // Estado de la puerta
-                const isCompressorOn = true; // Estado del compresor
+<!-- JavaScript para actualizar los datos -->
+<script>
+    $(document).ready(function() {
+        // Simulación de actualización de datos
+        function updateData() {
+            // Ejemplo de datos; en una aplicación real, estos vendrían de una API o base de datos
+            const temperature = 4; // Grados Celsius
+            const isDoorOpen = false; // Estado de la puerta
+            const isCompressorOn = true; // Estado del compresor
 
-                $('#temp').text(temperature);
-                $('#door-status').text(isDoorOpen ? 'Puerta: Abierta' : 'Puerta: Cerrada');
-                $('#compressor-status').text(isCompressorOn ? 'Compresor: Encendido' : 'Compresor: Apagado');
-            }
+            $('#temp').text(temperature);
+            $('#door-status').text(isDoorOpen ? 'Puerta: Abierta' : 'Puerta: Cerrada');
+            $('#compressor-status').text(isCompressorOn ? 'Compresor: Encendido' : 'Compresor: Apagado');
+        }
 
-            updateData();
-        });
-    </script>
+        updateData();
+    });
+</script>
 {% endblock %}
