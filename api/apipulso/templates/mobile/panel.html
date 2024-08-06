@@ -5,6 +5,78 @@
 {% block header_title %}Mi Panel{% endblock %}
 
 {% block content %}
-    <h2>Contenido Principal</h2>
-    <p>Este es el contenido principal de la página.</p>
+
+<style>
+    /* CSS personalizado para el diseño del reloj */
+    .clock-container {
+        position: relative;
+        width: 300px;
+        height: 300px;
+        margin: auto;
+    }
+    .clock {
+        background: url("{% static 'images/clock-face.png' %}") no-repeat center center;
+        background-size: cover;
+        width: 100%;
+        height: 100%;
+        position: relative;
+    }
+    .temperature {
+        position: absolute;
+        top: 50%;
+        left: 50%;
+        transform: translate(-50%, -50%);
+        font-size: 24px;
+        color: #fff;
+        text-align: center;
+    }
+    .status {
+        position: absolute;
+        bottom: 10px;
+        left: 50%;
+        transform: translateX(-50%);
+        font-size: 16px;
+        color: #fff;
+        text-align: center;
+    }
+</style>
+    
+<div data-role="page" id="dashboard">
+    <div data-role="header" class="navbar navbar-expand-lg navbar-light bg-light">
+        <a class="navbar-brand" href="#">Dashboard</a>
+    </div>
+
+    <div data-role="content" class="mt-3 text-center">
+        <div class="clock-container">
+            <div class="clock">
+                <div class="temperature">
+                    <span id="temp">-</span>°C
+                </div>
+                <div class="status">
+                    <div id="door-status">Puerta: Cerrada</div>
+                    <div id="compressor-status">Compresor: Apagado</div>
+                </div>
+            </div>
+        </div>
+    </div>>
+</div>
+
+     <!-- JavaScript para actualizar los datos -->
+     <script>
+        $(document).ready(function() {
+            // Simulación de actualización de datos
+            function updateData() {
+                // Ejemplo de datos; en una aplicación real, estos vendrían de una API o base de datos
+                const temperature = 4; // Grados Celsius
+                const isDoorOpen = false; // Estado de la puerta
+                const isCompressorOn = true; // Estado del compresor
+
+                $('#temp').text(temperature);
+                $('#door-status').text(isDoorOpen ? 'Puerta: Abierta' : 'Puerta: Cerrada');
+                $('#compressor-status').text(isCompressorOn ? 'Compresor: Encendido' : 'Compresor: Apagado');
+            }
+
+            updateData();
+        });
+    </script>
 {% endblock %}
