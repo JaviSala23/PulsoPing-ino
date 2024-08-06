@@ -96,7 +96,7 @@
             ];
 
             devices.forEach((device, index) => {
-                $(`#temp-${index + 1}`).text(device.temp);
+                $(`#temp-${index + 1}`).text(device.temp+"°");
                 $(`#door-status-${index + 1}`).text(device.isDoorOpen ? 'Puerta: Abierta' : 'Puerta: Cerrada');
                 $(`#compressor-status-${index + 1}`).text(device.isCompressorOn ? 'Compresor: Encendido' : 'Compresor: Apagado');
             });
