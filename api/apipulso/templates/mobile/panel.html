@@ -146,31 +146,8 @@
     </div>
 </div>
 
-<!-- JavaScript para actualizar los datos -->
+// JavaScript to update the data
 <script>
-    /*
-    $(document).ready(function() {
-
-    
-        function updateData() {
-                       
-
-            devices.forEach((device, index) => {
-                $(`#temp-${index + 1}`).text(device.temp+"°");
-                $(`#door-status-${index + 1}`).text(device.isDoorOpen ? 'Puerta: Abierta' : 'Puerta: Cerrada');
-                $(`#compressor-status-${index + 1}`).text(device.isCompressorOn ? 'Compresor: Encendido' : 'Compresor: Apagado');
-            });
-        }
-
-    });
-
-    
-      // 60000 milisegundos = 1 minuto
-
-// También puedes actualizar la tabla cuando la página se carga por primera vez
-*/
-
-// Función para actualizar la tabla cada minuto
 function actualizarTabla() {
     $.ajax({
         url: "{% url 'actualizar_relaciones_mobile' %}",
@@ -178,17 +155,16 @@ function actualizarTabla() {
             console.log(data);
             data.relaciones_actualizadas.forEach((item, index) => {
                 let temp = item.ultimo_registro.temperatura;
-                console.log(item.relacion.id)
+                console.log(item.relacion.id);
                 let isDoorOpen = item.ultimo_registro.puerta;
                 let isCompressorOn = item.ultimo_registro.compresor;
                 let fecha_hora = item.ultimo_registro.fecha_hora;
 
                 // Assuming the container IDs are in the format clock-container-{id}
-                
-                $('#clock-container-${item.relacion.id} .fecha').text(fecha_hora);
-                $('#clock-container-${item.relacion.id} .temperature').text(temp + '°');
-                $('#clock-container-${item.relacion.id}  .status .door-status-2').text('Puerta: ' + (isDoorOpen ? 'Abierta' : 'Cerrada'));
-                $('#clock-container-${item.relacion.id}  .status .compressor-status-2').text('Compresor: ' + (isCompressorOn ? 'Encendido' : 'Apagado'));
+                $(`#clock-container-${item.relacion.id} .fecha`).text(fecha_hora);
+                $(`#clock-container-${item.relacion.id} .temperature`).text(temp + '°');
+                $(`#clock-container-${item.relacion.id} .status .door-status-2`).text('Puerta: ' + (isDoorOpen ? 'Abierta' : 'Cerrada'));
+                $(`#clock-container-${item.relacion.id} .status .compressor-status-2`).text('Compresor: ' + (isCompressorOn ? 'Encendido' : 'Apagado'));
             });
         },
         error: function(xhr, status, error) {
@@ -205,4 +181,5 @@ $(document).ready(function() {
     actualizarTabla();
 });
 </script>
+
 {% endblock %}
