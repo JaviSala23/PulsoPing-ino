@@ -166,5 +166,32 @@
 
 // También puedes actualizar la tabla cuando la página se carga por primera vez
 */
+
+// Función para actualizar la tabla cada minuto
+function actualizarTabla() {
+    $.ajax({
+        url: "{% url 'actualizar_relaciones' %}",
+        success: function(data) {
+            $('#tabla-relaciones').html(data.tabla_html);
+            console.log(data)
+            data.forEach((data, index) => {
+                $(`#temp-${index + 1}`).text(device.temp+"°");
+                $(`#door-status-${index + 1}`).text(device.isDoorOpen ? 'Puerta: Abierta' : 'Puerta: Cerrada');
+                $(`#compressor-status-${index + 1}`).text(device.isCompressorOn ? 'Compresor: Encendido' : 'Compresor: Apagado');
+            });
+        },
+        error: function(xhr, status, error) {
+            console.error("Error al actualizar la tabla:", error);
+        }
+    });
+}
+
+// Actualiza la tabla cada 1 minuto
+setInterval(actualizarTabla, 60000);  // 60000 milisegundos = 1 minuto
+
+// También puedes actualizar la tabla cuando la página se carga por primera vez
+$(document).ready(function() {
+    actualizarTabla();
+});
 </script>
 {% endblock %}
