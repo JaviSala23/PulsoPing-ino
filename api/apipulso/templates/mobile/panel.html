@@ -42,7 +42,7 @@
         font-style: normal;
         position: absolute;
         top: 10%;
-        left: 30%;
+        left: 50%;
         transform: translate(-50%, -50%);
         font-size: 12px;
         color: #f3fb00;
@@ -54,7 +54,7 @@
         font-style: normal;
         position: absolute;
         top: 15%;
-        left: 40%;
+        left: 50%;
         transform: translate(-50%, -50%);
         font-size: 12px;
         color: #f3fb00;
@@ -72,7 +72,7 @@
         color: #f3fb00;
         text-align: center;
     }
-    .decha{
+    .fecha{
         font-family: "Share Tech Mono", monospace;
         font-weight: 100;
         font-style: normal;
@@ -89,8 +89,8 @@
         font-weight: 400;
         font-style: normal;
         position: absolute;
-        top: 30%;
-        left: 10%;
+        top: 50%;
+        left: 50%;
         transform: translate(-50%, -50%);
         font-size: 70px;
         color: #f3fb00;
@@ -124,12 +124,12 @@
                 <div class="clock">
                     <div class="cuenta" id="cuenta">{{ item.relacion.cuenta.nombre_cuenta }}</div>
                     <div class="artefacto" id="art">{{ item.relacion.artefacto.descripcion }}</div>
-                    <div class="puerto" id="puerto">{{ item.relacion.puerto }}</div>
+                    <div class="puerto" id="puerto">Puerto:{{ item.relacion.puerto }}</div>
                     <div class="fecha" id="fecha">{% if item.ultimo_registro %} {{ item.ultimo_registro.fecha_hora|date:"Y-m-d H:i:s" }} {% else %} N/A {% endif %}</div>
                     <div class="temperature" id="temp-2">{% if item.ultimo_registro %} {{ item.ultimo_registro.temperatura }} {% else %} N/A {% endif %}</div>
                     <div class="status">
-                    <div id="door-status-2">{% if item.ultimo_registro %} {% if item.ultimo_registro.puerta == 1 %} Abierta {% else %} Cerrada {% endif %} {% else %} N/A {% endif %}</div>
-                    <div id="compressor-status-2">{% if item.ultimo_registro %} {% if item.ultimo_registro.compresor == 1 %} Prendido {% else %} Apagado {% endif %} {% else %} N/A {% endif %}</div>
+                    <div id="door-status-2">Puerta:{% if item.ultimo_registro %} {% if item.ultimo_registro.puerta == 1 %} Abierta {% else %} Cerrada {% endif %} {% else %} N/A {% endif %}</div>
+                    <div id="compressor-status-2">Compresor:{% if item.ultimo_registro %} {% if item.ultimo_registro.compresor == 1 %} Prendido {% else %} Apagado {% endif %} {% else %} N/A {% endif %}</div>
                 </div>
             </div>
             
