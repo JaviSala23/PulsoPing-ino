@@ -121,7 +121,7 @@
             
             
             <div class="clock-container">
-                <div class="clock" id="clock-container-${{ item.relacion.id}}">
+                <div class="clock" id="clock-container-${{item.relacion.id}}">
                     {{ item.relacion.id}}
                     <div class="cuenta" id="cuenta">{{ item.relacion.cuenta.nombre_cuenta }}</div>
                     <div class="artefacto" id="art">{{ item.relacion.artefacto.descripcion }}</div>
@@ -186,7 +186,7 @@ function actualizarTabla() {
                 // Assuming the container IDs are in the format clock-container-{id}
                 
                 $('#clock-container-${item.relacion.id} .fecha').text(fecha_hora);
-                $('#clock-container-${item.relacion.id}  .temperature').text(temp + '°');
+                $('#clock-container-${item.relacion.id} .temperature').text(temp + '°');
                 $('#clock-container-${item.relacion.id}  .status .door-status-2').text('Puerta: ' + (isDoorOpen ? 'Abierta' : 'Cerrada'));
                 $('#clock-container-${item.relacion.id}  .status .compressor-status-2').text('Compresor: ' + (isCompressorOn ? 'Encendido' : 'Apagado'));
             });
