@@ -128,8 +128,8 @@
                     <div class="fecha" id="fecha">{% if item.ultimo_registro %} {{ item.ultimo_registro.fecha_hora|date:"Y-m-d H:i:s" }} {% else %} N/A {% endif %}</div>
                     <div class="temperature" id="temp-2">{% if item.ultimo_registro %} {{ item.ultimo_registro.temperatura }}° {% else %} -°{% endif %}</div>
                     <div class="status">
-                    <div id="door-status-2">Puerta:{% if item.ultimo_registro %} {% if item.ultimo_registro.puerta == 1 %} Abierta {% else %} Cerrada {% endif %} {% else %} N/A {% endif %}</div>
-                    <div id="compressor-status-2">Compresor:{% if item.ultimo_registro %} {% if item.ultimo_registro.compresor == 1 %} Prendido {% else %} Apagado {% endif %} {% else %} N/A {% endif %}</div>
+                    <div class="door-status-2">Puerta:{% if item.ultimo_registro %} {% if item.ultimo_registro.puerta == 1 %} Abierta {% else %} Cerrada {% endif %} {% else %} N/A {% endif %}</div>
+                    <div class="compressor-status-2">Compresor:{% if item.ultimo_registro %} {% if item.ultimo_registro.compresor == 1 %} Prendido {% else %} Apagado {% endif %} {% else %} N/A {% endif %}</div>
                 </div>
             </div>
             
@@ -174,7 +174,7 @@ function actualizarTabla() {
     $.ajax({
         url: "{% url 'actualizar_relaciones_mobile' %}",
         success: function(data) {
-            console.log(data);
+            console.log(data);door-status
             data.relaciones_actualizadas.forEach((item, index) => {
                 let temp = item.ultimo_registro.temperatura;
                 console.log(temp)
@@ -184,13 +184,10 @@ function actualizarTabla() {
 
                 // Assuming the container IDs are in the format clock-container-{id}
                 let container = $(`#clock-container-${item.relacion.id}`);
-                container.find('.cuenta').text(item.relacion.cuenta);
-                container.find('.artefacto').text(item.relacion.artefacto);
-                container.find('.puerto').text('Puerto: ' + item.relacion.puerto);
                 container.find('.fecha').text(fecha_hora);
                 container.find('.temperature').text(temp + '°');
-                container.find('.status #door-status').text('Puerta: ' + (isDoorOpen ? 'Abierta' : 'Cerrada'));
-                container.find('.status #compressor-status').text('Compresor: ' + (isCompressorOn ? 'Encendido' : 'Apagado'));
+                container.find('.status .door-status-2').text('Puerta: ' + (isDoorOpen ? 'Abierta' : 'Cerrada'));
+                container.find('.status .compressor-status-2').text('Compresor: ' + (isCompressorOn ? 'Encendido' : 'Apagado'));
             });
         },
         error: function(xhr, status, error) {
