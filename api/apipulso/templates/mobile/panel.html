@@ -176,16 +176,16 @@ function actualizarTabla() {
         success: function(data) {
             console.log(data);
             data.relaciones_actualizadas.forEach((item, index) => {
-                let temp = item.ultimo_registro.temp;
+                let temp = item.ultimo_registro.temperatura;
                 console.log(temp)
-                let isDoorOpen = item.ultimo_registro.isDoorOpen;
-                let isCompressorOn = item.ultimo_registro.isCompressorOn;
+                let isDoorOpen = item.ultimo_registro.puerta;
+                let isCompressorOn = item.ultimo_registro.compresor;
                 let fecha_hora = item.ultimo_registro.fecha_hora;
 
                 // Assuming the container IDs are in the format clock-container-{id}
                 let container = $(`#clock-container-${item.relacion.id}`);
-                container.find('.cuenta').text(item.relacion.nombre_cuenta);
-                container.find('.artefacto').text(item.relacion.artefacto_descripcion);
+                container.find('.cuenta').text(item.relacion.cuenta);
+                container.find('.artefacto').text(item.relacion.artefacto);
                 container.find('.puerto').text('Puerto: ' + item.relacion.puerto);
                 container.find('.fecha').text(fecha_hora);
                 container.find('.temperature').text(temp + '°');
