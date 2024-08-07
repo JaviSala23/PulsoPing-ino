@@ -122,7 +122,7 @@
             
             <div class="clock-container">
                 <div class="clock" id="clock-container-${{item.relacion.id}}">
-                    {{ item.relacion.id}}
+                    
                     <div class="cuenta" id="cuenta">{{ item.relacion.cuenta.nombre_cuenta }}</div>
                     <div class="artefacto" id="art">{{ item.relacion.artefacto.descripcion }}</div>
                     <div class="puerto" id="puerto">Puerto:{{ item.relacion.puerto }}</div>
@@ -159,8 +159,7 @@ function actualizarTabla() {
                 let isDoorOpen = item.ultimo_registro.puerta;
                 let isCompressorOn = item.ultimo_registro.compresor;
                 let fecha_hora = item.ultimo_registro.fecha_hora;
-                console.log(fecha_hora);
-                console.log(item.relacion.id);
+                
                 // Assuming the container IDs are in the format clock-container-{id}
                 let container = $(`#clock-container-${item.relacion.id}`);
                 console.log(container)
