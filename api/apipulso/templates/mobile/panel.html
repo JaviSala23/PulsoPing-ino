@@ -115,7 +115,7 @@
 
     <div data-role="content" class="mt-3">
         {% for item in relaciones_actualizadas %}
-        <div class="clock-grid">
+        <div class="clock-grid" id="{{ item.relacion.id}}">
             
             
             <div class="clock-container">
@@ -172,13 +172,22 @@ function actualizarTabla() {
     $.ajax({
         url: "{% url 'actualizar_relaciones_mobile' %}",
         success: function(data) {
-            console.log(data)
-            $('#tabla-relaciones').html(data.tabla_html);
-            console.log(data)
-            data.forEach((data, index) => {
-                $(`#temp-${index + 1}`).text(device.temp+"°");
-                $(`#door-status-${index + 1}`).text(device.isDoorOpen ? 'Puerta: Abierta' : 'Puerta: Cerrada');
-                $(`#compressor-status-${index + 1}`).text(device.isCompressorOn ? 'Compresor: Encendido' : 'Compresor: Apagado');
+            console.log(data);
+            data.relaciones_actualizadas.forEach((item, index) => {
+                let temp = item.ultimo_registro.temp;
+                let isDoorOpen = item.ultimo_registro.isDoorOpen;
+                let isCompressorOn = item.ultimo_registro.isCompressorOn;
+                let fecha_hora = item.ultimo_registro.fecha_hora;
+
+                // Assuming the container IDs are in the format clock-container-{id}
+                let container = $(`#clock-container-${item.relacion.id}`);
+                container.find('.cuenta').text(item.relacion.nombre_cuenta);
+                container.find('.artefacto').text(item.relacion.artefacto_descripcion);
+                container.find('.puerto').text('Puerto: ' + item.relacion.puerto);
+                container.find('.fecha').text(fecha_hora);
+                container.find('.temperature').text(temp + '°');
+                container.find('.status #door-status').text('Puerta: ' + (isDoorOpen ? 'Abierta' : 'Cerrada'));
+                container.find('.status #compressor-status').text('Compresor: ' + (isCompressorOn ? 'Encendido' : 'Apagado'));
             });
         },
         error: function(xhr, status, error) {
