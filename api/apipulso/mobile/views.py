@@ -46,7 +46,7 @@ def actualizar_relaciones_mobile(requrest):
 
         # Agrega un diccionario con la relación y el último registro de temperatura
         relaciones_actualizadas.append({
-            'relacion': relacion,
+            'relacion': relacion_serializable,
             'ultimo_registro': ultimo_registro
         })
 
