@@ -25,7 +25,7 @@ def panel_view(request):
 
     return render(request, 'mobile/panel.html', {'relaciones_actualizadas': relaciones_actualizadas})
 
-def actualizar_relaciones_mobile():
+def actualizar_relaciones_mobile(requrest):
     relaciones = Cuenta_has_Artefacto.objects.all()
 
     # Lista para almacenar relaciones junto con sus últimos registros de temperatura
