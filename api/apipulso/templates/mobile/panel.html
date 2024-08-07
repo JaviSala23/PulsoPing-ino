@@ -170,8 +170,9 @@
 // Función para actualizar la tabla cada minuto
 function actualizarTabla() {
     $.ajax({
-        url: "{% url 'actualizar_relaciones' %}",
+        url: "{% url 'mobile/actualizar_relaciones' %}",
         success: function(data) {
+            console.log(data)
             $('#tabla-relaciones').html(data.tabla_html);
             console.log(data)
             data.forEach((data, index) => {
