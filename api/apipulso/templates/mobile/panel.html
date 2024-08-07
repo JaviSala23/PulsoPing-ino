@@ -174,7 +174,7 @@ function actualizarTabla() {
     $.ajax({
         url: "{% url 'actualizar_relaciones_mobile' %}",
         success: function(data) {
-            console.log(data);door-status
+            console.log(data);
             data.relaciones_actualizadas.forEach((item, index) => {
                 let temp = item.ultimo_registro.temperatura;
                 console.log(temp)
