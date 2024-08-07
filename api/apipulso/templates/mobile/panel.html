@@ -126,11 +126,11 @@
                     <div class="cuenta" id="cuenta">{{ item.relacion.cuenta.nombre_cuenta }}</div>
                     <div class="artefacto" id="art">{{ item.relacion.artefacto.descripcion }}</div>
                     <div class="puerto" id="puerto">Puerto:{{ item.relacion.puerto }}</div>
-                    <div class="fecha" id="fecha">{% if item.ultimo_registro %} {{ item.ultimo_registro.fecha_hora|date:"Y-m-d H:i:s" }} {% else %} N/A {% endif %}</div>
-                    <div class="temperature" id="temp-2">{% if item.ultimo_registro %} {{ item.ultimo_registro.temperatura }}° {% else %} -°{% endif %}</div>
+                    <div class="fecha" id="fecha{{item.relacion.id}}">{% if item.ultimo_registro %} {{ item.ultimo_registro.fecha_hora|date:"Y-m-d H:i:s" }} {% else %} N/A {% endif %}</div>
+                    <div class="temperature" id="temp-2{{item.relacion.id}}">{% if item.ultimo_registro %} {{ item.ultimo_registro.temperatura }}° {% else %} -°{% endif %}</div>
                     <div class="status">
-                    <div class="door-status-2">Puerta:{% if item.ultimo_registro %} {% if item.ultimo_registro.puerta == 1 %} Abierta {% else %} Cerrada {% endif %} {% else %} N/A {% endif %}</div>
-                    <div class="compressor-status-2">Compresor:{% if item.ultimo_registro %} {% if item.ultimo_registro.compresor == 1 %} Prendido {% else %} Apagado {% endif %} {% else %} N/A {% endif %}</div>
+                    <div class="door-status-2{{item.relacion.id}}">Puerta:{% if item.ultimo_registro %} {% if item.ultimo_registro.puerta == 1 %} Abierta {% else %} Cerrada {% endif %} {% else %} N/A {% endif %}</div>
+                    <div class="compressor-status-2{{item.relacion.id}}">Compresor:{% if item.ultimo_registro %} {% if item.ultimo_registro.compresor == 1 %} Prendido {% else %} Apagado {% endif %} {% else %} N/A {% endif %}</div>
                 </div>
             </div>
             
@@ -146,7 +146,7 @@
     </div>
 </div>
 
-// JavaScript to update the data
+
 <script>
 function actualizarTabla() {
     $.ajax({
@@ -163,10 +163,10 @@ function actualizarTabla() {
                 // Assuming the container IDs are in the format clock-container-{id}
                 let container = $(`#clock-container-${item.relacion.id}`);
                 console.log(container)
-                container.find('.fecha').text(fecha_hora);
-                container.find('.temperature').text(temp);
-                container.find('.status .door-status-2').text('Puerta: ' + (isDoorOpen ? 'Abierta' : 'Cerrada'));
-                container.find('.status .compressor-status-2').text('Compresor: ' + (isCompressorOn ? 'Encendido' : 'Apagado'));
+                $('#fecha'+item.relacion.id).text(fecha_hora);
+                $('#temperature'+item.relacion.id).text(temp);
+                $('#door-status-2'+item.relacion.id).text('Puerta: ' + (isDoorOpen ? 'Abierta' : 'Cerrada'));
+                $('#compressor-status-2'+item.relacion.id).text('Compresor: ' + (isCompressorOn ? 'Encendido' : 'Apagado'));
 
 
             });
