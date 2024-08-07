@@ -2,6 +2,19 @@ from django.shortcuts import render
 from gestion.models import Cuenta_has_Artefacto
 from gestion.views import obtener_ultimo_registro
 from django.http import JsonResponse
+import pandas as pd
+import matplotlib.pyplot as plt
+from io import BytesIO
+import base64
+import mpld3
+from datetime import datetime
+from django.utils.dateparse import parse_datetime
+import os
+from django.template.loader import render_to_string
+from matplotlib.dates import DateFormatter
+from mpld3 import fig_to_html, plugins
+import json
+from datetime import datetime, timedelta
 
 def panel_view(request):
 
