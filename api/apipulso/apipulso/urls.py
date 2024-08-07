@@ -53,6 +53,6 @@ urlpatterns = [
 
     #mobile
     path('mobile/panel',mobile.panel_view,name='panelMobile'),
-    path('mobile/actualizar_relaciones',mobile.actualizar_relaciones_mobile,name='actualizar_relaciones_mobile')
+    path('mobile/actualizar_relaciones',mobile.actualizar_relaciones_mobile,name='actualizar_relaciones_mobile'),
 ]
 
