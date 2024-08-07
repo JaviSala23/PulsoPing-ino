@@ -54,3 +54,108 @@ def actualizar_relaciones_mobile(requrest):
     # Renderizar solo el contenido de la ta
     
     return JsonResponse({'relaciones_actualizadas': relaciones_actualizadas})
+
+
+
+# Diccionarios para traducir nombres de días y meses
+DIAS_ESPANOL = {
+    0: 'Lunes', 1: 'Martes', 2: 'Miércoles', 3: 'Jueves',
+    4: 'Viernes', 5: 'Sábado', 6: 'Domingo'
+}
+
+MESES_ESPANOL = {
+    1: 'Enero', 2: 'Febrero', 3: 'Marzo', 4: 'Abril',
+    5: 'Mayo', 6: 'Junio', 7: 'Julio', 8: 'Agosto',
+    9: 'Septiembre', 10: 'Octubre', 11: 'Noviembre', 12: 'Diciembre'
+}
+
+def translate_timestamp(timestamp):
+    # Función para traducir el timestamp a español
+    return timestamp.strftime('%d/%m %H:%M')
+
+def TemperatureGraphView(request, id):
+    try:
+        # Obtener el objeto Cuenta_has_Artefacto correspondiente
+        artefacto1 = Cuenta_has_Artefacto.objects.get(pk=id)
+    except Cuenta_has_Artefacto.DoesNotExist:
+        return HttpResponse("No se encontró el artefacto especificado.", content_type="text/plain")
+    
+    data = []
+    
+    try:
+        # Limpiar la URL para evitar caracteres de nueva línea
+        url_clean = artefacto1.url.strip()
+
+        # Leer datos del archivo
+        with open(url_clean, 'r') as f:
+            lines = f.readlines()
+    except Exception as e:
+        return HttpResponse(f"Error leyendo archivo {url_clean}: {e}", content_type="text/plain")
+
+    for line in lines:
+        parts = line.strip().split(',')
+        if len(parts) < 2:
+            continue
+
+        try:
+            timestamp = datetime.strptime(parts[0], "%Y-%m-%d %H:%M:%S")
+            temperature = float(parts[1])
+            data.append((timestamp, temperature))
+        except Exception as e:
+            continue
+
+    # Convertir los datos en un DataFrame de pandas
+    if not data:
+        return HttpResponse("No se encontraron datos válidos en los archivos.", content_type="text/plain")
+
+    df = pd.DataFrame(data, columns=['timestamp', 'temperature'])
+
+    # Filtrar datos por hora y fecha si se especifican en los parámetros de la solicitud
+    fecha_inicio_str = request.GET.get('fecha_inicio', None)
+    fecha_fin_str = request.GET.get('fecha_fin', None)
+
+    if not fecha_inicio_str and not fecha_fin_str:
+        # Calcular fecha_inicio y fecha_fin si no están especificadas
+        fecha_fin = datetime.now()  # Fecha actual
+        fecha_inicio = fecha_fin - timedelta(hours=4)  # 4 horas antes de la fecha actual
+    else:
+        try:
+            fecha_inicio = datetime.fromisoformat(fecha_inicio_str)
+            fecha_fin = datetime.fromisoformat(fecha_fin_str)
+        except Exception as e:
+            return HttpResponse(f"Error al procesar las fechas: {e}", content_type="text/plain")
+
+    df = df[(df['timestamp'] >= fecha_inicio) & (df['timestamp'] <= fecha_fin)]
+
+    
+
+    # Preparar datos para el gráfico
+    timestamps = [translate_timestamp(ts) for ts in df['timestamp']]
+    temperatures = df['temperature'].tolist()
+
+      # Ordenar los datos de más recientes a más antiguos
+    df = df.sort_values(by='timestamp', ascending=False)
+
+    # Preparar datos para la tabla
+    table_data = []
+    for date, temp in zip(df['timestamp'], df['temperature']):
+        date_str = translate_timestamp(date)  # Traducir la fecha y hora a español
+        
+        # Determinar el color de la temperatura en la tabla según los rangos definidos
+        if temp < artefacto1.temp_min or temp > artefacto1.temp_max:
+            temp_color = 'red'
+        else:
+            temp_color = 'blue'
+        
+        table_data.append({'fecha_hora': date_str, 'temperatura': temp, 'color': temp_color})
+
+    # Renderizar la plantilla con los datos del gráfico
+    return render(request, 'mobile/estadisticaM.html', {
+        'timestamps': json.dumps(timestamps),
+        'temperatures': json.dumps(temperatures),
+        'cuenta': artefacto1.cuenta.nombre_cuenta,
+        'puerto': puerto,
+        'descripcion': artefacto1.artefacto.descripcion,
+        'tabla_datos': table_data,
+        'datos': artefacto1
+    })

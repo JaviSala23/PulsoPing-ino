@@ -117,6 +117,7 @@
 
     <div data-role="content" class="mt-3">
         {% for item in relaciones_actualizadas %}
+        <a href="{% url 'temperature_graphM' id=item.relacion.id %}">
         <div class="clock-grid">
             
             
@@ -137,7 +138,7 @@
                 
        
             <!-- Añade más relojes según sea necesario -->
-        </div>
+        </div></a>
         {% endfor %}
     </div>
 
