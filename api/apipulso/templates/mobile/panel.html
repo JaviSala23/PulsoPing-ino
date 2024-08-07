@@ -126,7 +126,7 @@
                     <div class="artefacto" id="art">{{ item.relacion.artefacto.descripcion }}</div>
                     <div class="puerto" id="puerto">Puerto:{{ item.relacion.puerto }}</div>
                     <div class="fecha" id="fecha">{% if item.ultimo_registro %} {{ item.ultimo_registro.fecha_hora|date:"Y-m-d H:i:s" }} {% else %} N/A {% endif %}</div>
-                    <div class="temperature" id="temp-2">{% if item.ultimo_registro %} {{ item.ultimo_registro.temperatura }} {% else %} -{% endif %}°</div>
+                    <div class="temperature" id="temp-2">{% if item.ultimo_registro %} {{ item.ultimo_registro.temperatura }}°C {% else %} -°C{% endif %}</div>
                     <div class="status">
                     <div id="door-status-2">Puerta:{% if item.ultimo_registro %} {% if item.ultimo_registro.puerta == 1 %} Abierta {% else %} Cerrada {% endif %} {% else %} N/A {% endif %}</div>
                     <div id="compressor-status-2">Compresor:{% if item.ultimo_registro %} {% if item.ultimo_registro.compresor == 1 %} Prendido {% else %} Apagado {% endif %} {% else %} N/A {% endif %}</div>
