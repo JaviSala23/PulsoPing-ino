@@ -122,6 +122,7 @@
             
             <div class="clock-container">
                 <div class="clock" id="clock-container-${{ item.relacion.id}}">
+                    {{ item.relacion.id}}
                     <div class="cuenta" id="cuenta">{{ item.relacion.cuenta.nombre_cuenta }}</div>
                     <div class="artefacto" id="art">{{ item.relacion.artefacto.descripcion }}</div>
                     <div class="puerto" id="puerto">Puerto:{{ item.relacion.puerto }}</div>
@@ -177,17 +178,17 @@ function actualizarTabla() {
             console.log(data);
             data.relaciones_actualizadas.forEach((item, index) => {
                 let temp = item.ultimo_registro.temperatura;
-                console.log(temp)
+                console.log(item.relacion.id)
                 let isDoorOpen = item.ultimo_registro.puerta;
                 let isCompressorOn = item.ultimo_registro.compresor;
                 let fecha_hora = item.ultimo_registro.fecha_hora;
 
                 // Assuming the container IDs are in the format clock-container-{id}
-                let container = $('');
-                container.find('#clock-container-${item.relacion.id} .fecha').text(fecha_hora);
-                container.find('#clock-container-${item.relacion.id}  .temperature').text(temp + '°');
-                container.find('#clock-container-${item.relacion.id}  .status .door-status-2').text('Puerta: ' + (isDoorOpen ? 'Abierta' : 'Cerrada'));
-                container.find('#clock-container-${item.relacion.id}  .status .compressor-status-2').text('Compresor: ' + (isCompressorOn ? 'Encendido' : 'Apagado'));
+                
+                $('#clock-container-${item.relacion.id} .fecha').text(fecha_hora);
+                $('#clock-container-${item.relacion.id}  .temperature').text(temp + '°');
+                $('#clock-container-${item.relacion.id}  .status .door-status-2').text('Puerta: ' + (isDoorOpen ? 'Abierta' : 'Cerrada'));
+                $('#clock-container-${item.relacion.id}  .status .compressor-status-2').text('Compresor: ' + (isCompressorOn ? 'Encendido' : 'Apagado'));
             });
         },
         error: function(xhr, status, error) {
