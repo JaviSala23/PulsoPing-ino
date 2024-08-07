@@ -36,6 +36,14 @@ def actualizar_relaciones_mobile(requrest):
         archivo_path = relacion.url  # Ajusta esto según tu modelo y campo correspondiente
         ultimo_registro = obtener_ultimo_registro(archivo_path)
 
+        # Convierte la relación a un formato serializable
+        relacion_serializable = {
+            'cuenta': relacion.cuenta.nombre_cuenta,
+            'artefacto': relacion.artefacto.descripcion,  # Ajusta esto según tus campos
+            'puerto': relacion.puerto ,
+            # Agrega otros campos relevantes de tu modelo
+        }
+
         # Agrega un diccionario con la relación y el último registro de temperatura
         relaciones_actualizadas.append({
             'relacion': relacion,
