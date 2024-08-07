@@ -118,8 +118,9 @@
     <div data-role="content" class="mt-3">
         <div class="clock-grid">
             
-            {% for item in relaciones_actualizadas %}
+           
             <div class="clock-container">
+                {% for item in relaciones_actualizadas %}
                 <div class="clock">
                     <div class="cuenta" id="cuenta">{{ item.relacion.cuenta.nombre_cuenta }}</div>
                     <div class="artefacto" id="art">{{ item.relacion.artefacto.descripcion }}</div>
@@ -130,8 +131,9 @@
                     <div id="door-status-2">{% if item.ultimo_registro %} {% if item.ultimo_registro.puerta == 1 %} Abierta {% else %} Cerrada {% endif %} {% else %} N/A {% endif %}</div>
                     <div id="compressor-status-2">{% if item.ultimo_registro %} {% if item.ultimo_registro.compresor == 1 %} Prendido {% else %} Apagado {% endif %} {% else %} N/A {% endif %}</div>
                 </div>
-            </div>
                 {% endfor %}
+            </div>
+                
        
             <!-- Añade más relojes según sea necesario -->
         </div>
