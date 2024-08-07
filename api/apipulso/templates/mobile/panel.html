@@ -163,6 +163,7 @@ function actualizarTabla() {
                 console.log(item.relacion.id);
                 // Assuming the container IDs are in the format clock-container-{id}
                 let container = $(`#clock-container-${item.relacion.id}`);
+                print(container)
                 container.find('.fecha').text(fecha_hora);
                 container.find('.temperature').text(temp);
                 container.find('.status .door-status-2').text('Puerta: ' + (isDoorOpen ? 'Abierta' : 'Cerrada'));
