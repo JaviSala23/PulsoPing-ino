@@ -162,7 +162,7 @@ function actualizarTabla() {
                 console.log(fecha_hora);
                 console.log(item.relacion.id);
                 // Assuming the container IDs are in the format clock-container-{id}
-                $('#clock-container-${item.relacion.id} .fecha').text(fecha_hora);
+                $("#clock-container-${item.relacion.id} .fecha").text(fecha_hora);
                 $('#clock-container-${item.relacion.id} .temperature').text(temp + '°');
                 $('#clock-container-${item.relacion.id} .status .door-status-2').text('Puerta: ' + (isDoorOpen ? 'Abierta' : 'Cerrada'));
                 $('#clock-container-${item.relacion.id} .status .compressor-status-2').text('Compresor: ' + (isCompressorOn ? 'Encendido' : 'Apagado'));
