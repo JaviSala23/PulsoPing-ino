@@ -76,6 +76,7 @@ function actualizarTabla() {
         url: "{% url 'actualizar_relaciones' %}",
         success: function(data) {
             $('#tabla-relaciones').html(data.tabla_html);
+            print(data)
         },
         error: function(xhr, status, error) {
             console.error("Error al actualizar la tabla:", error);
