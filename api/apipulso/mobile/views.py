@@ -38,6 +38,7 @@ def actualizar_relaciones_mobile(requrest):
 
         # Convierte la relación a un formato serializable
         relacion_serializable = {
+            'id'=relacion.id,
             'cuenta': relacion.cuenta.nombre_cuenta,
             'artefacto': relacion.artefacto.descripcion,  # Ajusta esto según tus campos
             'puerto': relacion.puerto ,
