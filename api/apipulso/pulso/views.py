@@ -8,8 +8,12 @@ from datetime import datetime, timedelta
 import pytz
 
 class SensorReadingListCreate(generics.ListCreateAPIView):
-    queryset = SensorReading.objects.all()
     serializer_class = SensorReadingSerializer 
+
+    def get_queryset(self):
+        # Solo devolver el último registro si existe
+        last_record = SensorReading.objects.all().order_by('-timestamp').first()
+        return SensorReading.objects.filter(id=last_record.id) if last_record else SensorReading.objects.none()
 
     def perform_create(self, serializer):
         # Guardar en un archivo de texto
@@ -119,9 +123,3 @@ class SensorReadingListCreate(generics.ListCreateAPIView):
             results.append(response.json())
         
         return results
-
-class SensorReadingDetail(generics.RetrieveUpdateDestroyAPIView):
-    queryset = SensorReading.objects.all()
-    serializer_class = SensorReadingSerializer
-
-
