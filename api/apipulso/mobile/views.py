@@ -28,7 +28,7 @@ from django.core.exceptions import PermissionDenied
 def login_view(request):
     error_message = request.GET.get('error', None)
     form = AuthenticationForm()
-    next_url = request.GET.get('next', '/mobile/panel/')
+    next_url = request.GET.get('next', 'panel')
     context = {
         'form': form,
         'next': next_url,
