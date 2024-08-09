@@ -49,7 +49,7 @@ def authenticate_user(request):
     else:
         messages.error(request,f'Usuario y contraseña invalidos')
         return redirect('login_mobile') 
-
+@login_required
 def panel_view(request):
     print("anda")
      # Filtrar las relaciones según el grupo del usuario
