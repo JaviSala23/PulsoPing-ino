@@ -16,7 +16,7 @@ from mpld3 import fig_to_html, plugins
 import json
 from datetime import datetime, timedelta
 from django.contrib.auth.views import LoginView as DjangoLoginView
-
+from django.contrib.auth.decorators import login_required
 
 from django.contrib.auth import authenticate, login
 from django.http import HttpResponseRedirect
@@ -52,10 +52,16 @@ def login_view(request):
 
 
 
-
+@login_required
 def panel_view(request):
+     # Filtrar las relaciones según el grupo del usuario
+    if request.user.groups.filter(name='Clientes').exists():
+        relaciones = Cuenta_has_Artefacto.objects.filter(cuenta__usuario=request.user)  # Ajusta este filtro según tu modelo
+    else:
+        relaciones = Cuenta_has_Artefacto.objects.all()  # No mostrar nada si no es del grupo "Clientes"
+    
 
-    relaciones = Cuenta_has_Artefacto.objects.all()
+    
 
     # Lista para almacenar relaciones junto con sus últimos registros de temperatura
     relaciones_actualizadas = []

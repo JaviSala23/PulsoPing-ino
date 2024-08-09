@@ -131,7 +131,10 @@ class cuenta (models.Model):
         null=True, 
         blank=False,
         on_delete=models.PROTECT)
-    
+    usuario = models.ForeignKey(
+        User, null=True, blank=True, on_delete=models.SET_NULL)
+
+        
     def __str__(self):
         return self.nombre_cuenta
 
