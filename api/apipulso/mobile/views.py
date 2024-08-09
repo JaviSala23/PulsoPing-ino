@@ -40,21 +40,13 @@ def authenticate_user(request):
     if request.method == 'POST':
         form = AuthenticationForm(request, data=request.POST)
         if form.is_valid():
-            user = form.get_user()
-            auth_login(request, user)
-
-            next_url = request.POST.get('next', 'panel')
-            if not next_url or not next_url.startswith('/'):
-                next_url = 'panel'
-
-            # Mensajes de depuración
-            print(f"Redirecting to: {next_url}")
-
-            return redirect(next_url)
+            user = form.get_user()  # Obtiene el usuario autenticado
+            auth_login(request, user)  # Autentica al usuario y establece la sesión
+            return redirect('panelMobile')  # Redirige a una vista protegida
         else:
-            return redirect('login_mobile')
+            return redirect('login_mobile')  # Redirige al formulario de inicio de sesión en caso de error
     else:
-        return redirect('login_mobile')
+        return redirect('login_mobile') 
 
 def panel_view(request):
     print("anda")
