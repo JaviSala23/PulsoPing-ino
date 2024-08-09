@@ -37,11 +37,13 @@ def login_view(request):
             
             if user is not None:
                 auth_login(request, user)
-                return HttpResponseRedirect(next_url)
+                return render(request, 'mobile/panel.html', context)
             else:
                 form.add_error(None, 'Credenciales inválidas.')
+                return render(request, 'mobile/login.html', context)
         else:
             form_errors = form.errors
+            return render(request, 'mobile/login.html', context)
     else:
         form = AuthenticationForm()
         form_errors = None
@@ -51,7 +53,7 @@ def login_view(request):
         'next': next_url
     }
 
-    return render(request, 'mobile/login.html', context)
+        return render(request, 'mobile/login.html', context)
 
 
 
