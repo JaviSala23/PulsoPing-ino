@@ -44,10 +44,16 @@ def authenticate_user(request):
         if form.is_valid():
             user = form.get_user()
             auth_login(request, user)
-            return redirect('panelMobile')
+            
+            # Redirigir a la URL pasada en el parámetro 'next' o a la URL predeterminada
+            next_url = request.POST.get('next', '/mobile/panel/')
+            return redirect(next_url)
         else:
-            print("Formulario inválido")
+            # Si el formulario no es válido, redirige a la página de login con un mensaje de error
             return redirect('login_mobile')
+    else:
+        # Si no es una solicitud POST, redirige a la página de login
+        return redirect('login_mobile')
 
 def panel_view(request):
     print("anda")
