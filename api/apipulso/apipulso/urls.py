@@ -52,9 +52,11 @@ urlpatterns = [
 
 
     #mobile
+
     path('mobile/panel',mobile.panel_view,name='panelMobile'),
     path('mobile/actualizar_relaciones',mobile.actualizar_relaciones_mobile,name='actualizar_relaciones_mobile'),
     path('temperature-graphM/<int:id>', mobile.TemperatureGraphView, name='temperature_graphM'),
+    path('mobile/login', mobile_login_view, name='login_mobile'),
    
 ]
 
