@@ -33,7 +33,6 @@ def login_view(request):
 
     context = {
         'form': form,
-        'next': next_url,
         'error_message': error_message
     }
 
