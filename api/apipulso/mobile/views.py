@@ -37,7 +37,7 @@ def login_view(request):
             
             if user is not None:
                 auth_login(request, user)
-                return HttpResponseRedirect(next_url)
+                return redirect("panelMobile")
             else:
                 form.errors['__all__'] = ['Credenciales inválidas.']
         else:
