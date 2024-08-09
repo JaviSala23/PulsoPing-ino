@@ -9,7 +9,7 @@
     <form method="post" action="{% url 'authenticate_user' %}">
         {% csrf_token %}
         {{ form.as_p }}
-        <input type="hidden" name="next" value="{{ next }}" />
+       
         <button type="submit">Login</button>
     </form>
     {% if error_message %}
