@@ -47,10 +47,13 @@ def authenticate_user(request):
         if form.is_valid():
             user = form.get_user()
             auth_login(request, user)
+            print(user)
             return redirect('panelMobile')
         else:
+            print("no")
             return redirect('login_mobile')
     else:
+        print("no")
         return redirect('login_mobile')
 
 @login_required
