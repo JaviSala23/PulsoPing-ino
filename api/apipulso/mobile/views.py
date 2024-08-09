@@ -43,23 +43,17 @@ def authenticate_user(request):
             user = form.get_user()
             auth_login(request, user)
 
-            # Obtener el parámetro 'next' del POST o usar una URL por defecto
             next_url = request.POST.get('next', '/mobile/panel/')
-            
-            # Verificar si next_url es una cadena vacía
-            if not next_url:
+            if not next_url or not next_url.startswith('/'):
                 next_url = '/mobile/panel/'
-            
-            # Verificar si next_url es una URL válida
-            if not next_url.startswith('/'):
-                next_url = '/mobile/panel/'
+
+            # Mensajes de depuración
+            print(f"Redirecting to: {next_url}")
 
             return redirect(next_url)
         else:
-            # Redirige al login en caso de error con un mensaje de error si es necesario
             return redirect('login_mobile')
     else:
-        # Redirige al login si no es una solicitud POST
         return redirect('login_mobile')
 
 def panel_view(request):
