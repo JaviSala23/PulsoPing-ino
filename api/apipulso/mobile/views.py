@@ -26,16 +26,14 @@ from django.conf import settings
 from django.core.exceptions import PermissionDenied
 
 def login_view(request):
-   
     error_message = request.GET.get('error', None)
-    print("loginview")
     form = AuthenticationForm()
-
+    next_url = request.GET.get('next', '/mobile/panel/')
     context = {
         'form': form,
+        'next': next_url,
         'error_message': error_message
     }
-
     return render(request, 'mobile/login.html', context)
 
 def authenticate_user(request):
@@ -44,15 +42,24 @@ def authenticate_user(request):
         if form.is_valid():
             user = form.get_user()
             auth_login(request, user)
-            
-            # Redirigir a la URL pasada en el parámetro 'next' o a la URL predeterminada
+
+            # Obtener el parámetro 'next' del POST o usar una URL por defecto
             next_url = request.POST.get('next', '/mobile/panel/')
+            
+            # Verificar si next_url es una cadena vacía
+            if not next_url:
+                next_url = '/mobile/panel/'
+            
+            # Verificar si next_url es una URL válida
+            if not next_url.startswith('/'):
+                next_url = '/mobile/panel/'
+
             return redirect(next_url)
         else:
-            # Si el formulario no es válido, redirige a la página de login con un mensaje de error
+            # Redirige al login en caso de error con un mensaje de error si es necesario
             return redirect('login_mobile')
     else:
-        # Si no es una solicitud POST, redirige a la página de login
+        # Redirige al login si no es una solicitud POST
         return redirect('login_mobile')
 
 def panel_view(request):
