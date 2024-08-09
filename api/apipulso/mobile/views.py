@@ -26,8 +26,8 @@ from django.conf import settings
 from django.core.exceptions import PermissionDenied
 
 def login_view(request):
-    next_url = request.GET.get('next', reverse('panelMobile'))
-    
+    next_url = request.GET.get('next', reverse('login_mobile'))
+    print(f"Next URL: {next_url}")
     if request.method == 'POST':
         form = AuthenticationForm(request, data=request.POST)
         if form.is_valid():
@@ -37,13 +37,11 @@ def login_view(request):
             
             if user is not None:
                 auth_login(request, user)
-                return render(request, 'mobile/panel.html', context)
+                return HttpResponseRedirect(next_url)
             else:
-                form.add_error(None, 'Credenciales inválidas.')
-                return render(request, 'mobile/login.html', context)
+                form.errors['__all__'] = ['Credenciales inválidas.']
         else:
             form_errors = form.errors
-            return render(request, 'mobile/login.html', context)
     else:
         form = AuthenticationForm()
         form_errors = None
