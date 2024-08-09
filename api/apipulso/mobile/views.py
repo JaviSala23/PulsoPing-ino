@@ -25,6 +25,7 @@ from django.urls import reverse
 from django.conf import settings
 from django.core.exceptions import PermissionDenied
 from django.contrib import messages
+from django.contrib.auth import logout
 
 def login_view(request):
     error_message = request.GET.get('error', None)
@@ -34,6 +35,10 @@ def login_view(request):
         'error_message': error_message
     }
     return render(request, 'mobile/login.html', context)
+
+def logout_view(request):
+    logout(request)
+    return redirect('login_mobile') 
 
 def authenticate_user(request):
     if request.method == 'POST':
