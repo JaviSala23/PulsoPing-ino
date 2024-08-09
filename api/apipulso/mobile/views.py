@@ -23,7 +23,7 @@ from django.http import HttpResponseRedirect
 from django.urls import reverse
 
 def login_view(request):
-    next_url = request.GET.get('next', '')
+    next_url = request.GET.get('next', '/')
     
     if request.method == 'POST':
         username = request.POST.get('username')
@@ -32,7 +32,7 @@ def login_view(request):
         
         if user is not None:
             login(request, user)
-            return HttpResponseRedirect(next_url if next_url else reverse('panelMobile'))
+            return HttpResponseRedirect(next_url)
         else:
             form_errors = True
     else:
