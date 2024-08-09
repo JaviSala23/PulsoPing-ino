@@ -26,36 +26,32 @@ from django.conf import settings
 from django.core.exceptions import PermissionDenied
 
 def login_view(request):
-    # Obtener la URL a la que redirigir después del login, o usar 'panelMobile' como default
     next_url = request.GET.get('next', reverse('panelMobile'))
+    error_message = request.GET.get('error', None)
 
+    form = AuthenticationForm()
+
+    context = {
+        'form': form,
+        'next': next_url,
+        'error_message': error_message
+    }
+
+    return render(request, 'mobile/login.html', context)
+
+def authenticate_user(request):
+    next_url = request.GET.get('next', reverse('panelMobile'))
+    
     if request.method == 'POST':
         form = AuthenticationForm(request, data=request.POST)
         if form.is_valid():
-            # Autenticar al usuario
             user = form.get_user()
             auth_login(request, user)
-            # Redirigir a la URL especificada en 'next' o a la URL de la página principal si no se proporciona 'next'
             return redirect(next_url)
         else:
-            # En caso de error, renderizar el formulario con errores y mantener la URL de redirección
-            context = {
-                'form': form,
-                'next': next_url,
-                'error_message': 'Credenciales inválidas.'
-            }
-            return render(request, 'mobile/login.html', context)
+            return redirect(f"{reverse('login_mobile')}?next={next_url}&error=1")
     else:
-        # Inicializar el formulario vacío
-        form = AuthenticationForm()
-    
-    # Renderizar el formulario de login con la URL de redirección
-    context = {
-        'form': form,
-        'next': next_url
-    }
-    return render(request, 'mobile/login.html', context)
-
+        return redirect(reverse('login_mobile') + f"?next={next_url}")
 
 @login_required
 def panel_view(request):
