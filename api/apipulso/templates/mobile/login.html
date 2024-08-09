@@ -89,6 +89,7 @@
                     {% for message in messages %}
                     <li{% if message.tags %} class="{{ message.tags }}" {% endif %}>{{ message }}</li>
                         {% endfor %}
+                        {% endif %}
             <form method="post" action="{% url 'authenticate_userMobile' %}">
                 {% csrf_token %}
                 {{ form.non_field_errors }}
