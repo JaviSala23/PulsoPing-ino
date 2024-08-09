@@ -41,15 +41,15 @@ def login_view(request):
 def authenticate_user(request):
     if request.method == 'POST':
         form = AuthenticationForm(request, data=request.POST)
-    if form.is_valid():
-        user = form.get_user()
-        auth_login(request, user)
-        next_url = request.POST.get('next', '/mobile/panel/')  # Usa '/mobile/panel/' como URL por defecto
-        print(f"Redirigiendo a: {next_url}")  # Debugging line
-        return redirect(next_url)
-    else:
-        print("Formulario inválido")
-        return redirect('login_mobile')
+        if form.is_valid():
+            user = form.get_user()
+            auth_login(request, user)
+            next_url = request.POST.get('next', 'mobile/panel/')  # Usa '/mobile/panel/' como URL por defecto
+            print(f"Redirigiendo a: {next_url}")  # Debugging line
+            return redirect(next_url)
+        else:
+            print("Formulario inválido")
+            return redirect('login_mobile')
 
 def panel_view(request):
     print("anda")
