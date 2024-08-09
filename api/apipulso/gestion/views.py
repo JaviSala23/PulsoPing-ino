@@ -18,6 +18,17 @@ from matplotlib.dates import DateFormatter
 from mpld3 import fig_to_html, plugins
 import json
 from datetime import datetime, timedelta
+from django.contrib.auth.views import LoginView as DjangoLoginView
+
+from django.contrib.auth import authenticate, login
+from django.http import HttpResponseRedirect
+from django.urls import reverse_lazy
+
+class LoginView(DjangoLoginView):
+    template_name = 'login_desktop.html'
+    redirect_authenticated_user = True
+
+
 
 def panel(request):
     return render(request,'panel/panelControl.html')

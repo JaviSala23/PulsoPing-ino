@@ -15,7 +15,7 @@ from matplotlib.dates import DateFormatter
 from mpld3 import fig_to_html, plugins
 import json
 from datetime import datetime, timedelta
-
+from django.contrib.auth.views import LoginView as DjangoLoginView
 
 
 from django.contrib.auth import authenticate, login
@@ -23,7 +23,7 @@ from django.http import HttpResponseRedirect
 from django.urls import reverse
 
 def login_view(request):
-    next_url = request.GET.get('next', '/')
+    next_url = request.GET.get('next', 'mobile/panel')
     
     if request.method == 'POST':
         username = request.POST.get('username')
