@@ -25,7 +25,7 @@ from django.urls import reverse
 from django.conf import settings
 
 def login_view(request):
-    next_url = request.GET.get('next', '/mobile/panel')
+    next_url = request.GET.get('next', 'panel')
     
     if request.method == 'POST':
         form = AuthenticationForm(request, data=request.POST)
