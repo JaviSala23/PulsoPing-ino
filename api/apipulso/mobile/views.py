@@ -26,52 +26,35 @@ from django.conf import settings
 from django.core.exceptions import PermissionDenied
 
 def login_view(request):
+    # Obtener la URL a la que redirigir después del login, o usar 'panelMobile' como default
     next_url = request.GET.get('next', reverse('panelMobile'))
-    print(f"Next URL: {next_url}")
+
     if request.method == 'POST':
         form = AuthenticationForm(request, data=request.POST)
         if form.is_valid():
-            username = form.cleaned_data.get('username')
-            password = form.cleaned_data.get('password')
-            user = authenticate(request, username=username, password=password)
-            
-            if user is not None:
-                auth_login(request, user)
-                return redirect("panelMobile")
-            else:
-                form.errors['__all__'] = ['Credenciales inválidas.']
-                form = AuthenticationForm()
-                form_errors = None
-
-                context = {
-                    'form': form,
-                    'next': next_url
-                }
-
-                return render(request, 'mobile/login.html', context)
-                
+            # Autenticar al usuario
+            user = form.get_user()
+            auth_login(request, user)
+            # Redirigir a la URL especificada en 'next' o a la URL de la página principal si no se proporciona 'next'
+            return redirect(next_url)
         else:
-            form_errors = form.errors
-            form = AuthenticationForm()
-            form_errors = None
-
+            # En caso de error, renderizar el formulario con errores y mantener la URL de redirección
             context = {
                 'form': form,
-                'next': next_url
+                'next': next_url,
+                'error_message': 'Credenciales inválidas.'
             }
-
             return render(request, 'mobile/login.html', context)
     else:
+        # Inicializar el formulario vacío
         form = AuthenticationForm()
-        form_errors = None
-
-        context = {
-            'form': form,
-            'next': next_url
-        }
-
-        return render(request, 'mobile/login.html', context)
-
+    
+    # Renderizar el formulario de login con la URL de redirección
+    context = {
+        'form': form,
+        'next': next_url
+    }
+    return render(request, 'mobile/login.html', context)
 
 
 @login_required
