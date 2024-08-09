@@ -47,7 +47,7 @@ def login_view(request):
         'next': next_url
     }
     
-    return render(request, 'login.html', context)
+    return render(request, 'mobile/login.html', context)
 
 
 
