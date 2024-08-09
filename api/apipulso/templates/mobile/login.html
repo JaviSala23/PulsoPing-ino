@@ -19,7 +19,7 @@
             border-radius: 8px;
             box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
             max-width: 90%;
-            width: 400px;
+            width: 200px;
         }
         .ui-btn-success {
             background-color: #28a745;
@@ -69,7 +69,7 @@
     </style>
 
     <div class="bg-gradient-primary">
-        <h1>MantisTemp Login</h1>
+        <h1>Login</h1>
     </div>
 
     <div data-role="page" id="dashboard" class="container">
@@ -94,11 +94,11 @@
                 {% csrf_token %}
                 {{ form.non_field_errors }}
                 <div data-role="fieldcontain">
-                    {{ form.username.label_tag }}
+                    {{ form.username.label_tag }}<br>
                     {{ form.username }}
                 </div>
                 <div data-role="fieldcontain">
-                    {{ form.password.label_tag }}
+                    {{ form.password.label_tag }}<br>
                     {{ form.password }}
                 </div>
                 <div data-role="fieldcontain">
