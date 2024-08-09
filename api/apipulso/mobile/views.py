@@ -1,4 +1,4 @@
-from django.shortcuts import render
+from django.shortcuts import render,redirect
 from gestion.models import Cuenta_has_Artefacto
 from gestion.views import obtener_ultimo_registro
 from django.http import JsonResponse
