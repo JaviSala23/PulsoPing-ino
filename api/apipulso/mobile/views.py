@@ -28,13 +28,18 @@ from django.contrib import messages
 from django.contrib.auth import logout
 
 def login_view(request):
-    error_message = request.GET.get('error', None)
-    form = AuthenticationForm()
-    context = {
-        'form': form,
-        'error_message': error_message
-    }
-    return render(request, 'mobile/login.html', context)
+    # Obtener el nombre de usuario
+    username = request.user.username
+    if username:
+        return redirect('panelMobile') 
+    else:
+        error_message = request.GET.get('error', None)
+        form = AuthenticationForm()
+        context = {
+            'form': form,
+            'error_message': error_message
+        }
+        return render(request, 'mobile/login.html', context)
 
 def logout_view(request):
     logout(request)
@@ -54,40 +59,44 @@ def authenticate_user(request):
     else:
         messages.error(request,f'Usuario y contraseña invalidos')
         return redirect('login_mobile') 
-@login_required
-def panel_view(request):
-    print("anda")
-     # Filtrar las relaciones según el grupo del usuario
-    if request.user.groups.filter(name='Clientes').exists():
-        relaciones = Cuenta_has_Artefacto.objects.filter(cuenta__usuario=request.user)  # Ajusta este filtro según tu modelo
-       
-        print(relaciones)
-    else:
-        relaciones = Cuenta_has_Artefacto.objects.all()  # No mostrar nada si no es del grupo "Clientes"
-    
-        print(relaciones)
 
+def panel_view(request):
     # Obtener el nombre de usuario
     username = request.user.username
-    print(username)
-    # Lista para almacenar relaciones junto con sus últimos registros de temperatura
-    relaciones_actualizadas = []
+    if username:
 
-    # Itera sobre las relaciones para obtener y agregar el último registro de temperatura
-    for relacion in relaciones:
-        archivo_path = relacion.url  # Ajusta esto según tu modelo y campo correspondiente
-        print(archivo_path)
-        try:
-            ultimo_registro = obtener_ultimo_registro(archivo_path)
-        except:
-            ultimo_registro=0
-        # Agrega un diccionario con la relación y el último registro de temperatura
-        relaciones_actualizadas.append({
-            'relacion': relacion,
-            'ultimo_registro': ultimo_registro
-        })
-        print(relaciones_actualizadas)
-    return render(request, 'mobile/panel.html', {'relaciones_actualizadas': relaciones_actualizadas})
+        # Filtrar las relaciones según el grupo del usuario
+        if request.user.groups.filter(name='Clientes').exists():
+            relaciones = Cuenta_has_Artefacto.objects.filter(cuenta__usuario=request.user)  # Ajusta este filtro según tu modelo
+        
+            print(relaciones)
+        if request.user.groups.filter(name='Administrador').exists():
+            relaciones = Cuenta_has_Artefacto.objects.all()  # No mostrar nada si no es del grupo "Clientes"
+        
+        
+
+        
+        # Lista para almacenar relaciones junto con sus últimos registros de temperatura
+        relaciones_actualizadas = []
+
+        # Itera sobre las relaciones para obtener y agregar el último registro de temperatura
+        for relacion in relaciones:
+            archivo_path = relacion.url  # Ajusta esto según tu modelo y campo correspondiente
+            print(archivo_path)
+            try:
+                ultimo_registro = obtener_ultimo_registro(archivo_path)
+            except:
+                ultimo_registro=0
+            # Agrega un diccionario con la relación y el último registro de temperatura
+            relaciones_actualizadas.append({
+                'relacion': relacion,
+                'ultimo_registro': ultimo_registro
+            })
+            print(relaciones_actualizadas)
+        return render(request, 'mobile/panel.html', {'relaciones_actualizadas': relaciones_actualizadas})
+    else:
+        messages.error(request,f'Usuario y contraseña invalidos')
+        return redirect('login_mobile') 
 
 def actualizar_relaciones_mobile(request):
     relaciones = Cuenta_has_Artefacto.objects.all()
