@@ -53,35 +53,30 @@
         <div data-role="content" class="ui-content">
             {% if next %}
                 {% if user.is_authenticated %}
-                    <p>Tu cuenta no tiene acceso a esta página. Para proceder, inicia sesión con una cuenta que tenga acceso.</p>
+                    <p>Tu cuenta no tiene acceso a esta página. Para continuar, por favor inicia sesión con una cuenta que tenga acceso.</p>
                 {% else %}
-                    <p>Por favor, inicia sesión para ver esta página.</p>
+                    <p>Por favor inicia sesión para ver esta página.</p>
                 {% endif %}
             {% endif %}
 
             <div class="ui-card ui-body-a ui-corner-all">
                 <form method="post" action="{% url 'login_mobile' %}">
                     {% csrf_token %}
+                    {{ form.non_field_errors }}
                     <div data-role="fieldcontain">
-                        <label for="username">Usuario:</label>
-                        <input type="text" name="username" id="username" value="{{ form.username }}" />
+                        {{ form.username.label_tag }}
+                        {{ form.username }}
                     </div>
                     <div data-role="fieldcontain">
-                        <label for="password">Contraseña:</label>
-                        <input type="password" name="password" id="password" value="{{ form.password }}" />
+                        {{ form.password.label_tag }}
+                        {{ form.password }}
                     </div>
                     <div data-role="fieldcontain">
-                        <label for="remember_me">
-                            <input type="checkbox" name="remember_me" id="remember_me" />
-                            Recordarme
-                        </label>
+                        {{ form.remember_me.label_tag }}
+                        {{ form.remember_me }}
                     </div>
                     <input type="submit" class="ui-btn ui-btn-success ui-corner-all" value="INGRESAR">
                     <input type="hidden" name="next" value="{{ next }}" />
-                    
-                    {% if form.errors %}
-                        <p style="color:red">Tu usuario o contraseña no coincide, intenta de nuevo.</p>
-                    {% endif %}
                 </form>
             </div>
         </div>
