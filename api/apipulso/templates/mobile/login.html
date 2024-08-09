@@ -9,51 +9,99 @@
         .bg-gradient-primary {
             background: #4e73df;
             color: white;
+            padding: 20px;
+            text-align: center;
         }
         .ui-card {
-            margin: 20px;
-            padding: 15px;
+            margin: 20px auto;
+            padding: 20px;
+            background-color: #ffffff;
+            border-radius: 8px;
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+            max-width: 90%;
+            width: 400px;
         }
         .ui-btn-success {
             background-color: #28a745;
             border: none;
+            color: white;
+            font-size: 16px;
+            padding: 10px 20px;
+            border-radius: 5px;
+            cursor: pointer;
+        }
+        .ui-btn-success:hover {
+            background-color: #218838;
+        }
+        .ui-field-contain {
+            margin-bottom: 15px;
         }
         .ui-field-contain label {
-            color: black;
+            color: #333;
+            font-weight: bold;
+            display: block;
+            margin-bottom: 5px;
+        }
+        .ui-field-contain input[type="text"],
+        .ui-field-contain input[type="password"] {
+            width: 100%;
+            padding: 10px;
+            border: 1px solid #ccc;
+            border-radius: 5px;
+            box-sizing: border-box;
+        }
+        .ui-field-contain input[type="checkbox"] {
+            margin-right: 10px;
+        }
+        .form-error {
+            color: #dc3545;
+            margin-top: 10px;
+        }
+        .login-header {
+            font-size: 24px;
+            font-weight: bold;
+            margin-bottom: 20px;
+        }
+        .login-info {
+            margin-bottom: 20px;
+            color: #666;
         }
     </style>
 
-
-<div data-role="page" id="dashboard" class="container">
-    {% if next %}
-        {% if user.is_authenticated %}
-            <p>Tu cuenta no tiene acceso a esta página. Para continuar, por favor inicia sesión con una cuenta que tenga acceso.</p>
-        {% else %}
-            <p>Por favor inicia sesión para ver esta página.</p>
-        {% endif %}
-    {% endif %}
-
-    <div class="ui-card ui-body-a ui-corner-all">
-        <form method="post" action="{% url 'authenticate_userMobile' %}">
-            {% csrf_token %}
-            {{ form.non_field_errors }}
-            <div data-role="fieldcontain">
-                {{ form.username.label_tag }}
-                {{ form.username }}
-            </div>
-            <div data-role="fieldcontain">
-                {{ form.password.label_tag }}
-                {{ form.password }}
-            </div>
-            <div data-role="fieldcontain">
-                {{ form.remember_me.label_tag }}
-                {{ form.remember_me }}
-            </div>
-            <input type="submit" class="ui-btn ui-btn-success ui-corner-all" value="INGRESAR">
-            
-        </form>
+    <div class="bg-gradient-primary">
+        <h1>MantisTemp Login</h1>
     </div>
- </div>
 
+    <div data-role="page" id="dashboard" class="container">
+        <div class="ui-card ui-body-a ui-corner-all">
+            <div class="login-header">Iniciar Sesión</div>
+            {% if next %}
+                <div class="login-info">
+                    {% if user.is_authenticated %}
+                        <p>Tu cuenta no tiene acceso a esta página. Para continuar, por favor inicia sesión con una cuenta que tenga acceso.</p>
+                    {% else %}
+                        <p>Por favor inicia sesión para ver esta página.</p>
+                    {% endif %}
+                </div>
+            {% endif %}
 
- {% endblock %}
+            <form method="post" action="{% url 'authenticate_userMobile' %}">
+                {% csrf_token %}
+                {{ form.non_field_errors }}
+                <div data-role="fieldcontain">
+                    {{ form.username.label_tag }}
+                    {{ form.username }}
+                </div>
+                <div data-role="fieldcontain">
+                    {{ form.password.label_tag }}
+                    {{ form.password }}
+                </div>
+                <div data-role="fieldcontain">
+                    {{ form.remember_me.label_tag }}
+                    {{ form.remember_me }}
+                </div>
+                <input type="submit" class="ui-btn ui-btn-success ui-corner-all" value="INGRESAR">
+            </form>
+        </div>
+    </div>
+{% endblock %}
