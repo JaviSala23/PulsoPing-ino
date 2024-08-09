@@ -24,10 +24,8 @@ from django.http import HttpResponseRedirect
 from django.urls import reverse
 
 def login_view(request):
-# Obtiene la URL para redireccionar después del inicio de sesión
-    next_url = request.GET.get('next', 'panel')
+    next_url = request.GET.get('next', settings.LOGIN_REDIRECT_URL or 'panel')
     
-    # Maneja el formulario POST
     if request.method == 'POST':
         form = AuthenticationForm(request, data=request.POST)
         if form.is_valid():
@@ -37,17 +35,15 @@ def login_view(request):
             
             if user is not None:
                 auth_login(request, user)
-                # Redirige a la URL especificada en `next`
                 return HttpResponseRedirect(next_url)
             else:
-                form.errors = form._errors
+                form.errors['__all__'] = ['Credenciales inválidas.']
         else:
             form_errors = form.errors
     else:
         form = AuthenticationForm()
         form_errors = None
 
-    # Prepara el contexto para el template
     context = {
         'form': form,
         'next': next_url
