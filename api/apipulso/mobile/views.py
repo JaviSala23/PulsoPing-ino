@@ -65,7 +65,7 @@ def panel_view(request):
         print(relaciones)
     else:
         relaciones = Cuenta_has_Artefacto.objects.all()  # No mostrar nada si no es del grupo "Clientes"
-    
+        print(relaciones)
 
     
 
