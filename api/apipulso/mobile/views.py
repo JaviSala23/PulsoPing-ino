@@ -24,6 +24,7 @@ from django.http import HttpResponseRedirect
 from django.urls import reverse
 from django.conf import settings
 from django.core.exceptions import PermissionDenied
+from django.contrib import messages
 
 def login_view(request):
     error_message = request.GET.get('error', None)
@@ -41,9 +42,12 @@ def authenticate_user(request):
             user = form.get_user()  # Obtiene el usuario autenticado
             auth_login(request, user)  # Autentica al usuario y establece la sesión
             return redirect('panelMobile')  # Redirige a una vista protegida
-        else:
-            return redirect('login_mobile')  # Redirige al formulario de inicio de sesión en caso de error
+
+        else:  
+            messages.error(request, f'Usuario y contraseña invalidos')
+            return redirect('Usuario y contraseña invalidos')  # Redirige al formulario de inicio de sesión en caso de error
     else:
+        messages.error(request, f'No se pudo guardar el : {tipocuenta.descripcion}')
         return redirect('login_mobile') 
 
 def panel_view(request):
