@@ -22,6 +22,7 @@ from django.contrib.auth import authenticate, login
 from django.http import HttpResponseRedirect
 from django.urls import reverse
 
+def login_view(request):
 # Obtiene la URL para redireccionar después del inicio de sesión
     next_url = request.GET.get('next', 'panel')
     
