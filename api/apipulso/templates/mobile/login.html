@@ -60,7 +60,7 @@
             {% endif %}
 
             <div class="ui-card ui-body-a ui-corner-all">
-                <form method="post" action="{% url 'login_mobile' %}">
+                <form method="post" action="{% url 'authenticate_user' %}">
                     {% csrf_token %}
                     {{ form.non_field_errors }}
                     <div data-role="fieldcontain">
