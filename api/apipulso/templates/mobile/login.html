@@ -1,27 +1,9 @@
+% extends "layout_mobile.html" %}
 {% load static %}
 
-<!DOCTYPE html>
-<html lang="en">
+{% block title %}MantisTemp{% endblock %}
 
-<head>
-    <meta charset="utf-8">
-    <meta http-equiv="X-UA-Compatible" content="IE=edge">
-    <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
-    <meta name="description" content="">
-    <meta name="author" content="">
-
-    <title>Habitat - Ingreso</title>
-
-    <!-- jQuery Mobile CSS -->
-    <link rel="stylesheet" href="https://code.jquery.com/mobile/1.4.5/jquery.mobile-1.4.5.min.css">
-
-    <!-- Custom styles for this template -->
-    <link href="{% static 'css/style.css' %}" rel="stylesheet">
-    
-    <!-- Custom fonts for this template -->
-    <link href="{% static 'vendor/fontawesome-free/css/all.min.css' %}" rel="stylesheet" type="text/css">
-    <link href="https://fonts.googleapis.com/css?family=Nunito:200,200i,300,300i,400,400i,600,600i,700,700i,800,800i,900,900i" rel="stylesheet">
-
+{% block content %}
     <!-- Custom styles -->
     <style>
         .bg-gradient-primary {
@@ -40,53 +22,38 @@
             color: black;
         }
     </style>
-</head>
 
-<body class="bg-gradient-primary">
 
-    <div data-role="page" id="loginPage">
+<div data-role="page" id="dashboard" class="container">
+    {% if next %}
+        {% if user.is_authenticated %}
+            <p>Tu cuenta no tiene acceso a esta página. Para continuar, por favor inicia sesión con una cuenta que tenga acceso.</p>
+        {% else %}
+            <p>Por favor inicia sesión para ver esta página.</p>
+        {% endif %}
+    {% endif %}
 
-        <div data-role="header" data-position="fixed">
-            <h1>Bienvenido</h1>
-        </div>
-
-        <div data-role="content" class="ui-content">
-            {% if next %}
-                {% if user.is_authenticated %}
-                    <p>Tu cuenta no tiene acceso a esta página. Para continuar, por favor inicia sesión con una cuenta que tenga acceso.</p>
-                {% else %}
-                    <p>Por favor inicia sesión para ver esta página.</p>
-                {% endif %}
-            {% endif %}
-
-            <div class="ui-card ui-body-a ui-corner-all">
-                <form method="post" action="{% url 'authenticate_userMobile' %}">
-                    {% csrf_token %}
-                    {{ form.non_field_errors }}
-                    <div data-role="fieldcontain">
-                        {{ form.username.label_tag }}
-                        {{ form.username }}
-                    </div>
-                    <div data-role="fieldcontain">
-                        {{ form.password.label_tag }}
-                        {{ form.password }}
-                    </div>
-                    <div data-role="fieldcontain">
-                        {{ form.remember_me.label_tag }}
-                        {{ form.remember_me }}
-                    </div>
-                    <input type="submit" class="ui-btn ui-btn-success ui-corner-all" value="INGRESAR">
-                   
-                </form>
+    <div class="ui-card ui-body-a ui-corner-all">
+        <form method="post" action="{% url 'authenticate_userMobile' %}">
+            {% csrf_token %}
+            {{ form.non_field_errors }}
+            <div data-role="fieldcontain">
+                {{ form.username.label_tag }}
+                {{ form.username }}
             </div>
-        </div>
-
+            <div data-role="fieldcontain">
+                {{ form.password.label_tag }}
+                {{ form.password }}
+            </div>
+            <div data-role="fieldcontain">
+                {{ form.remember_me.label_tag }}
+                {{ form.remember_me }}
+            </div>
+            <input type="submit" class="ui-btn ui-btn-success ui-corner-all" value="INGRESAR">
+            
+        </form>
     </div>
+ </div>
 
-    <!-- jQuery and jQuery Mobile JavaScript -->
-    <script src="https://code.jquery.com/jquery-1.11.3.min.js"></script>
-    <script src="https://code.jquery.com/mobile/1.4.5/jquery.mobile-1.4.5.min.js"></script>
 
-</body>
-
-</html>
+ {% endblock %}
