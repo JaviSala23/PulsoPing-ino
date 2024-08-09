@@ -23,10 +23,11 @@ from django.contrib.auth import authenticate, login as auth_login
 from django.http import HttpResponseRedirect
 from django.urls import reverse
 from django.conf import settings
+from django.core.exceptions import PermissionDenied
 
 def login_view(request):
     next_url = request.GET.get('next', reverse('panelMobile'))
-    print(f"Next URL: {next_url}")
+    
     if request.method == 'POST':
         form = AuthenticationForm(request, data=request.POST)
         if form.is_valid():
@@ -38,7 +39,7 @@ def login_view(request):
                 auth_login(request, user)
                 return HttpResponseRedirect(next_url)
             else:
-                form.errors['__all__'] = ['Credenciales inválidas.']
+                form.add_error(None, 'Credenciales inválidas.')
         else:
             form_errors = form.errors
     else:
