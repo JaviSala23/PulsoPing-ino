@@ -26,7 +26,7 @@ from django.conf import settings
 from django.core.exceptions import PermissionDenied
 
 def login_view(request):
-    next_url = request.GET.get('next', reverse('panelMobile'))
+   
     error_message = request.GET.get('error', None)
     print("loginview")
     form = AuthenticationForm()
