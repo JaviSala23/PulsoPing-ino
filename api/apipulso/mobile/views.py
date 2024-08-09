@@ -55,7 +55,6 @@ def authenticate_user(request):
         print("no")
         return redirect('login_mobile')
 
-@login_required
 def panel_view(request):
     print("anda")
      # Filtrar las relaciones según el grupo del usuario
