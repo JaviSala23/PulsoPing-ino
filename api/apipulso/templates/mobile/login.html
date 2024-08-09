@@ -90,23 +90,27 @@
                     <li{% if message.tags %} class="{{ message.tags }}" {% endif %}>{{ message }}</li>
                         {% endfor %}
                         {% endif %}
-            <form method="post" action="{% url 'authenticate_userMobile' %}">
-                {% csrf_token %}
-                {{ form.non_field_errors }}
-                <div data-role="fieldcontain">
-                    {{ form.username.label_tag }}<br>
-                    {{ form.username }}
-                </div>
-                <div data-role="fieldcontain">
-                    {{ form.password.label_tag }}<br>
-                    {{ form.password }}
-                </div>
-                <div data-role="fieldcontain">
-                    {{ form.remember_me.label_tag }}
-                    {{ form.remember_me }}
-                </div>
-                <input type="submit" class="ui-btn ui-btn-success ui-corner-all" value="INGRESAR">
-            </form>
+                        <form method="post" action="{% url 'authenticate_userMobile' %}">
+                            {% csrf_token %}
+                            {{ form.non_field_errors }}
+                            
+                            <div data-role="fieldcontain" class="form-group">
+                                {{ form.username.label_tag }}
+                                {{ form.username }}
+                            </div>
+                            
+                            <div data-role="fieldcontain" class="form-group">
+                                {{ form.password.label_tag }}
+                                {{ form.password }}
+                            </div>
+                            
+                            <div data-role="fieldcontain" class="form-group">
+                                {{ form.remember_me.label_tag }}
+                                {{ form.remember_me }}
+                            </div>
+                            
+                            <input type="submit" class="ui-btn ui-btn-success ui-corner-all" value="INGRESAR">
+                        </form>
         </div>
     </div>
 {% endblock %}
