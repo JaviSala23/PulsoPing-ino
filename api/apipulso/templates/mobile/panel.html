@@ -5,12 +5,10 @@
 
 {% block content %}
 <style>
-   
-@import url('https://fonts.googleapis.com/css2?family=Share+Tech+Mono&family=VT323&display=swap');
-    body{
+    @import url('https://fonts.googleapis.com/css2?family=Share+Tech+Mono&family=VT323&display=swap');
+    body {
         background: rgb(255, 255, 255);
-     }
-    /* CSS personalizado para el diseño de múltiples relojes */
+    }
     .clock-grid {
         display: grid;
         grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
@@ -22,123 +20,111 @@
         width: 250px;
         height: 250px;
         margin: auto;
-        height: 250px; /* Ajusta la altura según sea necesario */
-        
     }
     .clock {
-        background: rgb(59,58,180);
-        background: linear-gradient(90deg, rgb(99, 99, 228) 0%, rgb(3, 71, 153) 50%, rgb(2, 15, 58) 100%); 
+        background: linear-gradient(90deg, rgb(99, 99, 228) 0%, rgb(3, 71, 153) 50%, rgb(2, 15, 58) 100%);
         background-size: cover;
         width: 110%;
         height: 110%;
         position: relative;
-        border: 2px solid #000000; /* Opcional: Añade un borde para ver la dimensión del contenedor */
+        border: 2px solid #000000;
         border-radius: 100px;
-        -webkit-box-shadow: 0px -1px 40px 1px rgba(0,0,0,0.75);
-        -moz-box-shadow: 0px -1px 40px 1px rgba(0,0,0,0.75);
         box-shadow: 0px -1px 40px 1px rgba(0,0,0,0.75);
     }
-    .cuenta{
+    .cuenta, .artefacto, .puerto, .fecha, .temperature, .status {
         font-family: "Share Tech Mono", monospace;
-        font-weight: 100;
-        font-style: normal;
+        font-weight: 400;
+        color: #f3fb00;
+        text-align: center;
+    }
+    .cuenta {
         position: absolute;
         top: 10%;
         left: 50%;
         transform: translate(-50%, -50%);
         font-size: 12px;
-        color: #f3fb00;
-        text-align: left;
     }
-    .artefacto{
-        font-family: "Share Tech Mono", monospace;
-        font-weight: 100;
-        font-style: normal;
+    .artefacto {
         position: absolute;
         top: 15%;
         left: 50%;
         transform: translate(-50%, -50%);
         font-size: 12px;
-        color: #f3fb00;
-        text-align: left;
     }
-    .puerto{
-        font-family: "Share Tech Mono", monospace;
-        font-weight: 100;
-        font-style: normal;
+    .puerto {
         position: absolute;
         top: 20%;
         left: 50%;
         transform: translate(-50%, -50%);
         font-size: 12px;
-        color: #f3fb00;
-        text-align: left;
     }
-    .fecha{
-        font-family: "Share Tech Mono", monospace;
-        font-weight: 100;
-        font-style: normal;
+    .fecha {
         position: absolute;
         top: 25%;
-        left: 49%;
+        left: 50%;
         transform: translate(-50%, -50%);
         font-size: 12px;
-        color: #f3fb00;
-        text-align: left;
     }
     .temperature {
-        font-family: "Share Tech Mono", monospace;
-        font-weight: 400;
-        font-style: normal;
         position: absolute;
         top: 50%;
         left: 50%;
         transform: translate(-50%, -50%);
         font-size: 65px;
-        color: #f3fb00;
-        text-align: center;
     }
     .status {
-        font-family: "Share Tech Mono", monospace;
-        font-weight: 400;
-        font-style: normal;
         position: absolute;
         bottom: 10px;
         left: 50%;
         transform: translateX(-50%);
         font-size: 15px;
-        color: #dde802;
-        text-align: center;
     }
 </style>
 
 <div data-role="page" id="dashboard" class="container">
-   esto lo tiene que cargar!!
-
     <div data-role="content" class="mt-3">
         {% for item in relaciones_actualizadas %}
         <a href="{% url 'temperature_graphM' id=item.relacion.id %}">
-        <div class="clock-grid">
-            
-            
-            <div class="clock-container">
-                <div class="clock" id="clock-container-${{item.relacion.id}}">
-                    
-                    <div class="cuenta" id="cuenta">{{ item.relacion.cuenta.nombre_cuenta }}</div>
-                    <div class="artefacto" id="art">{{ item.relacion.artefacto.descripcion }}</div>
-                    <div class="puerto" id="puerto">Puerto:{{ item.relacion.puerto }}</div>
-                    <div class="fecha" id="fecha{{item.relacion.id}}">{% if item.ultimo_registro %} {{ item.ultimo_registro.fecha_hora|date:"Y-m-d H:i:s" }} {% else %} N/A {% endif %}</div>
-                    <div class="temperature" id="temp-2{{item.relacion.id}}">{% if item.ultimo_registro %} {{ item.ultimo_registro.temperatura }}° {% else %} -°{% endif %}</div>
-                    <div class="status">
-                    <div class="door-status-2{{item.relacion.id}}">Puerta:{% if item.ultimo_registro %} {% if item.ultimo_registro.puerta == 1 %} Abierta {% else %} Cerrada {% endif %} {% else %} N/A {% endif %}</div>
-                    <div class="compressor-status-2{{item.relacion.id}}">Compresor:{% if item.ultimo_registro %} {% if item.ultimo_registro.compresor == 1 %} Prendido {% else %} Apagado {% endif %} {% else %} N/A {% endif %}</div>
+            <div class="clock-grid">
+                <div class="clock-container">
+                    <div class="clock" id="clock-container-{{ item.relacion.id }}">
+                        <div class="cuenta">{{ item.relacion.cuenta.nombre_cuenta }}</div>
+                        <div class="artefacto">{{ item.relacion.artefacto.descripcion }}</div>
+                        <div class="puerto">Puerto: {{ item.relacion.puerto }}</div>
+                        <div class="fecha" id="fecha{{ item.relacion.id }}">
+                            {% if item.ultimo_registro %}
+                                {{ item.ultimo_registro.fecha_hora|date:"Y-m-d H:i:s" }}
+                            {% else %}
+                                N/A
+                            {% endif %}
+                        </div>
+                        <div class="temperature" id="temp-{{ item.relacion.id }}">
+                            {% if item.ultimo_registro %}
+                                {{ item.ultimo_registro.temperatura }}°
+                            {% else %}
+                                -°
+                            {% endif %}
+                        </div>
+                        <div class="status">
+                            <div class="door-status-{{ item.relacion.id }}">
+                                Puerta: {% if item.ultimo_registro %}
+                                    {% if item.ultimo_registro.puerta == 1 %} Abierta {% else %} Cerrada {% endif %}
+                                {% else %}
+                                    N/A
+                                {% endif %}
+                            </div>
+                            <div class="compressor-status-{{ item.relacion.id }}">
+                                Compresor: {% if item.ultimo_registro %}
+                                    {% if item.ultimo_registro.compresor == 1 %} Prendido {% else %} Apagado {% endif %}
+                                {% else %}
+                                    N/A
+                                {% endif %}
+                            </div>
+                        </div>
+                    </div>
                 </div>
             </div>
-            
-                
-       
-            <!-- Añade más relojes según sea necesario -->
-        </div></a>
+        </a>
         {% endfor %}
     </div>
 
@@ -147,29 +133,23 @@
     </div>
 </div>
 
-
 <script>
 function actualizarTabla() {
     $.ajax({
         url: "{% url 'actualizar_relaciones_mobile' %}",
         success: function(data) {
             console.log(data);
-            data.relaciones_actualizadas.forEach((item, index) => {
+            data.relaciones_actualizadas.forEach((item) => {
                 let temp = item.ultimo_registro.temperatura;
-                
                 let isDoorOpen = item.ultimo_registro.puerta;
                 let isCompressorOn = item.ultimo_registro.compresor;
                 let fecha_hora = item.ultimo_registro.fecha_hora;
-                
-                // Assuming the container IDs are in the format clock-container-{id}
-                let container = $(`#clock-container-${item.relacion.id}`);
-                console.log(container)
-                $('#fecha'+item.relacion.id).text(fecha_hora);
-                $('#temperature'+item.relacion.id).text(temp);
-                $('#door-status-2'+item.relacion.id).text('Puerta: ' + (isDoorOpen ? 'Abierta' : 'Cerrada'));
-                $('#compressor-status-2'+item.relacion.id).text('Compresor: ' + (isCompressorOn ? 'Encendido' : 'Apagado'));
 
-
+                // Update the values in the DOM
+                $('#fecha' + item.relacion.id).text(fecha_hora);
+                $('#temp-' + item.relacion.id).text(temp + '°');
+                $('.door-status-' + item.relacion.id).text('Puerta: ' + (isDoorOpen ? 'Abierta' : 'Cerrada'));
+                $('.compressor-status-' + item.relacion.id).text('Compresor: ' + (isCompressorOn ? 'Encendido' : 'Apagado'));
             });
         },
         error: function(xhr, status, error) {
@@ -181,7 +161,7 @@ function actualizarTabla() {
 // Actualiza la tabla cada 1 minuto
 setInterval(actualizarTabla, 60000);  // 60000 milisegundos = 1 minuto
 
-// También puedes actualizar la tabla cuando la página se carga por primera vez
+// Actualiza la tabla cuando la página se carga por primera vez
 $(document).ready(function() {
     actualizarTabla();
 });
