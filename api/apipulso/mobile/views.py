@@ -40,18 +40,18 @@ def login_view(request):
     return render(request, 'mobile/login.html', context)
 
 def authenticate_user(request):
-    next_url = request.GET.get('next', reverse('panelMobile'))
+   
     
     if request.method == 'POST':
         form = AuthenticationForm(request, data=request.POST)
         if form.is_valid():
             user = form.get_user()
             auth_login(request, user)
-            return redirect(next_url)
+            return redirect('panelMobile')
         else:
-            return redirect(f"{reverse('login_mobile')}?next={next_url}&error=1")
+            return redirect('login_mobile')
     else:
-        return redirect(reverse('login_mobile') + f"?next={next_url}")
+        return redirect('login_mobile')
 
 @login_required
 def panel_view(request):
