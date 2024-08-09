@@ -15,6 +15,36 @@ from matplotlib.dates import DateFormatter
 from mpld3 import fig_to_html, plugins
 import json
 from datetime import datetime, timedelta
+from django.contrib.auth import authenticate, login
+from django.http import HttpResponseRedirect
+from django.urls import reverse
+
+def login_view(request):
+    next_url = request.GET.get('next', '')
+    
+    if request.method == 'POST':
+        username = request.POST.get('username')
+        password = request.POST.get('password')
+        user = authenticate(request, username=username, password=password)
+        
+        if user is not None:
+            login(request, user)
+            return HttpResponseRedirect(next_url if next_url else reverse('home'))
+        else:
+            form_errors = True
+    else:
+        form_errors = False
+    
+    context = {
+        'form': {
+            'username': request.POST.get('username', ''),
+            'password': request.POST.get('password', ''),
+            'errors': form_errors
+        },
+        'next': next_url
+    }
+    
+    return render(request, 'mobile/login.html', context)
 
 def panel_view(request):
 
