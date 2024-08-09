@@ -22,33 +22,36 @@ from django.contrib.auth import authenticate, login
 from django.http import HttpResponseRedirect
 from django.urls import reverse
 
-def login_view(request):
+# Obtiene la URL para redireccionar después del inicio de sesión
     next_url = request.GET.get('next', 'panel')
     
+    # Maneja el formulario POST
     if request.method == 'POST':
-        username = request.POST.get('username')
-        password = request.POST.get('password')
-        user = authenticate(request, username=username, password=password)
-        
-        if user is not None:
-            login(request, user)
-            return HttpResponseRedirect(next_url)
+        form = AuthenticationForm(request, data=request.POST)
+        if form.is_valid():
+            username = form.cleaned_data.get('username')
+            password = form.cleaned_data.get('password')
+            user = authenticate(request, username=username, password=password)
+            
+            if user is not None:
+                auth_login(request, user)
+                # Redirige a la URL especificada en `next`
+                return HttpResponseRedirect(next_url)
+            else:
+                form.errors = form._errors
         else:
-            form_errors = True
+            form_errors = form.errors
     else:
-        form_errors = False
-    
+        form = AuthenticationForm()
+        form_errors = None
+
+    # Prepara el contexto para el template
     context = {
-        'form': {
-            'username': request.POST.get('username', ''),
-            'password': request.POST.get('password', ''),
-            'errors': form_errors
-        },
+        'form': form,
         'next': next_url
     }
-    
-    return render(request, 'mobile/login.html', context)
 
+    return render(request, 'mobile/login.html', context)
 
 
 

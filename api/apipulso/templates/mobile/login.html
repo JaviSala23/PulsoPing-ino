@@ -70,10 +70,28 @@
                         <label for="password">Contraseña:</label>
                         <input type="password" name="password" id="password" value="{{ form.password }}" />
                     </div>
+                    <div data-role="fieldcontain">
+                        <label for="remember_me">
+                            <input type="checkbox" name="remember_me" id="remember_me" />
+                            Recordarme
+                        </label>
+                    </div>
                     <input type="submit" class="ui-btn ui-btn-success ui-corner-all" value="INGRESAR">
                     <input type="hidden" name="next" value="{{ next }}" />
                     
                     {% if form.errors %}
                         <p style="color:red">Tu usuario o contraseña no coincide, intenta de nuevo.</p>
                     {% endif %}
-                </form
+                </form>
+            </div>
+        </div>
+
+    </div>
+
+    <!-- jQuery and jQuery Mobile JavaScript -->
+    <script src="https://code.jquery.com/jquery-1.11.3.min.js"></script>
+    <script src="https://code.jquery.com/mobile/1.4.5/jquery.mobile-1.4.5.min.js"></script>
+
+</body>
+
+</html>
