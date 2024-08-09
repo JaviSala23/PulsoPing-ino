@@ -77,6 +77,7 @@ def panel_view(request):
     # Itera sobre las relaciones para obtener y agregar el último registro de temperatura
     for relacion in relaciones:
         archivo_path = relacion.url  # Ajusta esto según tu modelo y campo correspondiente
+        print(archivo_path)
         try:
             ultimo_registro = obtener_ultimo_registro(archivo_path)
         except:
