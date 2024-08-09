@@ -28,7 +28,7 @@ from django.core.exceptions import PermissionDenied
 def login_view(request):
     next_url = request.GET.get('next', reverse('panelMobile'))
     error_message = request.GET.get('error', None)
-
+    print("loginview")
     form = AuthenticationForm()
 
     context = {
@@ -40,7 +40,7 @@ def login_view(request):
     return render(request, 'mobile/login.html', context)
 
 def authenticate_user(request):
-    print('anda')
+    print('auth')
     
     if request.method == 'POST':
         form = AuthenticationForm(request, data=request.POST)
