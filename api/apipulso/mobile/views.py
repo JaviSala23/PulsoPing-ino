@@ -15,12 +15,9 @@ from matplotlib.dates import DateFormatter
 from mpld3 import fig_to_html, plugins
 import json
 from datetime import datetime, timedelta
-<<<<<<< HEAD
-from django.shortcuts import render
-from django.contrib.auth import authenticate, login
-from django.http import HttpResponseRedirect
-from django.urls import reverse
-=======
+
+
+
 from django.contrib.auth import authenticate, login
 from django.http import HttpResponseRedirect
 from django.urls import reverse
