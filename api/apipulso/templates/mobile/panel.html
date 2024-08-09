@@ -134,37 +134,37 @@
 </div>
 
 <script>
-function actualizarTabla() {
-    $.ajax({
-        url: "{% url 'actualizar_relaciones_mobile' %}",
-        success: function(data) {
-            console.log(data);
-            data.relaciones_actualizadas.forEach((item) => {
-                let temp = item.ultimo_registro.temperatura;
-                let isDoorOpen = item.ultimo_registro.puerta;
-                let isCompressorOn = item.ultimo_registro.compresor;
-                let fecha_hora = item.ultimo_registro.fecha_hora;
-
-                // Update the values in the DOM
-                $('#fecha' + item.relacion.id).text(fecha_hora);
-                $('#temp-' + item.relacion.id).text(temp + '°');
-                $('.door-status-' + item.relacion.id).text('Puerta: ' + (isDoorOpen ? 'Abierta' : 'Cerrada'));
-                $('.compressor-status-' + item.relacion.id).text('Compresor: ' + (isCompressorOn ? 'Encendido' : 'Apagado'));
-            });
-        },
-        error: function(xhr, status, error) {
-            console.error("Error al actualizar la tabla:", error);
-        }
+    function actualizarTabla() {
+        $.ajax({
+            url: "{% url 'actualizar_relaciones_mobile' %}",
+            dataType: "json",
+            success: function(data) {
+                console.log("Datos recibidos:", data);
+                data.relaciones_actualizadas.forEach((item) => {
+                    let temp = item.ultimo_registro.temperatura;
+                    let isDoorOpen = item.ultimo_registro.puerta;
+                    let isCompressorOn = item.ultimo_registro.compresor;
+                    let fecha_hora = item.ultimo_registro.fecha_hora;
+    
+                    $(`#fecha${item.relacion.id}`).text(fecha_hora || "N/A");
+                    $(`#temp-${item.relacion.id}`).text(temp ? `${temp}°` : "-°");
+                    $(`.door-status-${item.relacion.id}`).text(`Puerta: ${isDoorOpen ? 'Abierta' : 'Cerrada'}`);
+                    $(`.compressor-status-${item.relacion.id}`).text(`Compresor: ${isCompressorOn ? 'Prendido' : 'Apagado'}`);
+                });
+            },
+            error: function(xhr, status, error) {
+                console.error("Error al actualizar la tabla:", error);
+            }
+        });
+    }
+    
+    // Actualiza la tabla cada 1 minuto
+    setInterval(actualizarTabla, 60000); // 60000 milisegundos = 1 minuto
+    
+    // Actualiza la tabla cuando la página se carga por primera vez
+    $(document).ready(function() {
+        actualizarTabla();
     });
-}
-
-// Actualiza la tabla cada 1 minuto
-setInterval(actualizarTabla, 60000);  // 60000 milisegundos = 1 minuto
-
-// Actualiza la tabla cuando la página se carga por primera vez
-$(document).ready(function() {
-    actualizarTabla();
-});
-</script>
+    </script>
 
 {% endblock %}
