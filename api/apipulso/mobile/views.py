@@ -15,6 +15,12 @@ from matplotlib.dates import DateFormatter
 from mpld3 import fig_to_html, plugins
 import json
 from datetime import datetime, timedelta
+<<<<<<< HEAD
+from django.shortcuts import render
+from django.contrib.auth import authenticate, login
+from django.http import HttpResponseRedirect
+from django.urls import reverse
+=======
 from django.contrib.auth import authenticate, login
 from django.http import HttpResponseRedirect
 from django.urls import reverse
@@ -29,7 +35,7 @@ def login_view(request):
         
         if user is not None:
             login(request, user)
-            return HttpResponseRedirect(next_url if next_url else reverse('home'))
+            return HttpResponseRedirect(next_url if next_url else reverse('panelMobile'))
         else:
             form_errors = True
     else:
@@ -44,7 +50,11 @@ def login_view(request):
         'next': next_url
     }
     
-    return render(request, 'mobile/login.html', context)
+    return render(request, 'login.html', context)
+
+
+
+
 
 def panel_view(request):
 
