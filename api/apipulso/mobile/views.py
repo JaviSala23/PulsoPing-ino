@@ -25,96 +25,99 @@ from django.urls import reverse
 from django.conf import settings
 from django.core.exceptions import PermissionDenied
 
-from django.shortcuts import render, redirect
-from gestion.models import Cuenta_has_Artefacto
-from gestion.views import obtener_ultimo_registro
-from django.http import JsonResponse
-from django.contrib.auth.decorators import login_required
-from django.contrib.auth import authenticate, login as auth_login
-from django.contrib.auth.forms import AuthenticationForm
-
 def login_view(request):
+   
     error_message = request.GET.get('error', None)
+    print("loginview")
     form = AuthenticationForm()
-
-    # Redirige a la página de inicio después del login, si es necesario
-    next_url = request.GET.get('next', '/')
 
     context = {
         'form': form,
-        'next': next_url,
         'error_message': error_message
     }
 
     return render(request, 'mobile/login.html', context)
 
 def authenticate_user(request):
+    print('auth')
+    
     if request.method == 'POST':
         form = AuthenticationForm(request, data=request.POST)
         if form.is_valid():
             user = form.get_user()
             auth_login(request, user)
-            next_url = request.POST.get('next', 'panelMobile')
-            return redirect(next_url)
+            print(user)
+            return redirect('panelMobile')
         else:
+            print("no")
             return redirect('login_mobile')
     else:
+        print("no")
         return redirect('login_mobile')
 
 @login_required
 def panel_view(request):
+    print("anda")
+     # Filtrar las relaciones según el grupo del usuario
     if request.user.groups.filter(name='Clientes').exists():
-        relaciones = Cuenta_has_Artefacto.objects.filter(cuenta__usuario=request.user)
+        relaciones = Cuenta_has_Artefacto.objects.filter(cuenta__usuario=request.user)  # Ajusta este filtro según tu modelo
+        print("cliente")
+        print(relaciones)
     else:
-        relaciones = Cuenta_has_Artefacto.objects.all()
+        relaciones = Cuenta_has_Artefacto.objects.all()  # No mostrar nada si no es del grupo "Clientes"
+        print("admin")
+        print(relaciones)
 
+    
+
+    # Lista para almacenar relaciones junto con sus últimos registros de temperatura
     relaciones_actualizadas = []
 
+    # Itera sobre las relaciones para obtener y agregar el último registro de temperatura
     for relacion in relaciones:
-        archivo_path = relacion.url
+        archivo_path = relacion.url  # Ajusta esto según tu modelo y campo correspondiente
+        print(archivo_path)
         try:
             ultimo_registro = obtener_ultimo_registro(archivo_path)
         except:
-            ultimo_registro = None
-
+            ultimo_registro=0
+        # Agrega un diccionario con la relación y el último registro de temperatura
         relaciones_actualizadas.append({
             'relacion': relacion,
             'ultimo_registro': ultimo_registro
         })
-
+        print(relaciones_actualizadas)
     return render(request, 'mobile/panel.html', {'relaciones_actualizadas': relaciones_actualizadas})
 
 def actualizar_relaciones_mobile(request):
     relaciones = Cuenta_has_Artefacto.objects.all()
 
+    # Lista para almacenar relaciones junto con sus últimos registros de temperatura
     relaciones_actualizadas = []
 
+    # Itera sobre las relaciones para obtener y agregar el último registro de temperatura
     for relacion in relaciones:
-        archivo_path = relacion.url
-        try:
-            ultimo_registro = obtener_ultimo_registro(archivo_path)
-        except:
-            ultimo_registro = None
+        archivo_path = relacion.url  # Ajusta esto según tu modelo y campo correspondiente
+        ultimo_registro = obtener_ultimo_registro(archivo_path)
 
+        # Convierte la relación a un formato serializable
         relacion_serializable = {
-            'id': relacion.id,
+            'id':relacion.id,
             'cuenta': relacion.cuenta.nombre_cuenta,
-            'artefacto': relacion.artefacto.descripcion,
-            'puerto': relacion.puerto
+            'artefacto': relacion.artefacto.descripcion,  # Ajusta esto según tus campos
+            'puerto': relacion.puerto ,
+            # Agrega otros campos relevantes de tu modelo
         }
 
+        # Agrega un diccionario con la relación y el último registro de temperatura
         relaciones_actualizadas.append({
             'relacion': relacion_serializable,
-            'ultimo_registro': {
-                'fecha_hora': ultimo_registro.fecha_hora.isoformat() if ultimo_registro else None,
-                'temperatura': ultimo_registro.temperatura if ultimo_registro else None,
-                'puerta': ultimo_registro.puerta if ultimo_registro else None,
-                'compresor': ultimo_registro.compresor if ultimo_registro else None
-            }
+            'ultimo_registro': ultimo_registro
         })
 
+    # Renderizar solo el contenido de la ta
+    
     return JsonResponse({'relaciones_actualizadas': relaciones_actualizadas})
-
 
 
 
