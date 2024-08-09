@@ -40,8 +40,27 @@ def login_view(request):
                 return redirect("panelMobile")
             else:
                 form.errors['__all__'] = ['Credenciales inválidas.']
+                form = AuthenticationForm()
+                form_errors = None
+
+                context = {
+                    'form': form,
+                    'next': next_url
+                }
+
+                return render(request, 'mobile/login.html', context)
+                
         else:
             form_errors = form.errors
+            form = AuthenticationForm()
+            form_errors = None
+
+            context = {
+                'form': form,
+                'next': next_url
+            }
+
+            return render(request, 'mobile/login.html', context)
     else:
         form = AuthenticationForm()
         form_errors = None
