@@ -58,6 +58,7 @@ def authenticate_user(request):
 
 @login_required
 def panel_view(request):
+    print("anda")
      # Filtrar las relaciones según el grupo del usuario
     if request.user.groups.filter(name='Clientes').exists():
         relaciones = Cuenta_has_Artefacto.objects.filter(cuenta__usuario=request.user)  # Ajusta este filtro según tu modelo
