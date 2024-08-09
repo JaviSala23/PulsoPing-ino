@@ -48,12 +48,12 @@ def login_view(request):
         form = AuthenticationForm()
         form_errors = None
 
-        context = {
-            'form': form,
-            'next': next_url
-        }
+    context = {
+        'form': form,
+        'next': next_url
+    }
 
-            return render(request, 'mobile/login.html', context)
+    return render(request, 'mobile/login.html', context)
 
 
 
