@@ -87,7 +87,7 @@ def panel_view(request):
             'relacion': relacion,
             'ultimo_registro': ultimo_registro
         })
-
+        print(relaciones_actualizadas)
     return render(request, 'mobile/panel.html', {'relaciones_actualizadas': relaciones_actualizadas})
 
 def actualizar_relaciones_mobile(requrest):
