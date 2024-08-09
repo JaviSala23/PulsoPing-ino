@@ -22,6 +22,7 @@ from django.contrib.auth.forms import AuthenticationForm
 from django.contrib.auth import authenticate, login
 from django.http import HttpResponseRedirect
 from django.urls import reverse
+from django.conf import settings
 
 def login_view(request):
     next_url = request.GET.get('next', settings.LOGIN_REDIRECT_URL or 'panel')
