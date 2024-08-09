@@ -17,6 +17,7 @@ import json
 from datetime import datetime, timedelta
 from django.contrib.auth.views import LoginView as DjangoLoginView
 from django.contrib.auth.decorators import login_required
+from django.contrib.auth.forms import AuthenticationForm
 
 from django.contrib.auth import authenticate, login
 from django.http import HttpResponseRedirect
