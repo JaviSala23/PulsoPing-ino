@@ -43,9 +43,9 @@ def authenticate_user(request):
             user = form.get_user()
             auth_login(request, user)
 
-            next_url = request.POST.get('next', '/mobile/panel/')
+            next_url = request.POST.get('next', 'panel')
             if not next_url or not next_url.startswith('/'):
-                next_url = '/mobile/panel/'
+                next_url = 'panel'
 
             # Mensajes de depuración
             print(f"Redirecting to: {next_url}")
