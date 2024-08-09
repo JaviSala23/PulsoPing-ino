@@ -62,6 +62,7 @@ def panel_view(request):
      # Filtrar las relaciones según el grupo del usuario
     if request.user.groups.filter(name='Clientes').exists():
         relaciones = Cuenta_has_Artefacto.objects.filter(cuenta__usuario=request.user)  # Ajusta este filtro según tu modelo
+        print(relaciones)
     else:
         relaciones = Cuenta_has_Artefacto.objects.all()  # No mostrar nada si no es del grupo "Clientes"
     
