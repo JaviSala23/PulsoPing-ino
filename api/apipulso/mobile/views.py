@@ -40,7 +40,7 @@ def login_view(request):
     return render(request, 'mobile/login.html', context)
 
 def authenticate_user(request):
-   
+    print('anda')
     
     if request.method == 'POST':
         form = AuthenticationForm(request, data=request.POST)
