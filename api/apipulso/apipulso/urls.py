@@ -58,7 +58,7 @@ urlpatterns = [
     path('temperature-graphM/<int:id>', mobile.TemperatureGraphView, name='temperature_graphM'),
     path('mobile/login',mobile.login_view, name='login_mobile'),
     path('mobile/authenticate', mobile.authenticate_user, name='authenticate_userMobile'),
-    path('mobile/logout/', views.logout_view, name='logout_mobile'),
+    path('mobile/logout/', mobile.logout_view, name='logout_mobile'),
    
 ]
 
