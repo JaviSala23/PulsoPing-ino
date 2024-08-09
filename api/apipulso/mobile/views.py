@@ -23,7 +23,7 @@ from django.http import HttpResponseRedirect
 from django.urls import reverse
 
 def login_view(request):
-    next_url = request.GET.get('next', 'mobile/panel')
+    next_url = request.GET.get('next', 'panel')
     
     if request.method == 'POST':
         username = request.POST.get('username')
