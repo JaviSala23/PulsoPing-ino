@@ -11,11 +11,17 @@ class ProvinciaAdmin(admin.ModelAdmin):
     list_display = ('nombre_provincia', 'codigo_provincia', 'pais_idpais')
     search_fields = ('nombre_provincia', 'codigo_provincia')
     list_filter = ('pais_idpais',)
+    def get_pais_nombre(self, obj):
+        return obj.pais.nombre
+    get_pais_nombre.short_description = 'País'
 
 class LocalidadAdmin(admin.ModelAdmin):
     list_display = ('nombre_localidad', 'cp_localidad', 'provincia_id_provincia')
     search_fields = ('nombre_localidad', 'cp_localidad')
     list_filter = ('provincia_id_provincia',)
+    def get_pais_nombre(self, obj):
+        return obj.provincia.nombre_provincia
+    get_pais_nombre.short_description = 'Provincia'
 
 class TipoDocumentoAdmin(admin.ModelAdmin):
     list_display = ('descripcion', 'cod_afip')
