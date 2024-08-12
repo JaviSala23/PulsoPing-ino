@@ -62,6 +62,9 @@ class tipo_documento (models.Model):
                                  max_length=150)
     cod_afip=models.IntegerField(null=False)
 
+    def __str__(self):
+        return self.descripcion
+
 class situacionIva (models.Model):
     idsituacionIva= models.AutoField(
         primary_key=True
@@ -71,12 +74,18 @@ class situacionIva (models.Model):
     reducida=models.TextField(null=False,
                               max_length=10)
 
+    def __str__(self):
+        return self.descripcion
+
 class tipo_cuenta (models.Model):
     id_tipo_cuenta= models.AutoField(
         primary_key=True
     )
     descripcion=models.TextField(null=False,
                                  max_length=150)
+
+    def __str__(self):
+        return self.descripcion
     
 #cuenta gestiona proveedores / clientes
 
