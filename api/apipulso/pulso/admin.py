@@ -22,7 +22,7 @@ class SensorReadingAdmin(admin.ModelAdmin):
 
 @admin.register(MessageLog)
 class MessageLogAdmin(admin.ModelAdmin):
-    list_display = ('timestamp', 'placa', 'puerto', 'message_type', 'temperature', 'compresor_status', 'puerta_status')
-    search_fields = ('placa__codigo', 'message_type')
-    list_filter = ('message_type', 'compresor_status', 'puerta_status')
-    date_hierarchy = 'timestamp'
+    list_display = ('placa', 'puerto', 'timestamp', 'message_type', 'temperature', 'compresor_status', 'puerta_status')
+    search_fields = ('placa__id', 'puerto', 'message_type', 'temperature')
+    list_filter = ('message_type', 'compresor_status', 'puerta_status', 'timestamp')
+

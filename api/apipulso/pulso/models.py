@@ -13,7 +13,7 @@ class Firmware(models.Model):
 class Placa(models.Model):
     id = models.AutoField(primary_key=True)
     codigo = models.CharField(null=False, blank=False, max_length=15)
-    descripcion = models.CharField(null=False, blank=False, max_length=15)
+    descripcion = models.CharField(null=False, blank=False, max_length=100)
     firmware = models.ForeignKey(Firmware, null=False, blank=False, on_delete=models.PROTECT)
 
     def __str__(self):
@@ -40,7 +40,6 @@ class MessageLog(models.Model):
     timestamp = models.DateTimeField(auto_now_add=True)
     message_type = models.CharField(max_length=50)  # Puede ser "ALERT" o "STABLE"
     temperature = models.FloatField(blank=False, null=False)
-    # Nuevos campos para los mensajes de log
     compresor_status = models.BooleanField(default=False)
     puerta_status = models.BooleanField(default=False)
 
