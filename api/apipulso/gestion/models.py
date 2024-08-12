@@ -24,6 +24,9 @@ class pais (models.Model):
         null=False,
         max_length=150)
     
+    def __str__(self):
+        return self.nombre
+    
 class provincia (models.Model):
     id_provincia= models.AutoField(
         primary_key=True
@@ -34,6 +37,10 @@ class provincia (models.Model):
                                        max_length=6)
     pais_idpais= models.ForeignKey(pais , on_delete=models.PROTECT)
 
+    def __str__(self):
+        return self.nombre_provincia
+
+
 class localidad (models.Model):
     id_localidad= models.AutoField(
         primary_key=True
@@ -43,6 +50,9 @@ class localidad (models.Model):
     cp_localidad= models.TextField(null=False,
                                        max_length=10)
     provincia_id_provincia = models.ForeignKey(provincia, on_delete=models.PROTECT)
+
+    def __str__(self):
+        return self.nombre_localidad
 
 class tipo_documento (models.Model):
     idtipo_documento= models.AutoField(
