@@ -11,11 +11,16 @@
 
     <td>{% if item.ultimo_registro %} {{ item.ultimo_registro.temperatura }} {% else %} N/A {% endif %}</td>
     <td>{% if item.ultimo_registro %} {{ item.ultimo_registro.fecha_hora }} {% else %} N/A {% endif %}</td>
+    <td>{% if item.ultimo_registro %} {% if item.ultimo_registro.puerta == 1 %} Abierta {% else %} Cerrada {% endif %} {% else %} N/A {% endif %}</td>
+    <td>{% if item.ultimo_registro %} {% if item.ultimo_registro.compresor == 1 %} Prendido {% else %} Apagado {% endif %} {% else %} N/A {% endif %}</td>
+    <td>
     <td>
         <div class="table-data-feature">
-            <a href="{% url 'temperature_graph' item.relacion.placa.id item.relacion.puerto %}"><i class="fa-solid fa-chart-line"></i></a>
-            <a href="{% url 'nueva_cuenta_has_artefacto' item.relacion.id %}"><i class='fas fa-edit'></i></a>
-            <a href="{% url 'eliminar_cuenta_has_artefacto' item.relacion.id %}"><i class='far fa-trash-alt'></i></a>
+            {% if item.ultimo_registro %}
+            <a href="{% url 'temperature_graph' item.relacion.cuenta.id_cuenta item.relacion.puerto %}" class="btn btn-info btn-sm"><i class="fa-solid fa-chart-line"></i></a>
+            {% endif %}
+            <a href="{% url 'nueva_cuenta_has_artefacto' item.relacion.id %}" class="btn btn-warning btn-sm"><i class='fas fa-edit'></i></a>
+            <a href="{% url 'eliminar_cuenta_has_artefacto' item.relacion.id %}" class="btn btn-danger btn-sm"><i class='far fa-trash-alt'></i></a>
         </div>
     </td>
 </tr>
