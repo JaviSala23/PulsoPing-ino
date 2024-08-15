@@ -13,7 +13,7 @@
     <td>{% if item.ultimo_registro %} {{ item.ultimo_registro.fecha_hora }} {% else %} N/A {% endif %}</td>
     <td>{% if item.ultimo_registro %} {% if item.ultimo_registro.puerta == 1 %} Abierta {% else %} Cerrada {% endif %} {% else %} N/A {% endif %}</td>
     <td>{% if item.ultimo_registro %} {% if item.ultimo_registro.compresor == 1 %} Prendido {% else %} Apagado {% endif %} {% else %} N/A {% endif %}</td>
-    <td>
+
     <td>
         <div class="table-data-feature">
             {% if item.ultimo_registro %}
