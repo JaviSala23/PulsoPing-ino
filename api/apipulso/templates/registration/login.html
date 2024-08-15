@@ -6,7 +6,7 @@
 </head>
 <body>
     <h1>Login</h1>
-    <form method="post" action="{% url 'authenticate_user' %}">
+    <form method="post">
         {% csrf_token %}
         {{ form.as_p }}
        

@@ -13,6 +13,7 @@ urlpatterns = [
     path('panel/',gestion.panel,name='panel'),
     path('adSite/',admin.site.urls),
   
+  
 
     #url Autenticacion de usuarios
     path('login/', LoginView.as_view(), name= 'login'),
