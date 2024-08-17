@@ -11,12 +11,12 @@
 
     <td>{% if item.ultimo_registro %} {{ item.ultimo_registro.temperatura }} {% else %} N/A {% endif %}</td>
     <td>{% if item.ultimo_registro %} {{ item.ultimo_registro.fecha_hora }} {% else %} N/A {% endif %}</td>
-    {% if relaciones_actualizadas.relacion.placa.firmware.puerta  %}
+    {% if item.relacion.placa.firmware.puerta  %}
     <td>{% if item.ultimo_registro %} {% if item.ultimo_registro.puerta == True %} Abierta {% else %} Cerrada {% endif %} {% else %} N/A {% endif %}</td>
     {% else %}
     <td> NO INCLUYE </td>
     {% endif %}
-    {% if relaciones_actualizadas.relacion.placa.firmware.compresor  %}
+    {% if item.relacion.placa.firmware.compresor  %}
     <td>{% if item.ultimo_registro %} {% if item.ultimo_registro.compresor == True %} Prendido {% else %} Apagado {% endif %} {% else %} N/A {% endif %}</td>
     {% else %}
     <td> NO INCLUYE </td>
