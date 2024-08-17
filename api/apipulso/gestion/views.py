@@ -198,8 +198,7 @@ def listar_cuenta_has_artefacto(request):
             ultimo_registro = obtener_ultimo_registro(archivo_path)
         except:
             ultimo_registro=0
-        print(ultimo_registro['puerta'])
-        print(ultimo_registro['compresor'])
+    
         # Agrega un diccionario con la relación y el último registro de temperatura
         relaciones_actualizadas.append({
             'relacion': relacion,
@@ -221,8 +220,8 @@ def obtener_ultimo_registro(archivo_path):
                 ultimo_registro = {
                     'fecha_hora': parse_datetime(date_str),
                     'temperatura': float(temp_str),
-                    'compresor': bool(compresor),
-                    'puerta': bool(puerta)
+                    'compresor': compresor,
+                    'puerta': puerta
                 }
 
     return ultimo_registro
