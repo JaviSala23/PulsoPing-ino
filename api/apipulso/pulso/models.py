@@ -6,8 +6,8 @@ class Firmware(models.Model):
     nombre = models.CharField(null=False, blank=False, max_length=15)
     version = models.CharField(null=False, blank=False, max_length=15)
     descripcion = models.CharField(null=False, blank=False, max_length=200)
-    puerta = models.BooleanField(null=False, blank=False)
-    compresor = models.BooleanFields(null=False, blank=False)
+    puerta = models.BooleanField(default=False)
+    compresor = models.BooleanField(default=False)
 
     def __str__(self):
         return f"{self.nombre} - {self.version}"
