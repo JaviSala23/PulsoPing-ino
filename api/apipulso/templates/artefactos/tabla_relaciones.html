@@ -21,6 +21,7 @@
     {% else %}
     <td> NO INCLUYE </td>
     {% endif %}
+    <td>
         <div class="table-data-feature">
             {% if item.ultimo_registro %}
             <a href="{% url 'temperature_graph' item.relacion.cuenta.id_cuenta item.relacion.puerto %}" class="btn btn-info btn-sm"><i class="fa-solid fa-chart-line"></i></a>
