@@ -45,7 +45,7 @@ class SensorReadingListCreate(generics.ListCreateAPIView):
         
         # Guardar los datos en el archivo de texto
         with open(file_path, 'a') as f:
-            f.write(f"{data['timestamp']},{data['temperature']},{data['placa'].id},{data['puerto']},{data.get('compresor_status', 0)},{data.get('puerta_status', 0)}\n")
+            f.write(f"{data['timestamp']},{data['temperature']},{data['placa'].id},{data['puerto']},{data.get('compresor_status', False)},{data.get('puerta_status', True)}\n")
 
     def check_temperature_and_notify(self, reading):
         # Obtener los rangos de temperatura de Cuenta_has_Artefacto
