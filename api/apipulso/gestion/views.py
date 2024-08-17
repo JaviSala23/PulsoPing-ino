@@ -218,8 +218,8 @@ def obtener_ultimo_registro(archivo_path):
                 ultimo_registro = {
                     'fecha_hora': parse_datetime(date_str),
                     'temperatura': float(temp_str),
-                    'compresor': float(compresor),
-                    'puerta': float(puerta)
+                    'compresor': bool(compresor),
+                    'puerta': bool(puerta)
                 }
 
     return ultimo_registro
