@@ -203,7 +203,7 @@ def listar_cuenta_has_artefacto(request):
             'ultimo_registro': ultimo_registro
         })
 
-    return render(request, 'artefactos/listar_cuenta_has_artefacto.html', {'relaciones_actualizadas': relaciones_actualizadas})
+    return render(request, 'artefactos/listar_cuenta_has_artefacto.html', {'relaciones_actualizadas': relaciones_actualizadas,})
 
 def obtener_ultimo_registro(archivo_path):
     ultimo_registro = None
