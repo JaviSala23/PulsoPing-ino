@@ -341,7 +341,7 @@ def TemperatureGraphView(request, cuenta, puerto):
             if artefacto1.placa.firmware.puerta:
                 puerta = 1 if parts[4].strip().lower() == 'true' else 0
             else:
-                puerta = nombre_cuenta
+                puerta = None
             if artefacto1.placa.firmware.compresor:
                 compresor = 1 if parts[5].strip().lower() == 'true' else 0
             else:
