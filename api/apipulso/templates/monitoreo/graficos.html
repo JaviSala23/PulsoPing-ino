@@ -8,7 +8,6 @@
     <h1>Gráfico de Temperatura</h1>
     Cuenta: {{ datos.cuenta.nombre_cuenta }} - Dispositivo: {{ datos.artefacto.descripcion }} - Placa: {{ datos.placa.descripcion }} - Puerto: {{ datos.puerto }}
 
-    <!-- Formulario para filtrar por fecha y hora -->
     <form method="get" action="{% url 'temperature_graph' cuenta=datos.cuenta.id_cuenta puerto=datos.puerto %}">
         <div class="form-group">
             <label for="fecha_inicio">Fecha y Hora de Inicio:</label>
@@ -23,14 +22,12 @@
 
     <hr>
 
-    <!-- Mostrar el gráfico interactivo -->
     <div id="graph-container">
         <canvas id="temperatureChart" width="400" height="200"></canvas>
     </div>
 
     <hr>
 
-    <!-- Tabla de datos de temperatura -->
     <div id="tabla-datos">
         <h2>Datos Tabulados de Temperaturas</h2>
         <table class="table table-bordered">
@@ -38,6 +35,8 @@
                 <tr>
                     <th>Fecha y Hora</th>
                     <th>Temperatura (°C)</th>
+                    <th>Puerta</th>
+                    <th>Compresor</th>
                 </tr>
             </thead>
             <tbody>
@@ -45,6 +44,8 @@
                 <tr>
                     <td>{{ data.fecha_hora }}</td>
                     <td style="color: {{ data.color }}">{{ data.temperatura }}</td>
+                    <td>{{ data.puerta|yesno:"Abierta,Cerrada" }}</td>
+                    <td>{{ data.compresor|yesno:"Encendido,Apagado" }}</td>
                 </tr>
                 {% endfor %}
             </tbody>
@@ -53,39 +54,51 @@
 </div>
 
 <script>
- 
-    // Verificar que los datos se hayan pasado correctamente al template
-    console.log('Timestamps:', {{ timestamps|safe }});
-    console.log('Temperatures:', {{ temperatures|safe }});
-    console.log('Temp_min:', {{ datos.temp_min }});
-    console.log('Temp_max:', {{ datos.temp_max }});
-
-    
-
     const timestamps = JSON.parse('{{ timestamps|escapejs }}');
     const temperatures = JSON.parse('{{ temperatures|escapejs }}');
+    const puertaStates = JSON.parse('{{ puerta_states|escapejs }}');
+    const compresorStates = JSON.parse('{{ compresor_states|escapejs }}');
 
     const ctx = document.getElementById('temperatureChart').getContext('2d');
     const temperatureChart = new Chart(ctx, {
         type: 'line',
         data: {
             labels: timestamps,
-            datasets: [{
-                label: 'Temperatura',
-                data: temperatures,
-                borderColor: 'blue',
-                backgroundColor: 'rgba(0, 0, 255, 0.1)',
-                fill: false,
-                tension: 0.1,
-                pointRadius: 5,
-                pointHoverRadius: 7,
-                pointHoverBackgroundColor: 'green',
-                pointBackgroundColor: function(context) {
-                // Determinar el color del punto según el valor de temperatura
-                const temp = context.dataset.data[context.dataIndex];
-                return (temp < {{datos.temp_min|safe }} || temp > {{datos.temp_max|safe }} ) ? 'red' : 'blue';
-            }
-            }]
+            datasets: [
+                {
+                    label: 'Temperatura',
+                    data: temperatures,
+                    borderColor: 'blue',
+                    backgroundColor: 'rgba(0, 0, 255, 0.1)',
+                    fill: false,
+                    tension: 0.1,
+                    pointRadius: 5,
+                    pointHoverRadius: 7,
+                    pointHoverBackgroundColor: 'green',
+                    pointBackgroundColor: function(context) {
+                        const temp = context.dataset.data[context.dataIndex];
+                        return (temp < {{datos.temp_min|safe }} || temp > {{datos.temp_max|safe }} ) ? 'red' : 'blue';
+                    }
+                },
+                {
+                    type: 'bar',
+                    label: 'Puerta Abierta',
+                    data: puertaStates,
+                    backgroundColor: 'rgba(64,224,208,0.5)',  // Verde agua
+                    borderColor: 'rgba(64,224,208,1)',
+                    yAxisID: 'y-puerta',
+                    barThickness: 10,
+                },
+                {
+                    type: 'bar',
+                    label: 'Compresor Encendido',
+                    data: compresorStates,
+                    backgroundColor: 'rgba(0,255,255,0.5)',  // Cyan
+                    borderColor: 'rgba(0,255,255,1)',
+                    yAxisID: 'y-compresor',
+                    barThickness: 10,
+                }
+            ]
         },
         options: {
             scales: {
@@ -100,13 +113,29 @@
                         display: true,
                         text: 'Temperatura (°C)'
                     }
+                },
+                'y-puerta': {
+                    type: 'linear',
+                    display: false,  // Oculta este eje ya que solo se usa para escalar las barras
+                    beginAtZero: true,
+                    position: 'right',
+                },
+                'y-compresor': {
+                    type: 'linear',
+                    display: false,  // Oculta este eje ya que solo se usa para escalar las barras
+                    beginAtZero: true,
+                    position: 'right',
                 }
             },
             plugins: {
                 tooltip: {
                     callbacks: {
                         label: function(context) {
-                            return `Temperatura: ${context.raw}°C`;
+                            if (context.dataset.label === 'Temperatura') {
+                                return `Temperatura: ${context.raw}°C`;
+                            } else {
+                                return `${context.dataset.label}`;
+                            }
                         },
                         title: function(context) {
                             return `Fecha: ${context[0].label}`;
@@ -117,4 +146,5 @@
         }
     });
 </script>
+
 {% endblock %}
