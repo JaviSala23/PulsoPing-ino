@@ -52,6 +52,7 @@
                         <td>{% if item.ultimo_registro %} {{ item.ultimo_registro.fecha_hora|date:"Y-m-d H:i:s" }} {% else %} N/A {% endif %}</td>
     
                         {% if item.relacion.placa.firmware.puerta  %}
+                        {{item.ultimo_registro.puerta}}
                         <td>{% if item.ultimo_registro %} {% if item.ultimo_registro.puerta == False %} Cerrada {% else %} Abierta {% endif %} {% else %} N/A {% endif %}</td>
                         {% else %}
                         <td> NO INCLUYE </td>
