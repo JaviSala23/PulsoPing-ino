@@ -5,73 +5,90 @@
 
 {% block content %}
 
-<div data-role="page" id="dashboard" class="container">
-    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+<div class="container">
+    <h1>Gráfico de Temperatura</h1>
+    Cuenta: {{ datos.cuenta.nombre_cuenta }} - Dispositivo: {{ datos.artefacto.descripcion }} - Placa: {{ datos.placa.descripcion }} - Puerto: {{ datos.puerto }}
 
-    <div class="container">
-        <h1>Gráfico de Temperatura</h1>
-        Cuenta: {{ datos.cuenta.nombre_cuenta }} - Dispositivo: {{ datos.artefacto.descripcion }} - Placa: {{ datos.placa.descripcion }} - Puerto: {{ datos.puerto }}
-
-        <!-- Formulario para filtrar por fecha y hora -->
-        <form method="get" action="{% url 'temperature_graph' cuenta=datos.cuenta.id_cuenta puerto=datos.puerto %}">
-            <div class="form-group">
-                <label for="fecha_inicio">Fecha y Hora de Inicio:</label>
-                <input type="datetime-local" id="fecha_inicio" name="fecha_inicio" class="form-control">
-            </div>
-            <div class="form-group">
-                <label for="fecha_fin">Fecha y Hora de Fin:</label>
-                <input type="datetime-local" id="fecha_fin" name="fecha_fin" class="form-control">
-            </div>
-            <button type="submit" class="btn btn-primary">Filtrar</button>
-        </form>
-
-        <hr>
-
-        <!-- Mostrar el gráfico interactivo -->
-        <div id="graph-container">
-            <canvas id="temperatureChart"></canvas>
+    <form method="get" action="{% url 'temperature_graph' cuenta=datos.cuenta.id_cuenta puerto=datos.puerto %}">
+        <div class="form-group">
+            <label for="fecha_inicio">Fecha y Hora de Inicio:</label>
+            <input type="datetime-local" id="fecha_inicio" name="fecha_inicio" class="form-control">
         </div>
-
-        <hr>
-
-        <!-- Tabla de datos de temperatura -->
-        <div id="tabla-datos">
-            <h2>Datos Tabulados de Temperaturas</h2>
-            <table class="table table-bordered">
-                <thead>
-                    <tr>
-                        <th>Fecha y Hora</th>
-                        <th>Temperatura (°C)</th>
-                    </tr>
-                </thead>
-                <tbody>
-                    {% for data in tabla_datos %}
-                    <tr>
-                        <td>{{ data.fecha_hora }}</td>
-                        <td style="color: {{ data.color }}">{{ data.temperatura }}</td>
-                    </tr>
-                    {% endfor %}
-                </tbody>
-            </table>
+        <div class="form-group">
+            <label for="fecha_fin">Fecha y Hora de Fin:</label>
+            <input type="datetime-local" id="fecha_fin" name="fecha_fin" class="form-control">
         </div>
+        <button type="submit" class="btn btn-primary">Filtrar</button>
+    </form>
+
+    <hr>
+
+    <div id="graph-container">
+        <canvas id="temperatureChart" width="400" height="200"></canvas>
     </div>
 
-    <script>
-        // Verificar que los datos se hayan pasado correctamente al template
-        console.log('Timestamps:', {{ timestamps|safe }});
-        console.log('Temperatures:', {{ temperatures|safe }});
-        console.log('Temp_min:', {{ datos.temp_min }});
-        console.log('Temp_max:', {{ datos.temp_max }});
+    <hr>
 
-        const timestamps = JSON.parse('{{ timestamps|escapejs }}');
-        const temperatures = JSON.parse('{{ temperatures|escapejs }}');
+    <div id="tabla-datos">
+        <h2>Datos Tabulados de Temperaturas</h2>
+        <table class="table table-bordered">
+            <thead>
+                <tr>
+                    <th>Fecha y Hora</th>
+                    <th>Temperatura (°C)</th>
+                    <th>Puerta</th>
+                    <th>Compresor</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for data in tabla_datos %}
+                
+                <tr>
+                    <td>{{ data.fecha_hora }}</td>
+                    <td style="color: {{ data.color }}">{{ data.temperatura }}</td>
+                   
+                        {% if data.puerta == "Abierta" %}
+                        <td style="color: rgba(255, 99, 132)">
+                            Abierta
+                        </td>
+                        {% else %}
+                        <td>
+                            Cerrada
+                        </td>
+                        {% endif %}
+                    
+                    
+                        {% if data.compresor ==  "Encendido"  %}
+                        <td style="color: rgba(54, 162, 235)">
+                            Encendido
+                        </td>
+                        {% else %}
+                        <td>
+                            Apagado
+                        </td>
+                        {% endif %}
+                    
+                </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    </div>
+</div>
 
-        const ctx = document.getElementById('temperatureChart').getContext('2d');
-        const temperatureChart = new Chart(ctx, {
-            type: 'line',
-            data: {
-                labels: timestamps,
-                datasets: [{
+<script>
+    const timestamps = JSON.parse('{{ timestamps|escapejs }}');
+    const temperatures = JSON.parse('{{ temperatures|escapejs }}');
+    const puertaStates = JSON.parse('{{ puerta_states|escapejs }}');
+    const compresorStates = JSON.parse('{{ compresor_states|escapejs }}');
+
+    const ctx = document.getElementById('temperatureChart').getContext('2d');
+    const temperatureChart = new Chart(ctx, {
+        type: 'line',
+        data: {
+            labels: timestamps,
+            datasets: [
+                {
                     label: 'Temperatura',
                     data: temperatures,
                     borderColor: 'blue',
@@ -82,70 +99,75 @@
                     pointHoverRadius: 7,
                     pointHoverBackgroundColor: 'green',
                     pointBackgroundColor: function(context) {
-                        // Determinar el color del punto según el valor de temperatura
                         const temp = context.dataset.data[context.dataIndex];
-                        return (temp < {{ datos.temp_min|safe }} || temp > {{ datos.temp_max|safe }}) ? 'red' : 'blue';
-                    }
-                }]
-            },
-            options: {
-                scales: {
-                    x: {
-                        title: {
-                            display: true,
-                            text: 'Fecha'
-                        }
-                    },
-                    y: {
-                        title: {
-                            display: true,
-                            text: 'Temperatura (°C)'
-                        }
+                        return (temp < {{datos.temp_min|safe }} || temp > {{datos.temp_max|safe }} ) ? 'red' : 'blue';
                     }
                 },
-                plugins: {
-                    tooltip: {
-                        callbacks: {
-                            label: function(context) {
+                {
+                    type: 'bar',
+                    label: 'Puerta Abierta',
+                    data: puertaStates,
+                    backgroundColor: 'rgba(255, 99, 132, 0.5)',  // Rojo claro
+                    borderColor: 'rgba(255, 99, 132, 1)',
+                    yAxisID: 'y-puerta',
+                    barThickness: 10,
+                },
+                {
+                    type: 'bar',
+                    label: 'Compresor Encendido',
+                    data: compresorStates,
+                    backgroundColor: 'rgba(54, 162, 235, 0.5)',  // Azul claro
+                    borderColor: 'rgba(54, 162, 235, 1)',
+                    yAxisID: 'y-compresor',
+                    barThickness: 10,
+                }
+            ]
+        },
+        options: {
+            scales: {
+                x: {
+                    title: {
+                        display: true,
+                        text: 'Fecha'
+                    }
+                },
+                y: {
+                    title: {
+                        display: true,
+                        text: 'Temperatura (°C)'
+                    }
+                },
+                'y-puerta': {
+                    type: 'linear',
+                    display: false,  // Oculta este eje ya que solo se usa para escalar las barras
+                    beginAtZero: true,
+                    position: 'right',
+                },
+                'y-compresor': {
+                    type: 'linear',
+                    display: false,  // Oculta este eje ya que solo se usa para escalar las barras
+                    beginAtZero: true,
+                    position: 'right',
+                }
+            },
+            plugins: {
+                tooltip: {
+                    callbacks: {
+                        label: function(context) {
+                            if (context.dataset.label === 'Temperatura') {
                                 return `Temperatura: ${context.raw}°C`;
-                            },
-                            title: function(context) {
-                                return `Fecha: ${context[0].label}`;
+                            } else {
+                                return `${context.dataset.label}`;
                             }
+                        },
+                        title: function(context) {
+                            return `Fecha: ${context[0].label}`;
                         }
                     }
                 }
             }
-        });
-    </script>
-
-    <style>
-        /* Ajustar tamaño del gráfico */
-        #graph-container {
-            width: 100%;
-            height: 400px;
         }
+    });
+</script>
 
-        #temperatureChart {
-            width: 100% !important;
-            height: 100% !important;
-        }
-
-        /* Forzar orientación paisaje en móviles */
-        @media screen and (orientation: landscape) {
-            .container {
-                width: 100%;
-                max-width: 100%;
-            }
-        }
-
-        /* Opcional: estilos para orientación vertical */
-        @media screen and (orientation: portrait) {
-            .container {
-                /* Ajustar estilos si es necesario */
-            }
-        }
-    </style>
-
-</div>
 {% endblock %}
