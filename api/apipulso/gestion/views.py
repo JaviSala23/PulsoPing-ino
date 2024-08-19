@@ -339,11 +339,11 @@ def TemperatureGraphView(request, cuenta, puerto):
             timestamp = datetime.strptime(parts[0], "%Y-%m-%d %H:%M:%S")
             temperature = float(parts[1])
             if artefacto1.placa.firmware.puerta:
-                puerta = 1 if parts[4].strip().lower() == 'true' else 0
+                puerta = 1 if parts[4].strip().lower() == 'true' elif 0 else None
             else:
                 puerta = None
             if artefacto1.placa.firmware.compresor:
-                compresor = 1 if parts[5].strip().lower() == 'true' else 0
+                compresor = 1 if parts[5].strip().lower() == 'true' elif 0 else None
             else:
                 compresor=None
             data.append((timestamp, temperature, puerta, compresor))
@@ -389,8 +389,8 @@ def TemperatureGraphView(request, cuenta, puerto):
             'fecha_hora': date_str, 
             'temperatura': temp, 
             'color': temp_color, 
-            'puerta': 'Abierta' if puerta == 1 else 'Cerrada', 
-            'compresor': 'Encendido' if compresor == 1 else 'Apagado'
+            'puerta': 'Abierta' if puerta == 1 elif 'Cerrada' else None, 
+            'compresor': 'Encendido' if compresor == 1 elif 'Apagado' else None
         })
 
     return render(request, 'monitoreo/graficos.html', {
