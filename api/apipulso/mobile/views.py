@@ -219,7 +219,7 @@ def TemperatureGraphView(request, id):
             'compresor': 'Encendido' if compresor == 1 else 'Apagado'
         })
 
-    return render(request, 'monitoreo/graficos.html', {
+    return render(request, 'mobile/estadisticaM.html', {
         'timestamps': json.dumps(timestamps),
         'temperatures': json.dumps(temperatures),
         'puerta_states': json.dumps(puerta_states),
