@@ -45,14 +45,14 @@
                     <td>{{ data.fecha_hora }}</td>
                     <td style="color: {{ data.color }}">{{ data.temperatura }}</td>
                     <td>
-                        {% if data.puerta == "True" %}
+                        {% if data.puerta == "1" %}
                             Abierta
                         {% else %}
                             Cerrada
                         {% endif %}
                     </td>
                     <td>
-                        {% if data.compresor == "True" %}
+                        {% if data.compresor == "1" %}
                             Encendido
                         {% else %}
                             Apagado
