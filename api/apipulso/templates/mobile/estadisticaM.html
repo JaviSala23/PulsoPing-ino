@@ -52,9 +52,13 @@
                         <td style="color: rgba(255, 99, 132)">
                             Abierta
                         </td>
-                        {% else %}
+                        {% elif data.puerta == "Cerrada" %}
                         <td>
                             Cerrada
+                        </td>
+                        {% else %}
+                        <td>
+                            NO INCLUYE
                         </td>
                         {% endif %}
                     
@@ -63,9 +67,13 @@
                         <td style="color: rgba(54, 162, 235)">
                             Encendido
                         </td>
-                        {% else %}
+                        {% elif data.compresor ==  "Apagado" %}
                         <td>
                             Apagado
+                        </td>
+                        {% else %}
+                        <td>
+                            NO INCLUYE
                         </td>
                         {% endif %}
                     
