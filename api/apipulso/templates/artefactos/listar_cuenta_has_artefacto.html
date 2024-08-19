@@ -53,7 +53,7 @@
     
                         {% if item.relacion.placa.firmware.puerta  %}
                         {{item.ultimo_registro.puerta}}
-                        <td>{% if item.ultimo_registro %} {% if item.ultimo_registro.puerta %} Cerrada {% else %} Abierta {% endif %} {% else %} N/A {% endif %}</td>
+                        <td>{% if item.ultimo_registro %} {% if item.ultimo_registro.puerta %} Abierta {% else %} Cerrada {% endif %} {% else %} N/A {% endif %}</td>
                         {% else %}
                         <td> NO INCLUYE </td>
                         {% endif %}
