@@ -338,8 +338,14 @@ def TemperatureGraphView(request, cuenta, puerto):
         try:
             timestamp = datetime.strptime(parts[0], "%Y-%m-%d %H:%M:%S")
             temperature = float(parts[1])
-            puerta = 1 if parts[4].strip().lower() == 'true' else 0
-            compresor = 1 if parts[5].strip().lower() == 'true' else 0
+            if artefacto1.placa.firmware.puerta:
+                puerta = 1 if parts[4].strip().lower() == 'true' else 0
+            else:
+                puerta = nombre_cuenta
+            if artefacto1.placa.firmware.compresor:
+                compresor = 1 if parts[5].strip().lower() == 'true' else 0
+            else:
+                compresor=None
             data.append((timestamp, temperature, puerta, compresor))
         except Exception as e:
             continue
