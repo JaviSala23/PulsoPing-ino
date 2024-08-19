@@ -146,9 +146,9 @@ def translate_timestamp(timestamp):
     # Función para traducir el timestamp a español
     return timestamp.strftime('%d/%m %H:%M')
 
-def TemperatureGraphView(request, cuenta, puerto):
+def TemperatureGraphView(request, id):
     try:
-        artefacto1 = Cuenta_has_Artefacto.objects.get(cuenta=cuenta, puerto=puerto)
+        artefacto1 = Cuenta_has_Artefacto.objects.get(pk=id)
     except Cuenta_has_Artefacto.DoesNotExist:
         return HttpResponse("No se encontró el artefacto especificado.", content_type="text/plain")
     
