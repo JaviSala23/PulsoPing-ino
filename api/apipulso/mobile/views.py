@@ -225,7 +225,6 @@ def TemperatureGraphView(request, id):
         'puerta_states': json.dumps(puerta_states),
         'compresor_states': json.dumps(compresor_states),
         'cuenta': artefacto1.cuenta.nombre_cuenta,
-        'puerto': puerto,
         'descripcion': artefacto1.artefacto.descripcion,
         'tabla_datos': table_data,
         'datos': artefacto1
