@@ -46,34 +46,34 @@
                     <td>{{ data.fecha_hora }}</td>
                     <td style="color: {{ data.color }}">{{ data.temperatura }}</td>
                    
-                        {% if data.puerta == "Abierta" %}
-                        <td style="color: rgba(255, 99, 132)">
-                            Abierta
-                        </td>
-                        {% elif == "Cerrada"  %}
-                        <td>
-                            Cerrada
-                        </td>
-                        {% else  %}
-                        <td>
-                            NO INCLUYE
-                        </td>
-                        {% endif %}
+                    {% if data.puerta|yesno:"Abierta,Cerrada" == "Abierta" %}
+                    <td style="color: rgba(255, 99, 132)">
+                        Abierta
+                    </td>
+                {% elif data.puerta|yesno:"Abierta,Cerrada" == "Cerrada" %}
+                    <td>
+                        Cerrada
+                    </td>
+                {% else %}
+                    <td>
+                        NO INCLUYE
+                    </td>
+                {% endif %}
                     
                     
-                        {% if data.compresor ==  "Encendido"  %}
-                        <td style="color: rgba(54, 162, 235)">
-                            Encendido
-                        </td>
-                        {% elif == "Apagado"  %}
-                        <td>
-                            Apagado
-                        </td>
-                        {% else  %}
-                        <td>
-                            NO INCLUYE
-                        </td>
-                        {% endif %}
+                {% if data.compresor|default:"NO INCLUYE" == "Encendido" %}
+                <td style="color: rgba(54, 162, 235)">
+                    Encendido
+                </td>
+            {% elif data.compresor|default:"NO INCLUYE" == "Apagado" %}
+                <td>
+                    Apagado
+                </td>
+            {% else %}
+                <td>
+                    NO INCLUYE
+                </td>
+            {% endif %}
                     
                 </tr>
                 {% endfor %}
