@@ -332,14 +332,14 @@ def TemperatureGraphView(request, cuenta, puerto):
 
     for line in lines:
         parts = line.strip().split(',')
-        if len(parts) < 4:
+        if len(parts) < 6:  # Asegúrate de que haya al menos 6 partes en la línea
             continue
 
         try:
             timestamp = datetime.strptime(parts[0], "%Y-%m-%d %H:%M:%S")
             temperature = float(parts[1])
-            puerta = 1 if parts[2].strip().lower() == 'true' else 0
-            compresor = 1 if parts[3].strip().lower() == 'true' else 0
+            puerta = 1 if parts[4].strip().lower() == 'true' else 0
+            compresor = 1 if parts[5].strip().lower() == 'true' else 0
             data.append((timestamp, temperature, puerta, compresor))
         except Exception as e:
             continue
@@ -349,6 +349,7 @@ def TemperatureGraphView(request, cuenta, puerto):
 
     df = pd.DataFrame(data, columns=['timestamp', 'temperature', 'puerta', 'compresor'])
 
+    # Filtrar por fecha y hora
     fecha_inicio_str = request.GET.get('fecha_inicio', None)
     fecha_fin_str = request.GET.get('fecha_fin', None)
 
@@ -375,9 +376,16 @@ def TemperatureGraphView(request, cuenta, puerto):
     for date, temp, puerta, compresor in zip(df['timestamp'], df['temperature'], df['puerta'], df['compresor']):
         date_str = translate_timestamp(date)
         
+        # Determina el color basado en los límites de temperatura
         temp_color = 'red' if temp < artefacto1.temp_min or temp > artefacto1.temp_max else 'blue'
         
-        table_data.append({'fecha_hora': date_str, 'temperatura': temp, 'color': temp_color, 'puerta': puerta, 'compresor': compresor})
+        table_data.append({
+            'fecha_hora': date_str, 
+            'temperatura': temp, 
+            'color': temp_color, 
+            'puerta': 'Abierta' if puerta == 1 else 'Cerrada', 
+            'compresor': 'Encendido' if compresor == 1 else 'Apagado'
+        })
 
     return render(request, 'monitoreo/graficos.html', {
         'timestamps': json.dumps(timestamps),
