@@ -56,13 +56,17 @@
                         </td>
                         {% endif %}
                     
-                    <td>
-                        {% if data.compresor == 1 %}
+                    
+                        {% if data.compresor ==  "Encendido"  %}
+                        <td style="backgroundColor: rgba(54, 162, 235, 0.5)">
                             Encendido
+                        </td>
                         {% else %}
+                        <td>
                             Apagado
+                        </td>
                         {% endif %}
-                    </td>
+                    
                 </tr>
                 {% endfor %}
             </tbody>
