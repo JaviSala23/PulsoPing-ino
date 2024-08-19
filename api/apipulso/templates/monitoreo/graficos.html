@@ -46,11 +46,11 @@
                     <td>{{ data.fecha_hora }}</td>
                     <td style="color: {{ data.color }}">{{ data.temperatura }}</td>
                    
-                    {% if data.compresor|default:"NO INCLUYE" == "Abierta" %}
+                    {% if data.puerta|default:"NO INCLUYE" == "Abierta" %}
                     <td style="color: rgba(255, 99, 132)">
                         Abierta
                     </td>
-                {% elif data.compresor|default:"NO INCLUYE" == "Cerrada" %}
+                {% elif data.puerta|default:"NO INCLUYE" == "Cerrada" %}
                     <td>
                         Cerrada
                     </td>
