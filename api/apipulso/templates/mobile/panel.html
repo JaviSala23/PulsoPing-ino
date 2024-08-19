@@ -108,14 +108,14 @@
                         <div class="status">
                             <div class="door-status-{{ item.relacion.id }}">
                                 Puerta: {% if item.ultimo_registro %}
-                                    {% if item.ultimo_registro.puerta == 1 %} Abierta {% else %} Cerrada {% endif %}
+                                    {% if item.ultimo_registro.puerta == True %} Abierta {% else %} Cerrada {% endif %}
                                 {% else %}
                                     N/A
                                 {% endif %}
                             </div>
                             <div class="compressor-status-{{ item.relacion.id }}">
                                 Compresor: {% if item.ultimo_registro %}
-                                    {% if item.ultimo_registro.compresor == 1 %} Prendido {% else %} Apagado {% endif %}
+                                    {% if item.ultimo_registro.compresor == True %} Prendido {% else %} Apagado {% endif %}
                                 {% else %}
                                     N/A
                                 {% endif %}
