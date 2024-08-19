@@ -45,13 +45,17 @@
                 <tr>
                     <td>{{ data.fecha_hora }}</td>
                     <td style="color: {{ data.color }}">{{ data.temperatura }}</td>
-                    <td>
+                   
                         {% if data.puerta == "1" %}
+                        <td style="backgroundColor: rgba(255, 99, 132, 0.5)">
                             Abierta
+                        </td>
                         {% else %}
+                        <td style="backgroundColor: rgba(54, 162, 235, 0.5)">
                             Cerrada
+                        </td>
                         {% endif %}
-                    </td>
+                    
                     <td>
                         {% if data.compresor == "1" %}
                             Encendido
