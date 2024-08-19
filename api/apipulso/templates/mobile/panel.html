@@ -157,8 +157,12 @@
     
                     $(`#fecha${item.relacion.id}`).text(fecha_hora || "N/A");
                     $(`#temp-${item.relacion.id}`).text(temp ? `${temp}°` : "-°");
+                    if (item.relacion.placa.firmware.puerta){ 
                     $(`.door-status-${item.relacion.id}`).text(`Puerta: ${isDoorOpen === 'True' ? 'Abierta' : 'Cerrada'}`);
+                    }
+                    if (item.relacion.placa.firmware.compresor){ 
                     $(`.compressor-status-${item.relacion.id}`).text(`Compresor: ${isCompressorOn === 'True' ? 'Prendido' : 'Apagado'}`);
+                    }
                 });
             },
             error: function(xhr, status, error) {
