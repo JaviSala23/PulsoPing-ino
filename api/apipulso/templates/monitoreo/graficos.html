@@ -41,7 +41,7 @@
             </thead>
             <tbody>
                 {% for data in tabla_datos %}
-                
+                {{data.puerta}}
                 <tr>
                     <td>{{ data.fecha_hora }}</td>
                     <td style="color: {{ data.color }}">{{ data.temperatura }}</td>
