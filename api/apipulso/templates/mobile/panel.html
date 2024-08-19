@@ -106,20 +106,32 @@
                             {% endif %}
                         </div>
                         <div class="status">
+                            {% if item.relacion.placa.firmware.puerta  %}
                             <div class="door-status-{{ item.relacion.id }}">
                                 Puerta: {% if item.ultimo_registro %}
-                                    {% if item.ultimo_registro.puerta == True %} Abierta {% else %} Cerrada {% endif %}
+                                    {% if item.ultimo_registro.puerta == "True" %} Abierta {% else %} Cerrada {% endif %}
                                 {% else %}
                                     N/A
                                 {% endif %}
                             </div>
+                            {% else %}
+                            <div class="door-status-{{ item.relacion.id }}">
+                                NO INCLUYE
+                            </div>
+                            {% endif %}
+                            {% if item.relacion.placa.firmware.compresor  %}
                             <div class="compressor-status-{{ item.relacion.id }}">
                                 Compresor: {% if item.ultimo_registro %}
-                                    {% if item.ultimo_registro.compresor == True %} Prendido {% else %} Apagado {% endif %}
+                                    {% if item.ultimo_registro.compresor == "True" %} Prendido {% else %} Apagado {% endif %}
                                 {% else %}
                                     N/A
                                 {% endif %}
                             </div>
+                            {% else %}
+                            <div class="door-status-{{ item.relacion.id }}">
+                                NO INCLUYE
+                            </div>
+                            {% endif %}
                         </div>
                     </div>
                 </div>
@@ -145,8 +157,8 @@
     
                     $(`#fecha${item.relacion.id}`).text(fecha_hora || "N/A");
                     $(`#temp-${item.relacion.id}`).text(temp ? `${temp}°` : "-°");
-                    $(`.door-status-${item.relacion.id}`).text(`Puerta: ${isDoorOpen ? 'Abierta' : 'Cerrada'}`);
-                    $(`.compressor-status-${item.relacion.id}`).text(`Compresor: ${isCompressorOn ? 'Prendido' : 'Apagado'}`);
+                    $(`.door-status-${item.relacion.id}`).text(`Puerta: ${isDoorOpen === 'True' ? 'Abierta' : 'Cerrada'}`);
+                    $(`.compressor-status-${item.relacion.id}`).text(`Compresor: ${isCompressorOn === 'True' ? 'Prendido' : 'Apagado'}`);
                 });
             },
             error: function(xhr, status, error) {
