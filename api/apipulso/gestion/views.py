@@ -338,8 +338,8 @@ def TemperatureGraphView(request, cuenta, puerto):
         try:
             timestamp = datetime.strptime(parts[0], "%Y-%m-%d %H:%M:%S")
             temperature = float(parts[1])
-            puerta = parts[2].strip().lower() == 'true'
-            compresor = parts[3].strip().lower() == 'true'
+            puerta = 1 if parts[2].strip().lower() == 'true' else 0
+            compresor = 1 if parts[3].strip().lower() == 'true' else 0
             data.append((timestamp, temperature, puerta, compresor))
         except Exception as e:
             continue
@@ -368,8 +368,8 @@ def TemperatureGraphView(request, cuenta, puerto):
 
     timestamps = [translate_timestamp(ts) for ts in df['timestamp']]
     temperatures = df['temperature'].tolist()
-    puerta_states = df['puerta'].astype(int).tolist()
-    compresor_states = df['compresor'].astype(int).tolist()
+    puerta_states = df['puerta'].tolist()
+    compresor_states = df['compresor'].tolist()
 
     table_data = []
     for date, temp, puerta, compresor in zip(df['timestamp'], df['temperature'], df['puerta'], df['compresor']):
