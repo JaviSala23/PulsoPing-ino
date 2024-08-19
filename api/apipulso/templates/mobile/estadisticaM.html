@@ -4,8 +4,51 @@
 {% block title %}MantisTemp{% endblock %}
 
 {% block content %}
-
 <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+<style>
+    @media only screen and (orientation: landscape) {
+        #graph-container {
+            width: 100%;
+            height: auto;
+        }
+
+        canvas {
+            width: 100% !important;
+            height: auto !important;
+        }
+
+        .container {
+            padding: 0 10px;
+        }
+    }
+
+    @media only screen and (orientation: portrait) {
+        #graph-container {
+            width: 100%;
+            height: auto;
+        }
+
+        canvas {
+            width: 100% !important;
+            height: auto !important;
+        }
+    }
+
+    #graph-container {
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        width: 100%;
+        height: auto;
+        margin: 0 auto;
+    }
+
+    canvas {
+        max-width: 100%;
+        height: auto;
+    }
+</style>
+
 <div class="container">
     <h1>Gráfico de Temperatura</h1>
     Cuenta: {{ datos.cuenta.nombre_cuenta }} - Dispositivo: {{ datos.artefacto.descripcion }} - Placa: {{ datos.placa.descripcion }} - Puerto: {{ datos.puerto }}
@@ -43,40 +86,36 @@
             </thead>
             <tbody>
                 {% for data in tabla_datos %}
-                
                 <tr>
                     <td>{{ data.fecha_hora }}</td>
                     <td style="color: {{ data.color }}">{{ data.temperatura }}</td>
-                   
                     {% if data.puerta|default:"NO INCLUYE" == "Abierta" %}
                     <td style="color: rgba(255, 99, 132)">
                         Abierta
                     </td>
-                {% elif data.puerta|default:"NO INCLUYE" == "Cerrada" %}
+                    {% elif data.puerta|default:"NO INCLUYE" == "Cerrada" %}
                     <td>
                         Cerrada
                     </td>
-                {% else %}
+                    {% else %}
                     <td>
                         NO INCLUYE
                     </td>
-                {% endif %}
+                    {% endif %}
                     
-                    
-                {% if data.compresor|default:"NO INCLUYE" == "Encendido" %}
-                <td style="color: rgba(54, 162, 235)">
-                    Encendido
-                </td>
-            {% elif data.compresor|default:"NO INCLUYE" == "Apagado" %}
-                <td>
-                    Apagado
-                </td>
-            {% else %}
-                <td>
-                    NO INCLUYE
-                </td>
-            {% endif %}
-                    
+                    {% if data.compresor|default:"NO INCLUYE" == "Encendido" %}
+                    <td style="color: rgba(54, 162, 235)">
+                        Encendido
+                    </td>
+                    {% elif data.compresor|default:"NO INCLUYE" == "Apagado" %}
+                    <td>
+                        Apagado
+                    </td>
+                    {% else %}
+                    <td>
+                        NO INCLUYE
+                    </td>
+                    {% endif %}
                 </tr>
                 {% endfor %}
             </tbody>
@@ -85,6 +124,14 @@
 </div>
 
 <script>
+    function resizeChart() {
+        const canvas = document.getElementById('temperatureChart');
+        const ctx = canvas.getContext('2d');
+        canvas.width = window.innerWidth;
+        canvas.height = window.innerHeight * 0.5; // Ajusta la altura según sea necesario
+        temperatureChart.resize();
+    }
+
     const timestamps = JSON.parse('{{ timestamps|escapejs }}');
     const temperatures = JSON.parse('{{ temperatures|escapejs }}');
     const puertaStates = JSON.parse('{{ puerta_states|escapejs }}');
@@ -176,6 +223,9 @@
             }
         }
     });
+
+    window.addEventListener('resize', resizeChart);
+    resizeChart(); // Llama a la función para inicializar el tamaño correcto
 </script>
 
 {% endblock %}
