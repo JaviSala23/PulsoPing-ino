@@ -48,11 +48,11 @@
                     <td>{{ data.fecha_hora }}</td>
                     <td style="color: {{ data.color }}">{{ data.temperatura }}</td>
                    
-                    {% if data.puerta|yesno:"Abierta,Cerrada" == "Abierta" %}
+                    {% if data.puerta|default:"NO INCLUYE" == "Abierta" %}
                     <td style="color: rgba(255, 99, 132)">
                         Abierta
                     </td>
-                {% elif data.puerta|yesno:"Abierta,Cerrada" == "Cerrada" %}
+                {% elif data.puerta|default:"NO INCLUYE" == "Cerrada" %}
                     <td>
                         Cerrada
                     </td>

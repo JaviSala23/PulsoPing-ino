@@ -221,8 +221,8 @@ def TemperatureGraphView(request, id):
             'fecha_hora': date_str, 
             'temperatura': temp, 
             'color': temp_color, 
-            'puerta': 'Abierta' if puerta == 1 else 'Cerrada', 
-            'compresor': 'Encendido' if compresor == 1 else 'Apagado'
+            'puerta': 'Abierta' if puerta == 1 else 'Cerrada' if puerta == 0 else None, 
+            'compresor': 'Encendido' if compresor == 1 else 'Apagado' if compresor == 0 else None
         })
 
     return render(request, 'mobile/estadisticaM.html', {
