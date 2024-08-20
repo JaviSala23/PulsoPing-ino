@@ -171,11 +171,11 @@ def TemperatureGraphView(request, id):
             timestamp = datetime.strptime(parts[0], "%Y-%m-%d %H:%M:%S")
             temperature = float(parts[1])
             if artefacto1.placa.firmware.puerta:
-                puerta = 1 if parts[4].strip().lower() == 'true' else 0
+                puerta = 1 if parts[5].strip().lower() == 'true' else 0
             else:
                 puerta=None
             if artefacto1.placa.firmware.compresor:
-                compresor = 1 if parts[5].strip().lower() == 'true' else 0
+                compresor = 1 if parts[4].strip().lower() == 'true' else 0
             else:
                 compresor=None
             data.append((timestamp, temperature, puerta, compresor))
@@ -203,13 +203,13 @@ def TemperatureGraphView(request, id):
 
     df = df[(df['timestamp'] >= fecha_inicio) & (df['timestamp'] <= fecha_fin)]
 
-    df = df.sort_values(by='timestamp', ascending=False)
+    
 
     timestamps = [translate_timestamp(ts) for ts in df['timestamp']]
     temperatures = df['temperature'].tolist()
     puerta_states = df['puerta'].tolist()
     compresor_states = df['compresor'].tolist()
-
+    df = df.sort_values(by='timestamp', ascending=False)
     table_data = []
     for date, temp, puerta, compresor in zip(df['timestamp'], df['temperature'], df['puerta'], df['compresor']):
         date_str = translate_timestamp(date)
