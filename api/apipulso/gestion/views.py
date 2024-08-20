@@ -354,7 +354,7 @@ def TemperatureGraphView(request, cuenta, puerto):
         return HttpResponse("No se encontraron datos válidos en los archivos.", content_type="text/plain")
 
     df = pd.DataFrame(data, columns=['timestamp', 'temperature', 'puerta', 'compresor'])
-    df = df.sort_values(by='timestamp', ascending=False)
+   
     # Filtrar por fecha y hora
     fecha_inicio_str = request.GET.get('fecha_inicio', None)
     fecha_fin_str = request.GET.get('fecha_fin', None)
@@ -371,13 +371,13 @@ def TemperatureGraphView(request, cuenta, puerto):
 
     df = df[(df['timestamp'] >= fecha_inicio) & (df['timestamp'] <= fecha_fin)]
 
-    df = df.sort_values(by='timestamp', ascending=False)
+    
 
     timestamps = [translate_timestamp(ts) for ts in df['timestamp']]
     temperatures = df['temperature'].tolist()
     puerta_states = df['puerta'].tolist()
     compresor_states = df['compresor'].tolist()
-
+    df = df.sort_values(by='timestamp', ascending=False)
     table_data = []
     for date, temp, puerta, compresor in zip(df['timestamp'], df['temperature'], df['puerta'], df['compresor']):
         date_str = translate_timestamp(date)
