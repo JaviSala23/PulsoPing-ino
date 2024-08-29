@@ -246,7 +246,7 @@ def TemperatureGraphView(request, id):
 def check_device_view(request):
     placa = request.GET.get('codigo')
     puerto = request.GET.get('puerto')
-
+    print(placa,puerto)
     # Validar que ambos parámetros estén presentes
     if not placa or not puerto:
         return Response({'error': 'Faltan parámetros'}, status=status.HTTP_400_BAD_REQUEST)
