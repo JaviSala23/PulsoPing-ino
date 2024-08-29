@@ -242,18 +242,22 @@ def TemperatureGraphView(request, id):
     })
 
 
-@api_view(['GET'])
+@api_view(['POST'])
 def check_device_view(request):
-    placa = request.GET.get('codigo')
-    puerto = request.GET.get('puerto')
-    print(placa,puerto)
+    # Obtener los datos JSON del cuerpo de la solicitud
+    placa = request.data.get('codigo')
+    puerto = request.data.get('puerto')
+    
+    # Imprimir los parámetros para depuración
+    print(f"Placa: {placa}, Puerto: {puerto}")
+    
     # Validar que ambos parámetros estén presentes
     if not placa or not puerto:
         return Response({'error': 'Faltan parámetros'}, status=status.HTTP_400_BAD_REQUEST)
 
     try:
         # Verificar si existe una entrada con el placa y puerto dados
-        device_exists = CuentaHasArtefactos.objects.filter(placa=placa, puerto=puerto).exists()
+        device_exists = Cuenta_has_Artefacto.objects.filter(placa=placa, puerto=puerto).exists()
 
         # Devolver la respuesta en JSON
         if device_exists:
