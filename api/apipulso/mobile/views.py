@@ -242,7 +242,7 @@ def TemperatureGraphView(request, id):
     })
 
 
-@api_view(['POST'])
+@api_view(['GET'])
 def check_device_view(request):
     # Obtener los datos JSON del cuerpo de la solicitud
     placa = request.data.get('codigo')
