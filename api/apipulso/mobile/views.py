@@ -256,8 +256,9 @@ def check_device_view(request):
         return Response({'error': 'Faltan parámetros'}, status=status.HTTP_400_BAD_REQUEST)
 
     try:
+        placa1=Placa.objects.get(id=placa)
         # Verificar si existe una entrada con el placa y puerto dados
-        device_exists = Cuenta_has_Artefacto.objects.filter(placa=placa, puerto=puerto).exists()
+        device_exists = Cuenta_has_Artefacto.objects.filter(placa=placa1, puerto=puerto).exists()
 
         # Devolver la respuesta en JSON
         if device_exists:
