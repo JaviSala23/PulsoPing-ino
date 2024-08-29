@@ -27,6 +27,11 @@ from django.core.exceptions import PermissionDenied
 from django.contrib import messages
 from django.contrib.auth import logout
 
+
+from rest_framework.decorators import api_view
+from rest_framework.response import Response
+from rest_framework import status
+
 def login_view(request):
     # Obtener el nombre de usuario
     username = request.user.username
@@ -235,3 +240,25 @@ def TemperatureGraphView(request, id):
         'tabla_datos': table_data,
         'datos': artefacto1
     })
+
+
+@api_view(['GET'])
+def check_device_view(request):
+    placa = request.GET.get('codigo')
+    puerto = request.GET.get('puerto')
+
+    # Validar que ambos parámetros estén presentes
+    if not placa or not puerto:
+        return Response({'error': 'Faltan parámetros'}, status=status.HTTP_400_BAD_REQUEST)
+
+    try:
+        # Verificar si existe una entrada con el placa y puerto dados
+        device_exists = CuentaHasArtefactos.objects.filter(placa=placa, puerto=puerto).exists()
+
+        # Devolver la respuesta en JSON
+        if device_exists:
+            return Response({'valid': True}, status=status.HTTP_200_OK)
+        else:
+            return Response({'valid': False}, status=status.HTTP_200_OK)
+    except Exception as e:
+        return Response({'error': str(e)}, status=status.HTTP_500_INTERNAL_SERVER_ERROR)

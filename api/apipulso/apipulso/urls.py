@@ -60,6 +60,10 @@ urlpatterns = [
     path('mobile/login',mobile.login_view, name='login_mobile'),
     path('mobile/authenticate', mobile.authenticate_user, name='authenticate_userMobile'),
     path('mobile/logout/', mobile.logout_view, name='logout_mobile'),
+
+    #mobile android
+    path('checkDevice', mobile.check_device_view, name='checkDevice'),
+
    
 ]
 
