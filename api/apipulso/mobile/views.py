@@ -1,5 +1,6 @@
 from django.shortcuts import render,redirect
 from gestion.models import Cuenta_has_Artefacto
+from pulso.models import Placa
 from gestion.views import obtener_ultimo_registro
 from django.http import JsonResponse
 import pandas as pd
