@@ -91,7 +91,7 @@ def panel_view(request):
             archivo_path = relacion.url  # Ajusta esto según tu modelo y campo correspondiente
             print(archivo_path)
             try:
-                ultimo_registro = obtener_ultimo_registro(archivo_path)
+                ultimo_registro = placa(archivo_path)
             except:
                 ultimo_registro=0
             # Agrega un diccionario con la relación y el último registro de temperatura
@@ -292,14 +292,23 @@ def get_device_status(request):
         for dispositivo in dispositivos:
             archivo_path = dispositivo.url  # Ajusta esto según tu modelo y campo correspondiente
             ultimo_registro = obtener_ultimo_registro(archivo_path)
-
+            if dispositivo.placa.firmware.puerta==False:
+               puerta= "No Incluye"
+            else:
+               puerta= ultimo_registro['puerta']
+            
+            if dispositivo.placa.firmware.compresor==False:
+               compresor= "No Incluye"
+            else:
+               compresor= ultimo_registro['compresor']
+            
             # Verificar si se obtuvo un último registro
             if ultimo_registro:
                 data = {
                     'temperature': ultimo_registro['temperatura'],
                     'energyStatus': None,  # Añade lógica si necesitas este campo
-                    'doorStatus': ultimo_registro['puerta'],
-                    'compressorStatus': ultimo_registro['compresor'],
+                    'doorStatus': puerta,
+                    'compressorStatus': compresor,
                     'dateTime': ultimo_registro['fecha_hora'],
                 }
                 relaciones_actualizadas.append(data)
