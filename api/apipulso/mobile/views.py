@@ -296,9 +296,9 @@ def get_device_status(request):
                 puerta= "No Incluye"
             else:
                 if ultimo_registro['puerta']=="True":
-                    puerta="Cerrada"
-                else:
                     puerta="Abieta"
+                else:
+                    puerta="Cerrada"
             
             if dispositivo.placa.firmware.compresor==False:
                 compresor= "No Incluye"
