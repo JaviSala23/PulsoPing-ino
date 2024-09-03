@@ -248,9 +248,7 @@ def check_device_view(request):
     # Obtener los datos JSON del cuerpo de la solicitud
     placa = request.data.get('codigo')
     puerto = request.data.get('puerto')
-    
-    # Imprimir los parámetros para depuración
-    print(f"Placa: {placa}, Puerto: {puerto}")
+
     
     # Validar que ambos parámetros estén presentes
     if not placa or not puerto:
@@ -266,5 +264,51 @@ def check_device_view(request):
             return Response({'valid': True}, status=status.HTTP_200_OK)
         else:
             return Response({'valid': False}, status=status.HTTP_200_OK)
+    except Exception as e:
+        return Response({'error': str(e)}, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
+
+@api_view(['GET'])
+def get_device_status(request):
+    # Obtener los datos de los parámetros de la URL
+    placa_codigo = request.query_params.get('codigo')
+    puerto_codigo = request.query_params.get('puerto')
+
+    # Validar que ambos parámetros estén presentes
+    if not placa_codigo or not puerto_codigo:
+        return Response({'error': 'Faltan parámetros'}, status=status.HTTP_400_BAD_REQUEST)
+
+    try:
+        # Buscar el objeto Placa y manejar si no existe
+        placa = get_object_or_404(Placa, codigo=placa_codigo)
+
+        # Filtrar por placa y puerto
+        dispositivos = Cuenta_has_Artefacto.objects.filter(placa=placa, puerto=puerto_codigo)
+
+        # Crear una lista para almacenar los datos de respuesta
+        relaciones_actualizadas = []
+
+        # Iterar sobre los dispositivos y obtener el último registro de cada uno
+        for dispositivo in dispositivos:
+            archivo_path = dispositivo.url  # Ajusta esto según tu modelo y campo correspondiente
+            ultimo_registro = obtener_ultimo_registro(archivo_path)
+
+            # Verificar si se obtuvo un último registro
+            if ultimo_registro:
+                data = {
+                    'temperature': ultimo_registro['temperatura'],
+                    'energyStatus': None,  # Añade lógica si necesitas este campo
+                    'doorStatus': ultimo_registro['puerta'],
+                    'compressorStatus': ultimo_registro['compresor'],
+                    'dateTime': ultimo_registro['fecha_hora'],
+                }
+                relaciones_actualizadas.append(data)
+            else:
+                return Response({'error': 'No se pudo obtener el último registro del archivo'}, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
+
+        # Devolver la lista de dispositivos con sus últimos registros
+        return Response({'relaciones_actualizadas': relaciones_actualizadas}, status=status.HTTP_200_OK)
+
+    except Placa.DoesNotExist:
+        return Response({'error': 'Placa no encontrada'}, status=status.HTTP_404_NOT_FOUND)
     except Exception as e:
         return Response({'error': str(e)}, status=status.HTTP_500_INTERNAL_SERVER_ERROR)

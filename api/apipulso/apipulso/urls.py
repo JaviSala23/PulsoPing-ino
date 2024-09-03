@@ -63,7 +63,7 @@ urlpatterns = [
 
     #mobile android
     path('checkDevice', mobile.check_device_view, name='checkDevice'),
-
+    path('pedido_mobil', mobile.get_device_status, name='pedido_mobil'),
    
 ]
 
