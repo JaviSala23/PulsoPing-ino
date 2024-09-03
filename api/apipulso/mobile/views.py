@@ -293,7 +293,7 @@ def get_device_status(request):
             archivo_path = dispositivo.url  # Ajusta esto según tu modelo y campo correspondiente
             ultimo_registro = obtener_ultimo_registro(archivo_path)
             if dispositivo.placa.firmware.puerta==False:
-               puerta= "No Incluye"
+                puerta= "No Incluye"
             else:
                 if ultimo_registro['puerta']=="True":
                     puerta="Cerrada"
@@ -301,7 +301,7 @@ def get_device_status(request):
                     puerta="Abieta"
             
             if dispositivo.placa.firmware.compresor==False:
-               compresor= "No Incluye"
+                compresor= "No Incluye"
             else:
                 if ultimo_registro['compresor']=="True":
                     compresor="Prendido"
