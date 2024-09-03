@@ -271,7 +271,7 @@ def check_device_view(request):
 @api_view(['GET'])
 def get_device_status(request):
     # Obtener los datos de los parámetros de la URL
-    placa_codigo = request.query_params.get('codigo')
+    placa_codigo = request.query_params.get('placa')
     puerto_codigo = request.query_params.get('puerto')
 
     # Validar que ambos parámetros estén presentes
