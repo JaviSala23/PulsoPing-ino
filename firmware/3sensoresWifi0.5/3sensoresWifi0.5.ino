@@ -7,14 +7,14 @@
 
 // Pines de los sensores DS18B20
 #define ONE_WIRE_BUS_1 4
-#define ONE_WIRE_BUS_2 5
-
+#define ONE_WIRE_BUS_2 13
+#define ONE_WIRE_BUS_3 12
 // Pin para iniciar modo AP manualmente
 #define AP_MODE_PIN 2
 
 // Pines para los LEDs
 #define LED_GREEN_PIN 14
-#define LED_RED_PIN 12
+#define LED_RED_PIN 15
 
 // Configuración de red WiFi predeterminada
 char ssid[32] = "default_ssid";
@@ -30,12 +30,12 @@ DNSServer dnsServer;
 
 // Configuración del sensor DS18B20
 OneWire oneWire1(ONE_WIRE_BUS_1);
-OneWire oneWire2(ONE_WIRE_BUS_2);
+
 DallasTemperature sensors1(&oneWire1);
-DallasTemperature sensors2(&oneWire2);
+
 
 // Configuración del AP
-const char* apSSID = "MasterRef_SandBox";
+const char* apSSID = "MasterRef_WSD1ESP82660002";
 const char* apPassword = "masterref"; // Opcional: Agrega una contraseña al AP
 
 // Variables de tiempo
@@ -44,11 +44,12 @@ unsigned long lastCommandTime = 0;
 void setup() {
   Serial.begin(115200);
   sensors1.begin();
-  sensors2.begin();
 
   pinMode(AP_MODE_PIN, INPUT_PULLUP);
-
-   // Configurar pines de LEDs
+  pinMode(ONE_WIRE_BUS_2, INPUT); // Configura el pin definido como entrada
+  pinMode(ONE_WIRE_BUS_3, INPUT); // Configura el pin definido como entrada
+  
+  // Configurar pines de LEDs
   pinMode(LED_GREEN_PIN, OUTPUT);
   pinMode(LED_RED_PIN, OUTPUT);
 
@@ -58,32 +59,11 @@ void setup() {
   } else {
     Serial.println("Failed to mount file system");
   }
-
+  if (strcmp(ssid, "default_ssid") != 0) {
   // Intentar conexión con las credenciales guardadas
-  WiFi.begin(ssid, password);
-  Serial.print("Connecting to ");
-  Serial.println(ssid);
-
-  int retries = 0;
-  while (WiFi.status() != WL_CONNECTED && retries < 10) {
-    delay(500);
-    Serial.print(".");
-    retries++;
-  }
-
-  if (WiFi.status() == WL_CONNECTED) {
-    Serial.println("");
-    Serial.println("WiFi connected");
-    Serial.println("IP address: ");
-    Serial.println(WiFi.localIP());
-
-      // Encender LED verde
-    digitalWrite(LED_GREEN_PIN, HIGH);
-    digitalWrite(LED_RED_PIN, LOW);
-
-    // Iniciar la lectura de sensores ahora que estamos conectados al WiFi
-    readSensors();
-  } else {
+  connectToWiFi();
+   }
+   else {
     Serial.println("Failed to connect to WiFi. Starting AP mode...");
     startAPMode();
        // Encender LED verde
@@ -104,27 +84,72 @@ void loop() {
   // Procesar solicitudes del portal cautivo
   dnsServer.processNextRequest();
   server.handleClient();
+  if (strcmp(ssid, "default_ssid") != 0) {
+  // Verificar estado de conexión WiFi
+    if (WiFi.status() != WL_CONNECTED) {
+      digitalWrite(LED_GREEN_PIN, LOW);
+    digitalWrite(LED_RED_PIN, HIGH);
+      Serial.println("WiFi desconectado. Intentando reconectar...");
+      connectToWiFi(); // Intentar reconectar
 
-  if (WiFi.status() == WL_CONNECTED) {
-    // Leer sensores y enviar datos cada 60 segundos
-    if (millis() - lastCommandTime > 60000) {
-      lastCommandTime = millis();
-      readSensors();
+    
+    }else {
+      // Leer sensores y enviar datos si estamos conectados
+      if (millis() - lastCommandTime > 60000) {
+        lastCommandTime = millis();
+        readSensors();
+      }
     }
   }
+}
+
+void connectToWiFi() {
+  Serial.print("Connecting to ");
+  Serial.println(ssid);
+
+  WiFi.begin(ssid, password);
+
+  unsigned long startAttemptTime = millis();
+
+  // Intentar conectar de forma indefinida hasta que el botón del AP sea presionado
+  while (WiFi.status() != WL_CONNECTED) {
+    digitalWrite(LED_GREEN_PIN, LOW);
+    digitalWrite(LED_RED_PIN, HIGH);
+    if (digitalRead(AP_MODE_PIN) == LOW) {
+      Serial.println("Botón presionado, iniciando modo AP...");
+      startAPMode();
+      return; // Salir de la función y continuar con el modo AP
+    }
+
+    delay(500);
+    Serial.print(".");
+  }
+
+  Serial.println("");
+  Serial.println("WiFi connected");
+  Serial.println("IP address: ");
+  Serial.println(WiFi.localIP());
+
+  // Encender LED verde
+  digitalWrite(LED_GREEN_PIN, HIGH);
+  digitalWrite(LED_RED_PIN, LOW);
+
+  // Iniciar la lectura de sensores ahora que estamos conectados al WiFi
+  readSensors();
 }
 
 void readSensors() {
   // Leer temperatura de los sensores DS18B20
   sensors1.requestTemperatures();
-  sensors2.requestTemperatures();
+
 
   float t1 = sensors1.getTempCByIndex(0);
-  float t2 = sensors2.getTempCByIndex(0);
+  int puerta=0;
+  int compresor=0;
 
   // Verificar si falló la lectura
   bool t1Failed = (t1 == DEVICE_DISCONNECTED_C);
-  bool t2Failed = (t2 == DEVICE_DISCONNECTED_C);
+  
 
   if (t1Failed) {
     Serial.println("Failed to read from DS18B20 sensor 1!");
@@ -134,24 +159,33 @@ void readSensors() {
     Serial.println(" *C");
   }
 
-  if (t2Failed) {
-    Serial.println("Failed to read from DS18B20 sensor 2!");
-  } else {
-    Serial.print("Temperature sensor 2: ");
-    Serial.print(t2);
-    Serial.println(" *C");
-  }
+  int sensorState = digitalRead(ONE_WIRE_BUS_2); // Lee el estado del pin definido
+    if (sensorState == HIGH) {
+      Serial.println("Puerta cerrada");
+      puerta=0;
+    } else {
+      Serial.println("Puerta abierta");
+      puerta=1;
+    }
+  
+  int sensorState1 = digitalRead(ONE_WIRE_BUS_3); // Lee el estado del pin definido
+    if (sensorState1 == HIGH) {
+      Serial.println("Compresor Prendido");
+      compresor=1;
+    } else {
+      Serial.println("Compresor apagado");
+      compresor=0;
+    }
+
 
   // Enviar datos si las lecturas son válidas
   if (!t1Failed) {
-    String json1 = "{\"temperature\":" + String(t1) + ", \"placa\":2, \"puerto\":1}";
+    String json1 = "{\"temperature\":" + String(t1) + ", \"placa\":2, \"puerto\":1, \"puerta_status\":" + String(puerta) + ", \"compresor_status\":" + String(compresor) + "}";
     sendData(json1);
   }
 
-  if (!t2Failed) {
-    String json2 = "{\"temperature\":" + String(t2) + ", \"placa\":2, \"puerto\":2}";
-    sendData(json2);
-  }
+ 
+
 }
 
 void sendData(String json) {

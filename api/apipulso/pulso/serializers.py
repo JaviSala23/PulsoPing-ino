@@ -16,7 +16,7 @@ class SensorReadingSerializer(serializers.ModelSerializer):
 
     def to_representation(self, instance):
         representation = super().to_representation(instance)
-        print(f"Lectura temperatura: {representation['temperature']}, Placa: {representation['placa']}, Puerto: {representation['puerto']}")
+        print(f"Lectura temperatura: {representation['temperature']}, Placa: {representation['placa']}, Puerto: {representation['puerto']}, Puerta: {representation['puerta_status']}, Compresor: {representation['compresor_status']}")
         return representation
 
     def create(self, validated_data):
