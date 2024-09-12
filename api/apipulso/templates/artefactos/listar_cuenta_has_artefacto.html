@@ -15,6 +15,11 @@
 {% endblock %}
 
 {% block contenido %}
+<script>
+    function openPopup(url) {
+        window.open(url, 'popupWindow', 'width=600,height=400,scrollbars=yes,resizable=yes');
+    }
+    </script>
 <div class="row">
     <div class="col-sm-12">
         <div class="table-responsive">
@@ -66,6 +71,11 @@
                         <td>
                             <div class="table-data-feature">
                                 {% if item.ultimo_registro %}
+                                <a href="{% url 'barcode' %}?nombre={{ nombre }}&codigo={{ codigo }}&puerto={{ puerto }}"
+                                    class="btn btn-info btn-sm"
+                                    onclick="openPopup(this.href); return false;">
+                                    <i class="fa-solid fa-barcode"></i>
+                                </a>
                                 <a href="{% url 'temperature_graph' item.relacion.cuenta.id_cuenta item.relacion.puerto %}" class="btn btn-info btn-sm"><i class="fa-solid fa-chart-line"></i></a>
                                 {% endif %}
                                 <a href="{% url 'nueva_cuenta_has_artefacto' item.relacion.id %}" class="btn btn-warning btn-sm"><i class='fas fa-edit'></i></a>

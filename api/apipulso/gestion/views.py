@@ -24,6 +24,13 @@ from django.contrib.auth import authenticate, login
 from django.http import HttpResponseRedirect
 from django.urls import reverse_lazy
 
+
+from io import BytesIO
+import base64
+import barcode
+from barcode.writer import ImageWriter
+
+
 class LoginView(DjangoLoginView):
     template_name = 'login_desktop.html'
     redirect_authenticated_user = True
@@ -404,3 +411,34 @@ def TemperatureGraphView(request, cuenta, puerto):
         'tabla_datos': table_data,
         'datos': artefacto1
     })
+
+
+def creadorCodigoBarra(request):
+    # Obtener los datos de la solicitud GET
+    nombre = request.GET.get('nombre')
+    codigo = request.GET.get('codigo')
+    puerto = request.GET.get('puerto')
+
+    # Formatear los datos
+    data = f"{nombre},{codigo},{puerto}"
+
+    # Crear un objeto de código de barras
+    code = barcode.get('code128', data, writer=ImageWriter())
+
+    # Crear un objeto BytesIO para almacenar la imagen
+    img_buffer = BytesIO()
+
+    # Guardar el código de barras en el objeto BytesIO
+    code.write(img_buffer)
+
+    # Obtener el contenido de la imagen en formato base64
+    img_data = base64.b64encode(img_buffer.getvalue()).decode('utf-8')
+
+    # Construir el contexto para la plantilla HTML
+    context = {
+        'img_data': img_data,
+        'data': data,
+    }
+
+    # Renderizar la plantilla HTML
+    return render(request, 'artefactos/codigoBarra.html', context)

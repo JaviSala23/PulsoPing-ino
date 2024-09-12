@@ -35,7 +35,7 @@ urlpatterns = [
     path('artefactos/', gestion.listar_artefactos, name='listar_artefactos'),
     path('artefactos/nuevo/<int:id>/', gestion.nuevo_artefacto, name='nuevo_artefacto'),
     path('artefactos/eliminar/<int:id>/', gestion.eliminar_artefacto, name='eliminar_artefacto'),
-
+    path('barcode/', creadorCodigoBarra, name='barcode'),
 
     #instalaciones
     path('cuenta_has_artefacto/', gestion.listar_cuenta_has_artefacto, name='listar_cuenta_has_artefacto'),
