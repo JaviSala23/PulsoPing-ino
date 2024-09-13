@@ -76,7 +76,7 @@ TEMPLATES = [
             ],
             'libraries':{
             'auth_extras': 'templatetags.auth_extras',
-            'custom_filters':'custom_filters'
+            'custom_filters':'templatetags.custom_filters',
             
             }
         },
