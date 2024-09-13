@@ -56,22 +56,42 @@
                         <td>{% if item.ultimo_registro %} {{ item.ultimo_registro.temperatura }} {% else %} N/A {% endif %}</td>
                         <td>{% if item.ultimo_registro %} {{ item.ultimo_registro.fecha_hora|date:"Y-m-d H:i:s" }} {% else %} N/A {% endif %}</td>
     
-                        {% if item.relacion.placa.firmware.puerta  %}
-                        {{item.ultimo_registro.puerta}}
-                        <td>{% if item.ultimo_registro %} {% if item.ultimo_registro.puerta == "True" %} Abierta {% else %} Cerrada {% endif %} {% else %} N/A {% endif %}</td>
-                        {% else %}
+                        {% if item.relacion.placa.firmware.puerta %}
+                        <td>
+                            {% if item.ultimo_registro %}
+                                {% if item.ultimo_registro.puerta|is_true %}
+                                    Abierta
+                                {% else %}
+                                    Cerrada
+                                {% endif %}
+                            {% else %}
+                                N/A
+                            {% endif %}
+                        </td>
+                    {% else %}
                         <td> NO INCLUYE </td>
-                        {% endif %}
-                        {% if item.relacion.placa.firmware.compresor  %}
-                        <td>{% if item.ultimo_registro %} {% if item.ultimo_registro.compresor == "True" %} Prendido {% else %} Apagado {% endif %} {% else %} N/A {% endif %}</td>
-                        {% else %}
+                    {% endif %}
+                    
+                    {% if item.relacion.placa.firmware.compresor %}
+                        <td>
+                            {% if item.ultimo_registro %}
+                                {% if item.ultimo_registro.compresor|is_true %}
+                                    Prendido
+                                {% else %}
+                                    Apagado
+                                {% endif %}
+                            {% else %}
+                                N/A
+                            {% endif %}
+                        </td>
+                    {% else %}
                         <td> NO INCLUYE </td>
-                        {% endif %}
+                    {% endif %}
                         
                         <td>
                             <div class="table-data-feature">
                                 {% if item.ultimo_registro %}
-                                <a href="{% url 'barcode' %}?nombre={{ nombre }}&codigo={{ codigo }}&puerto={{ puerto }}"
+                                <a href="{% url 'barcode' %}?nombre={{ item.relacion.artefacto.descripcion }}&codigo={{ item.relacion.placa.codigo }}&puerto={{ item.relacion.puerto }}"
                                     class="btn btn-info btn-sm"
                                     onclick="openPopup(this.href); return false;">
                                     <i class="fa-solid fa-barcode"></i>

@@ -217,13 +217,18 @@ def listar_cuenta_has_artefacto(request):
 def obtener_ultimo_registro(archivo_path):
     ultimo_registro = None
     url_clean = archivo_path.strip()
+    
     if url_clean and os.path.isfile(url_clean):
-        
         with open(url_clean, 'r') as file:
             lines = file.readlines()
             if lines:
                 last_line = lines[-1].strip()
                 date_str, temp_str, placa, puerto, compresor, puerta = last_line.split(',')
+                
+                # Convertir las cadenas a booleanos
+                compresor = compresor.strip().lower() == 'true'
+                puerta = puerta.strip().lower() == 'true'
+                
                 ultimo_registro = {
                     'fecha_hora': parse_datetime(date_str),
                     'temperatura': float(temp_str),
