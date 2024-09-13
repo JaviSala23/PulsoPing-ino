@@ -1,5 +1,5 @@
 {% extends 'layout.html' %}
-
+{% load custom_filters %}
 {% block titulo %}
 <div class="d-sm-flex align-items-center justify-content-between mb-4">
     <h2 class="title-1">Instalaciones: Relaciones Cuenta-Dispositivos</h2>
@@ -111,6 +111,7 @@
 </div>
 
 <script>
+    /*
 // Función para actualizar la tabla cada minuto
 function actualizarTabla() {
     $.ajax({
@@ -131,7 +132,7 @@ setInterval(actualizarTabla, 60000);  // 60000 milisegundos = 1 minuto
 // También puedes actualizar la tabla cuando la página se carga por primera vez
 $(document).ready(function() {
     actualizarTabla();
-});
+});*/
 </script>
 
 {% endblock %}
