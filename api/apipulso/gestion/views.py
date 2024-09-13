@@ -27,8 +27,8 @@ from django.urls import reverse_lazy
 
 from io import BytesIO
 import base64
-import barcode
-from barcode.writer import ImageWriter
+import qrcode
+
 
 
 class LoginView(DjangoLoginView):
@@ -414,7 +414,7 @@ def TemperatureGraphView(request, cuenta, puerto):
 
 
 def creadorCodigoBarra(request):
-    # Obtener los datos de la solicitud GET
+     # Obtener los datos de la solicitud GET
     nombre = request.GET.get('nombre')
     codigo = request.GET.get('codigo')
     puerto = request.GET.get('puerto')
@@ -422,14 +422,22 @@ def creadorCodigoBarra(request):
     # Formatear los datos
     data = f"{nombre},{codigo},{puerto}"
 
-    # Crear un objeto de código de barras
-    code = barcode.get('code128', data, writer=ImageWriter())
+    # Crear un objeto QRCode
+    qr = qrcode.QRCode(
+        version=1,
+        error_correction=qrcode.constants.ERROR_CORRECT_L,
+        box_size=10,
+        border=4,
+    )
+    qr.add_data(data)
+    qr.make(fit=True)
+
+    # Crear una imagen del QRCode
+    img = qr.make_image(fill='black', back_color='white')
 
     # Crear un objeto BytesIO para almacenar la imagen
     img_buffer = BytesIO()
-
-    # Guardar el código de barras en el objeto BytesIO
-    code.write(img_buffer)
+    img.save(img_buffer, format='PNG')
 
     # Obtener el contenido de la imagen en formato base64
     img_data = base64.b64encode(img_buffer.getvalue()).decode('utf-8')
