@@ -1,4 +1,6 @@
+{% load custom_filters %}
 {% for item in relaciones_actualizadas %}
+
 <tr class="odd" style="color: rgb(112, 112, 112)">
     <td>{{ item.relacion.cuenta.nombre_cuenta }}</td>
     <td>{{ item.relacion.artefacto.descripcion }}</td>
