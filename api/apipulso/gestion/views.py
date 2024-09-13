@@ -418,6 +418,7 @@ def creadorCodigoBarra(request):
     nombre = request.GET.get('nombre')
     codigo = request.GET.get('codigo')
     puerto = request.GET.get('puerto')
+    print(nombre,codigo,puerto)
 
     # Formatear los datos
     data = f"{nombre},{codigo},{puerto}"
