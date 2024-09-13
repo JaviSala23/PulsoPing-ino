@@ -27,7 +27,7 @@ SECRET_KEY = 'django-insecure-xgqe#1rn!-*8xug4$)r1nd@z5#$1ka%p=75)#7oq&c**e05m9(
 
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = True
-ALLOWED_HOSTS = ['habitatonline.ar']
+ALLOWED_HOSTS = ['mantistemp.com.ar']
 
 
 
