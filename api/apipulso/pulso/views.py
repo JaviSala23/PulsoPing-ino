@@ -25,6 +25,7 @@ class SensorReadingListCreate(generics.ListCreateAPIView):
         self.check_temperature_and_notify(serializer.instance)
         self.check_electricidad_and_notify(serializer.instance)
 
+
     def save_to_file(self, data):
         placa_id = data['placa'].id
         puerto = data['puerto']
@@ -44,9 +45,24 @@ class SensorReadingListCreate(generics.ListCreateAPIView):
         if 'timestamp' not in data:
             data['timestamp'] = datetime.now().strftime("%Y-%m-%d %H:%M:%S")
         
-        # Guardar los datos en el archivo de texto
-        with open(file_path, 'a') as f:
-            f.write(f"{data['timestamp']},{data['temperature']},{data['placa'].id},{data['puerto']},{data.get('compresor_status', False)},{data.get('puerta_status', True)},{data.get('energia_status', True)}\n")
+        # Leer el archivo existente y contar las líneas
+        if os.path.exists(file_path):
+            with open(file_path, 'r') as f:
+                lines = f.readlines()
+        else:
+            lines = []
+        
+        # Si el archivo ya tiene más de 86,400 líneas, eliminar las más antiguas
+        if len(lines) >= 86400:
+            lines = lines[-86399:]  # Dejar las últimas 86,399 líneas para agregar la nueva
+        
+        # Añadir la nueva línea con los datos
+        new_line = f"{data['timestamp']},{data['temperature']},{data['placa'].id},{data['puerto']},{data.get('compresor_status', False)},{data.get('puerta_status', True)},{data.get('energia_status', True)}\n"
+        lines.append(new_line)
+        
+        # Escribir las líneas de nuevo al archivo, incluyendo la nueva
+        with open(file_path, 'w') as f:
+            f.writelines(lines)
 
     def check_temperature_and_notify(self, reading):
         # Obtener los rangos de temperatura de Cuenta_has_Artefacto
