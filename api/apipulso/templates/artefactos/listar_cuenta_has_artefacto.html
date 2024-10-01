@@ -57,11 +57,11 @@
                         <td 
                             {% if item.ultimo_registro %}
                                 {% if item.ultimo_registro.temperatura > item.relacion.temp_max %}
-                                    style="color: red;font-size: 0.800rem;"
+                                    style="color: red;font-size: 0.900rem;font-weight: bold;"
                                 {% elif item.ultimo_registro.temperatura < item.relacion.temp_min %}
-                                    style="color: blue;font-size: 0.800rem;"
+                                    style="color: blue;font-size: 0.900rem;font-weight: bold;"
                                 {% else %}
-                                    style="color: green;font-size: 0.800rem;"
+                                    style="color: green;font-size: 0.900rem;font-weight: bold;"
                                 {% endif %}
                             {% endif %}
                         >
