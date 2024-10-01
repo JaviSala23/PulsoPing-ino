@@ -12,7 +12,7 @@ class SensorReadingListCreate(generics.ListCreateAPIView):
     serializer_class = SensorReadingSerializer 
 
     def perform_create(self, serializer):
-        print(serializer)
+        
         # Guardar en un archivo de texto
         self.save_to_file(serializer.validated_data)
 
