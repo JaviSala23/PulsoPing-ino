@@ -234,7 +234,7 @@ def obtener_ultimo_registro(archivo_path):
                     'temperatura': float(temp_str),
                     'compresor': compresor,
                     'puerta': puerta,
-                    'energia': energia
+                    'energia': 'true'
                 }
 
     return ultimo_registro
