@@ -27,8 +27,8 @@ class SensorReadingListCreate(generics.ListCreateAPIView):
                 # Manejar el error, quizás logearlo o enviar una respuesta adecuada
                 print(f"Error al guardar: {e}")
         
-        self.check_temperature_and_notify(serializer.instance)
-        self.check_electricidad_and_notify(serializer.instance)
+        self.check_temperature_and_notify(serializer)
+        self.check_electricidad_and_notify(serializer)
 
 
     def save_to_file(self, data):
