@@ -54,7 +54,23 @@
                         <td>{{ item.relacion.temp_min }}</td>
                         <td>{{ item.relacion.temp_max }}</td>
 
-                        <td>{% if item.ultimo_registro %} {{ item.ultimo_registro.temperatura }} {% else %} N/A {% endif %}</td>
+                        <td 
+                            {% if item.ultimo_registro %}
+                                {% if item.ultimo_registro.temperatura > item.relacion.temp_max %}
+                                    style="color: red;"
+                                {% elif item.ultimo_registro.temperatura < item.relacion.temp_min %}
+                                    style="color: blue;"
+                                {% else %}
+                                    style="color: green;"
+                                {% endif %}
+                            {% endif %}
+                        >
+                            {% if item.ultimo_registro %}
+                                {{ item.ultimo_registro.temperatura }}
+                            {% else %}
+                                N/A
+                            {% endif %}
+                        </td>
                         <td>{% if item.ultimo_registro %} {{ item.ultimo_registro.fecha_hora|date:"Y-m-d H:i:s" }} {% else %} N/A {% endif %}</td>
     
                         {% if item.relacion.placa.firmware.puerta %}
@@ -63,11 +79,11 @@
                             {% if item.ultimo_registro %}
                             
                                 {% if item.ultimo_registro.puerta|is_true %}
-                                <td style="color:'red'">
+                                <td style="color:red">
                                  Abierta 
                                 </td>
                                 {% else %}
-                                <td style="color:'green'">
+                                <td style="color:green">
                                  Cerrada </td>
                                 {% endif %}
                             {% else %}
@@ -84,10 +100,10 @@
                         
                             {% if item.ultimo_registro %}
                                 {% if item.ultimo_registro.compresor|is_true %}
-                                <td style="color:'red'">Prendido</td>
+                                <td style="color:red">Prendido</td>
                         
                                 {% else %}
-                                <td style="color:'green'">Apagado</td>
+                                <td style="color:green">Apagado</td>
                                
                                 {% endif %}
                             {% else %}
@@ -105,10 +121,10 @@
                             
                                 {% if item.ultimo_registro %}
                                     {% if item.ultimo_registro.energia|is_true %}
-                                    <td style="color:'green'">Estable</td>
+                                    <td style="color:green">Estable</td>
                                  
                                     {% else %}
-                                    <td style="color:'red'">Cortada</td>
+                                    <td style="color:red">Cortada</td>
                                  
                                     {% endif %}
                                 {% else %}
