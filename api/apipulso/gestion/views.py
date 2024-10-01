@@ -223,7 +223,22 @@ def obtener_ultimo_registro(archivo_path):
             lines = file.readlines()
             if lines:
                 last_line = lines[-1].strip()
-                date_str, temp_str, placa, puerto, compresor, puerta = last_line.split(',')
+               # Supongamos que last_line es la última línea del archivo
+                last_line = last_line.strip()  # Eliminar espacios en blanco y saltos de línea
+                parts = last_line.split(',')
+
+                # Asignar valores con comprobación de longitud
+                date_str = parts[0]  # Fecha
+                temp_str = parts[1]  # Temperatura
+                placa = parts[2]     # Placa
+                puerto = parts[3]    # Puerto
+                compresor = parts[4] # Compresor
+
+                # Asignar un valor por defecto a energia si no está presente
+                energia = parts[5] if len(parts) > 5 else 'true'  # Valor por defecto: 'true'
+                puerta = parts[6] if len(parts) > 6 else 'true'   # También puedes asignar un valor por defecto a puerta
+
+                # Si el número de elementos en parts es menor a 7, asigna 'true' a puerta
                 
                 # Convertir las cadenas a booleanos
                 compresor = compresor.strip().lower() == 'true'
@@ -234,7 +249,7 @@ def obtener_ultimo_registro(archivo_path):
                     'temperatura': float(temp_str),
                     'compresor': compresor,
                     'puerta': puerta,
-                    'energia': 'true'
+                    'energia':  energia 
                 }
 
     return ultimo_registro
