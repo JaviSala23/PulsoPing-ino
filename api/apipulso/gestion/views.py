@@ -228,8 +228,7 @@ def obtener_ultimo_registro(archivo_path):
                 # Asignar los valores con comprobación de longitud
                 date_str = parts[0]  # Fecha
                 temp_str = parts[1]  # Temperatura
-                compresor = parts[4] # Compresor
-
+           
                 # Si la línea no tiene información de puerta, compresor o energía, asignar un valor por defecto
                 compresor=parts[4]if len(parts) > 4 else 'True' 
                 puerta = parts[5] if len(parts) > 5 else 'True'  # Valor por defecto: 'True'
