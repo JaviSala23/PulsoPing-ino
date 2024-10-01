@@ -44,9 +44,9 @@ class MessageLog(models.Model):
     timestamp = models.DateTimeField(auto_now_add=True)
     message_type = models.CharField(max_length=50)  # Puede ser "ALERT" o "STABLE"
     temperature = models.FloatField(blank=False, null=False)
-    compresor_status = models.BooleanField(default=False)
-    puerta_status = models.BooleanField(default=False)
-    energia_status = models.BooleanField(default=False) 
+    compresor_status = models.BooleanField(default=False , null=True)
+    puerta_status = models.BooleanField(default=False , null=True)
+    energia_status = models.BooleanField(default=False , null=True) 
 
     def __str__(self):
         return f"Placa: {self.placa.id}, Puerto: {self.puerto}, Tipo: {self.message_type}, Temp: {self.temperature}, Timestamp: {self.timestamp}"
