@@ -30,9 +30,9 @@ class SensorReading(models.Model):
     puerto = models.IntegerField(blank=False, null=False)
 
     # Nuevos campos para sensores adicionales
-    compresor_status = models.BooleanField(default=False)  # True para encendido, False para apagado
-    puerta_status = models.BooleanField(default=False)    
-    energia_status = models.BooleanField(default=False)   # True para +, False para -
+    compresor_status = models.BooleanField(default=False, null=True)  # True para encendido, False para apagado
+    puerta_status = models.BooleanField(default=False,null=True)    
+    energia_status = models.BooleanField(default=False,null=True)   # True para +, False para -
 
     def __str__(self):
         return f"{self.placa.id}-{self.timestamp} - Temp: {self.temperature}°C, Compresor: {self.compresor_status}, Puerta: {self.puerta_status}"
