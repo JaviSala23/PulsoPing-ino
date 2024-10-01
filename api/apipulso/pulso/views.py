@@ -12,21 +12,21 @@ class SensorReadingListCreate(generics.ListCreateAPIView):
     serializer_class = SensorReadingSerializer 
 
     def perform_create(self, serializer):
-    if serializer.is_valid():
-        self.save_to_file(serializer.validated_data)
-        last_reading = SensorReading.objects.filter(puerto=serializer.validated_data['puerto']).order_by('timestamp').last()
+        if serializer.is_valid():
+            self.save_to_file(serializer.validated_data)
+            last_reading = SensorReading.objects.filter(puerto=serializer.validated_data['puerto']).order_by('timestamp').last()
 
-        if last_reading is None or abs(serializer.validated_data['temperature'] - last_reading.temperature) >= 0.5:
-            try:
-                # Guardar el objeto en la base de datos
-                sensor_reading_instance = serializer.save()  # Guarda y obtiene la instancia
-                self.check_temperature_and_notify(sensor_reading_instance)  # Pasa la instancia guardada
-            except Exception as e:
-                print(f"Error al guardar: {e}")
+            if last_reading is None or abs(serializer.validated_data['temperature'] - last_reading.temperature) >= 0.5:
+                try:
+                    # Guardar el objeto en la base de datos
+                    sensor_reading_instance = serializer.save()  # Guarda y obtiene la instancia
+                    self.check_temperature_and_notify(sensor_reading_instance)  # Pasa la instancia guardada
+                except Exception as e:
+                    print(f"Error al guardar: {e}")
+            else:
+                print("La variación de temperatura no es suficiente.")
         else:
-            print("La variación de temperatura no es suficiente.")
-    else:
-        print("Errores de validación:", serializer.errors)
+            print("Errores de validación:", serializer.errors)
 
 
 
