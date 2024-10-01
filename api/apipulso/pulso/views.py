@@ -23,6 +23,7 @@ class SensorReadingListCreate(generics.ListCreateAPIView):
             serializer.save()
         
         self.check_temperature_and_notify(serializer.instance)
+        self.check_electricidad_and_notify(serializer.instance)
 
     def save_to_file(self, data):
         placa_id = data['placa'].id
@@ -45,11 +46,11 @@ class SensorReadingListCreate(generics.ListCreateAPIView):
         
         # Guardar los datos en el archivo de texto
         with open(file_path, 'a') as f:
-            f.write(f"{data['timestamp']},{data['temperature']},{data['placa'].id},{data['puerto']},{data.get('compresor_status', False)},{data.get('puerta_status', True)}\n")
+            f.write(f"{data['timestamp']},{data['temperature']},{data['placa'].id},{data['puerto']},{data.get('compresor_status', False)},{data.get('puerta_status', True)},{data.get('energia_status', True)}\n")
 
     def check_temperature_and_notify(self, reading):
         # Obtener los rangos de temperatura de Cuenta_has_Artefacto
-        print(reading.placa)
+       
         cuenta_artefacto = Cuenta_has_Artefacto.objects.get(placa=reading.placa, puerto=reading.puerto)
         temp_min = cuenta_artefacto.temp_min
         temp_max = cuenta_artefacto.temp_max
@@ -59,6 +60,19 @@ class SensorReadingListCreate(generics.ListCreateAPIView):
             self.send_alert(reading, temp_min, temp_max)
         else:
             self.send_stable(reading)
+    
+    def check_electricidad_and_notify(self, reading):
+        # Obtener los rangos de temperatura de Cuenta_has_Artefacto
+
+        # Comprobar si la temperatura excede los límites
+        if reading.energy ==False:
+            self.send_alert(reading)
+        else:
+            self.send_stable(reading)
+
+
+
+            
 
     def send_alert(self, reading, temp_min, temp_max):
         # Verificar el último mensaje enviado para esta placa y puerto
@@ -73,6 +87,25 @@ class SensorReadingListCreate(generics.ListCreateAPIView):
                 puerto=reading.puerto,
                 temperature=reading.temperature,
                 message_type="ALERT",
+                compresor_status=reading.compresor_status,
+                puerta_status=reading.puerta_status,
+                energia_status=reading.energia_status
+            )
+
+
+    def send_alert_electricidad(self, reading, temp_min, temp_max):
+        # Verificar el último mensaje enviado para esta placa y puerto
+        last_message = MessageLog.objects.filter(placa=reading.placa, puerto=reading.puerto, message_type="ELECTRICIDAD").last()
+
+        if last_message is None or self.is_time_difference_greater_than(last_message.timestamp, timedelta(minutes=30)) or abs(last_message.temperature - reading.temperature) >= 1:
+            # Enviar un mensaje de alerta por Telegram
+            cuenta_art = Cuenta_has_Artefacto.objects.get(placa_id=reading.placa, puerto=reading.puerto)
+            self.send_telegram_message(f"Alerta: Corte de red electrica: {reading.temperature}°C excede los límites ({temp_min}°C - {temp_max}°C) para {cuenta_art.artefacto.descripcion}, Cliente: {cuenta_art.cuenta.nombre_cuenta}, Puerto: {reading.puerto}")
+            MessageLog.objects.create(
+                placa=reading.placa,
+                puerto=reading.puerto,
+                temperature=reading.temperature,
+                message_type="ELECTRICIDAD",
                 compresor_status=reading.compresor_status,
                 puerta_status=reading.puerta_status
             )
@@ -104,6 +137,24 @@ class SensorReadingListCreate(generics.ListCreateAPIView):
                 puerta_status=reading.puerta_status
             )
 
+
+    def send_energy_stable(self, reading):
+        # Verificar el último mensaje enviado para esta placa y puerto
+        last_alert = MessageLog.objects.filter(placa=reading.placa, puerto=reading.puerto, message_type="ELECTRICIDAD").last()
+        last_stable = MessageLog.objects.filter(placa=reading.placa, puerto=reading.puerto, message_type="EnergiaEstable").last()
+        cuenta_art = Cuenta_has_Artefacto.objects.get(placa_id=reading.placa, puerto=reading.puerto)
+        if last_alert and (last_stable is None or last_alert.timestamp > last_stable.timestamp):
+            # Enviar un mensaje indicando que la temperatura ha vuelto a los límites normales
+            self.send_telegram_message(f"Red Electrica Normal  {cuenta_art.artefacto.descripcion}, cliente {cuenta_art.cuenta.nombre_cuenta}, Puerto: {reading.puerto}")
+            MessageLog.objects.create(
+                placa=reading.placa,
+                puerto=reading.puerto,
+                temperature=reading.temperature,
+                message_type="EnergiaEstable",
+                compresor_status=reading.compresor_status,
+                puerta_status=reading.puerta_status
+            )
+
     def send_telegram_message(self, message):
         chat_ids = ['6476665770', '7307403963']
         telegram_token = '7157402657:AAHIiCK42UKAslXGH0SU0HDpyBwEjjo0xo4'
@@ -120,6 +171,8 @@ class SensorReadingListCreate(generics.ListCreateAPIView):
             results.append(response.json())
         
         return results
+    
+    
 
 class SensorReadingDetail(generics.RetrieveUpdateDestroyAPIView):
     queryset = SensorReading.objects.all()

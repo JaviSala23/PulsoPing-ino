@@ -8,6 +8,7 @@ class Firmware(models.Model):
     descripcion = models.CharField(null=False, blank=False, max_length=200)
     puerta = models.BooleanField(default=False)
     compresor = models.BooleanField(default=False)
+    energia = models.BooleanField(default=False)
 
     def __str__(self):
         return f"{self.nombre} - {self.version}"
@@ -30,7 +31,8 @@ class SensorReading(models.Model):
 
     # Nuevos campos para sensores adicionales
     compresor_status = models.BooleanField(default=False)  # True para encendido, False para apagado
-    puerta_status = models.BooleanField(default=False)      # True para abierto, False para cerrado
+    puerta_status = models.BooleanField(default=False)    
+    energia_status = models.BooleanField(default=False)   # True para +, False para -
 
     def __str__(self):
         return f"{self.placa.id}-{self.timestamp} - Temp: {self.temperature}°C, Compresor: {self.compresor_status}, Puerta: {self.puerta_status}"
@@ -44,6 +46,7 @@ class MessageLog(models.Model):
     temperature = models.FloatField(blank=False, null=False)
     compresor_status = models.BooleanField(default=False)
     puerta_status = models.BooleanField(default=False)
+    energia_status = models.BooleanField(default=False) 
 
     def __str__(self):
         return f"Placa: {self.placa.id}, Puerto: {self.puerto}, Tipo: {self.message_type}, Temp: {self.temperature}, Timestamp: {self.timestamp}"

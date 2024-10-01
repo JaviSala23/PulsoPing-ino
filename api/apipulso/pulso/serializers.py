@@ -11,12 +11,12 @@ class SensorReadingSerializer(serializers.ModelSerializer):
 
     class Meta:
         model = SensorReading
-        fields = ['temperature', 'placa', 'puerto', 'timestamp', 'compresor_status', 'puerta_status']
+        fields = ['temperature', 'placa', 'puerto', 'timestamp', 'compresor_status', 'puerta_status','energia_status']
         read_only_fields = ('timestamp',)
 
     def to_representation(self, instance):
         representation = super().to_representation(instance)
-        print(f"Lectura temperatura: {representation['temperature']}, Placa: {representation['placa']}, Puerto: {representation['puerto']}, Puerta: {representation['puerta_status']}, Compresor: {representation['compresor_status']}")
+        print(f"Lectura temperatura: {representation['temperature']}, Placa: {representation['placa']}, Puerto: {representation['puerto']}, Puerta: {representation['puerta_status']}, Compresor: {representation['compresor_status']},Energia: {representation['energia_status']}")
         return representation
 
     def create(self, validated_data):
