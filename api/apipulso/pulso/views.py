@@ -12,12 +12,13 @@ class SensorReadingListCreate(generics.ListCreateAPIView):
     serializer_class = SensorReadingSerializer 
 
     def perform_create(self, serializer):
+        print(serializer)
         # Guardar en un archivo de texto
         self.save_to_file(serializer.validated_data)
 
         # Obtener el último registro de la base de datos para el mismo puerto
         last_reading = SensorReading.objects.filter(puerto=serializer.validated_data['puerto']).order_by('timestamp').last()
-
+       
         # Verificar si la variación de temperatura es al menos 0.5 grados para el mismo puerto
         if last_reading is None or abs(serializer.validated_data['temperature'] - last_reading.temperature) >= 0.5:
             try:
