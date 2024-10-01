@@ -1,9 +1,10 @@
 #include <ESP8266WiFi.h>
 #include <ESP8266WebServer.h>
 #include <DNSServer.h>
-#include <FS.h>
+#include <EEPROM.h>
 #include <OneWire.h>
 #include <DallasTemperature.h>
+#include <Ticker.h>
 
 // Pines de los sensores DS18B20
 #define ONE_WIRE_BUS_1 4
@@ -39,6 +40,13 @@ const char* apPassword = "masterref"; // Opcional: Agrega una contraseña al AP
 // Variables de tiempo
 unsigned long lastCommandTime = 0;
 
+// Watchdog
+Ticker watchdog;
+
+void resetModule() {
+    ESP.restart();
+}
+
 void setup() {
     Serial.begin(115200);
     sensors1.begin();
@@ -50,24 +58,29 @@ void setup() {
     pinMode(LED_GREEN_PIN, OUTPUT);
     pinMode(LED_RED_PIN, OUTPUT);
 
-    if (SPIFFS.begin()) {
-        Serial.println("File system mounted");
-        readCredentials();
-    } else {
-        Serial.println("Failed to mount file system");
-    }
+    // Inicializar EEPROM
+    EEPROM.begin(512);
+    
+    readCredentials();
     
     if (strcmp(ssid, "default_ssid") != 0) {
         connectToWiFi();
     } else {
-        Serial.println("Failed to connect to WiFi. Starting AP mode...");
+        Serial.println("No se encontraron credenciales. Iniciando modo AP...");
         startAPMode();
         digitalWrite(LED_GREEN_PIN, LOW);
         digitalWrite(LED_RED_PIN, HIGH);
     }
+
+    // Iniciar watchdog
+    watchdog.attach(300, resetModule);
 }
 
 void loop() {
+    // Reiniciar el watchdog
+    watchdog.detach();
+    watchdog.attach(300, resetModule);
+
     if (digitalRead(AP_MODE_PIN) == LOW) {
         Serial.println("Botón presionado, limpiando credenciales y reiniciando...");
         clearCredentials();
@@ -94,7 +107,7 @@ void loop() {
 }
 
 void connectToWiFi() {
-    Serial.print("Connecting to ");
+    Serial.print("Conectando a ");
     Serial.println(ssid);
 
     WiFi.begin(ssid, password);
@@ -112,11 +125,17 @@ void connectToWiFi() {
 
         delay(1000);
         Serial.print(".");
+
+        if (millis() - startAttemptTime > 30000) {
+            Serial.println("\nFalló la conexión WiFi. Iniciando modo AP...");
+            startAPMode();
+            return;
+        }
     }
 
     Serial.println("");
-    Serial.println("WiFi connected");
-    Serial.println("IP address: ");
+    Serial.println("WiFi conectado");
+    Serial.println("Dirección IP: ");
     Serial.println(WiFi.localIP());
 
     digitalWrite(LED_GREEN_PIN, HIGH);
@@ -133,9 +152,9 @@ void readSensors() {
     bool t1Failed = (t1 == DEVICE_DISCONNECTED_C);
 
     if (t1Failed) {
-        Serial.println("Failed to read from DS18B20 sensor 1!");
+        Serial.println("Error al leer el sensor DS18B20 1!");
     } else {
-        Serial.print("Temperature sensor 1: ");
+        Serial.print("Temperatura sensor 1: ");
         Serial.print(t1);
         Serial.println(" *C");
     }
@@ -172,13 +191,13 @@ void sendData(String json) {
                     "Connection: close\r\n\r\n" +
                     json;
 
-    Serial.println("Sending data to server:");
+    Serial.println("Enviando datos al servidor:");
     Serial.println(request);
 
     if (client.connect(host, port)) {
         client.print(request);
     } else {
-        Serial.println("Connection failed");
+        Serial.println("Conexión fallida");
     }
 
     while (client.connected() && !client.available()) {
@@ -194,55 +213,60 @@ void sendData(String json) {
 }
 
 void readCredentials() {
-    File file = SPIFFS.open("/credentials.txt", "r");
-    if (!file) {
-        Serial.println("Failed to open credentials file");
-        return;
+    Serial.println("Leyendo credenciales de EEPROM...");
+    
+    for (int i = 0; i < 32; i++) {
+        ssid[i] = EEPROM.read(i);
+    }
+    for (int i = 0; i < 32; i++) {
+        password[i] = EEPROM.read(32 + i);
     }
 
-    file.readBytesUntil('\n', ssid, sizeof(ssid));
-    ssid[strcspn(ssid, "\r\n")] = 0;  
-    file.readBytesUntil('\n', password, sizeof(password));
-    password[strcspn(password, "\r\n")] = 0;
-    file.close();
+    ssid[31] = '\0';
+    password[31] = '\0';
 
-    Serial.print("SSID cargado desde el archivo: ");
+    Serial.print("SSID leído: ");
     Serial.println(ssid);
-    Serial.print("Contraseña cargada desde el archivo: ");
+    Serial.print("Contraseña leída: ");
     Serial.println(password);
 }
 
 void writeCredentials() {
-    File file = SPIFFS.open("/credentials.txt", "w");
-    if (!file) {
-        Serial.println("Failed to open credentials file for writing");
-        return;
+    Serial.println("Escribiendo credenciales en EEPROM...");
+    
+    for (int i = 0; i < 32; i++) {
+        EEPROM.write(i, ssid[i]);
+    }
+    for (int i = 0; i < 32; i++) {
+        EEPROM.write(32 + i, password[i]);
     }
 
-    file.println(ssid);
-    file.println(password);
-    file.close();
+    EEPROM.commit();
 
-    Serial.println("Credenciales actualizadas y escritas en el archivo");
+    Serial.println("Credenciales escritas en EEPROM");
 }
 
 void clearCredentials() {
-    if (SPIFFS.remove("/credentials.txt")) {
-        Serial.println("Archivo de credenciales borrado");
-    } else {
-        Serial.println("No se pudo borrar el archivo de credenciales");
+    Serial.println("Limpiando credenciales de EEPROM...");
+    
+    for (int i = 0; i < 64; i++) {
+        EEPROM.write(i, 0);
     }
 
-    ssid[0] = '\0';
-    password[0] = '\0';
+    EEPROM.commit();
+
+    strcpy(ssid, "default_ssid");
+    strcpy(password, "default_password");
+
+    Serial.println("Credenciales limpiadas");
 }
 
 void startAPMode() {
-    Serial.println("Starting Access Point...");
+    Serial.println("Iniciando Punto de Acceso...");
     WiFi.softAP(apSSID, apPassword);
     delay(1000);
     IPAddress myIP = WiFi.softAPIP();
-    Serial.print("AP IP address: ");
+    Serial.print("Dirección IP del AP: ");
     Serial.println(myIP);
     dnsServer.start(53, "*", myIP);
 
@@ -255,7 +279,7 @@ void startAPMode() {
     server.on("/config", HTTP_POST, handleConfig);
     server.begin();
 
-    Serial.println("AP Mode Started. Connect to 'MasterRef_Sandbox' to configure WiFi.");
+    Serial.println("Modo AP iniciado. Conéctate a 'MasterRef_Sandbox' para configurar WiFi.");
 }
 
 void handleConfig() {
@@ -266,8 +290,10 @@ void handleConfig() {
         newSSID.trim();
         newPassword.trim();
 
-        newSSID.toCharArray(ssid, sizeof(ssid));
-        newPassword.toCharArray(password, sizeof(password));
+        strncpy(ssid, newSSID.c_str(), sizeof(ssid) - 1);
+        strncpy(password, newPassword.c_str(), sizeof(password) - 1);
+        ssid[sizeof(ssid) - 1] = '\0';
+        password[sizeof(password) - 1] = '\0';
 
         writeCredentials();
         
@@ -279,44 +305,44 @@ void handleConfig() {
     }
 }
 
-  void handleRoot() {
+void handleRoot() {
     String ssidList = "[";
     int n = WiFi.scanNetworks();
-    Serial.print("Found networks: ");
+    Serial.print("Redes encontradas: ");
     Serial.println(n);
     if (n == 0) {
-      ssidList += "]";
+        ssidList += "]";
     } else {
-      for (int i = 0; i < n; i++) {
-        if (i > 0) ssidList += ",";
-        ssidList += "\"" + WiFi.SSID(i) + "\"";
-        Serial.println("Network: " + WiFi.SSID(i));
-      }
-      ssidList += "]";
+        for (int i = 0; i < n; i++) {
+            if (i > 0) ssidList += ",";
+            ssidList += "\"" + WiFi.SSID(i) + "\"";
+            Serial.println("Red: " + WiFi.SSID(i));
+        }
+        ssidList += "]";
     }
     String page = generateHTMLPage(ssidList);
     server.send(200, "text/html", page);
-  }
+}
 
-  String generateHTMLPage(String ssidList) {
+String generateHTMLPage(String ssidList) {
     // Generar las opciones del menú desplegable para SSID
     String options = "";
     if (ssidList != "[]") {
-      // Convertir JSON array a opciones de <select>
-      int start = 1; // Empezar después del primer corchete
-      int end = ssidList.indexOf(']');
-      while (start < end) {
-        int comma = ssidList.indexOf(',', start);
-        if (comma == -1 || comma > end) comma = end;
+        // Convertir JSON array a opciones de <select>
+        int start = 1; // Empezar después del primer corchete
+        int end = ssidList.indexOf(']');
+        while (start < end) {
+            int comma = ssidList.indexOf(',', start);
+            if (comma == -1 || comma > end) comma = end;
 
-        String ssid = ssidList.substring(start, comma);
-        ssid.replace("\"", ""); // Eliminar comillas innecesarias
-        options += "<option value='" + ssid + "'>" + ssid + "</option>";
+            String ssid = ssidList.substring(start, comma);
+            ssid.replace("\"", ""); // Eliminar comillas innecesarias
+            options += "<option value='" + ssid + "'>" + ssid + "</option>";
 
-        start = comma + 1;
-      }
+            start = comma + 1;
+        }
     } else {
-      options = "<option value=''>No networks found</option>";
+        options = "<option value=''>No se encontraron redes</option>";
     }
 
     return String("<!DOCTYPE html><html><head>"
@@ -340,4 +366,4 @@ void handleConfig() {
           "<input type='submit' value='Guardar'>"
           "</form>"
           "</body></html>");
-  }
+}
