@@ -59,33 +59,42 @@
     
                         {% if item.relacion.placa.firmware.puerta %}
                      
-                        <td>
+                        
                             {% if item.ultimo_registro %}
+                            
                                 {% if item.ultimo_registro.puerta|is_true %}
-                                  <span style="color:'red'">Abierta</span>  
+                                <td style="color:'red'">
+                                 Abierta 
+                                </td>
                                 {% else %}
-                                <span style="color:'green'"> Cerrada</span> 
+                                <td style="color:'green'">
+                                 Cerrada </td>
                                 {% endif %}
                             {% else %}
+                            <td>
                                 N/A
+                            </td>
                             {% endif %}
-                        </td>
+                        
                     {% else %}
                         <td> NO INCLUYE </td>
                     {% endif %}
                     
                     {% if item.relacion.placa.firmware.compresor %}
-                        <td>
+                        
                             {% if item.ultimo_registro %}
                                 {% if item.ultimo_registro.compresor|is_true %}
-                                <span style="color:'red'"> Prendido</span>
+                                <td style="color:'red'">Prendido</td>
+                        
                                 {% else %}
-                                <span style="color:'green'">   Apagado </span>
+                                <td style="color:'green'">Apagado</td>
+                               
                                 {% endif %}
                             {% else %}
-                                N/A
+                            <td>N/A</td>
+                                
                             {% endif %}
-                        </td>
+                        
                     {% else %}
                         <td> NO INCLUYE </td>
                     {% endif %}
@@ -93,17 +102,20 @@
                       
 
                             {% if item.relacion.placa.firmware.energia %}
-                            <td>
+                            
                                 {% if item.ultimo_registro %}
                                     {% if item.ultimo_registro.energia|is_true %}
-                                    <span style="color:'green'">Estable</span>
+                                    <td style="color:'green'">Estable</td>
+                                 
                                     {% else %}
-                                    <span style="color:'red'">   Cortada </span>
+                                    <td style="color:'red'">Cortada</td>
+                                 
                                     {% endif %}
                                 {% else %}
-                                    N/A
+                                <td>N/A</td>
+                                    
                                 {% endif %}
-                            </td>
+                            
                         {% else %}
                             <td> NO INCLUYE </td>
                         {% endif %}
