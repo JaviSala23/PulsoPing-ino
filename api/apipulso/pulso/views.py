@@ -83,12 +83,12 @@ class SensorReadingListCreate(generics.ListCreateAPIView):
     
     def check_electricidad_and_notify(self, reading):
         # Obtener los rangos de temperatura de Cuenta_has_Artefacto
-
+        if reading.energy:
         # Comprobar si la temperatura excede los límites
-        if reading.energy ==False:
-            self.send_alert(reading)
-        else:
-            self.send_stable(reading)
+            if reading.energy ==False:
+                self.send_alert(reading)
+            else:
+                self.send_stable(reading)
 
 
 
