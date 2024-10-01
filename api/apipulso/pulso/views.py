@@ -8,7 +8,7 @@ from datetime import datetime, timedelta
 import pytz
 
 class SensorReadingListCreate(generics.ListCreateAPIView):
-    queryset = SensorReading.objects.all()
+    #queryset = SensorReading.objects.all()
     serializer_class = SensorReadingSerializer 
 
     def perform_create(self, serializer):
