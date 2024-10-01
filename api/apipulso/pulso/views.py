@@ -21,6 +21,7 @@ class SensorReadingListCreate(generics.ListCreateAPIView):
                     # Guardar el objeto en la base de datos
                     sensor_reading_instance = serializer.save()  # Guarda y obtiene la instancia
                     self.check_temperature_and_notify(sensor_reading_instance)  # Pasa la instancia guardada
+                    self.check_electricidad_and_notify(sensor_reading_instance)
                 except Exception as e:
                     print(f"Error al guardar: {e}")
             else:
