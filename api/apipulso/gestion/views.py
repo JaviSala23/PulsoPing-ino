@@ -223,7 +223,7 @@ def obtener_ultimo_registro(archivo_path):
             lines = file.readlines()
             if lines:
                 last_line = lines[-1].strip()
-                date_str, temp_str, placa, puerto, compresor, puerta = last_line.split(',')
+                date_str, temp_str, placa, puerto, compresor, puerta, energia = last_line.split(',')
                 
                 # Convertir las cadenas a booleanos
                 compresor = compresor.strip().lower() == 'true'
@@ -233,7 +233,8 @@ def obtener_ultimo_registro(archivo_path):
                     'fecha_hora': parse_datetime(date_str),
                     'temperatura': float(temp_str),
                     'compresor': compresor,
-                    'puerta': puerta
+                    'puerta': puerta,
+                    'energia': energia
                 }
 
     return ultimo_registro

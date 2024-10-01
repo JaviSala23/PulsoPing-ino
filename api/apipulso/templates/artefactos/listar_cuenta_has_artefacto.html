@@ -25,7 +25,7 @@
         <div class="table-responsive">
             <table class="table table-bordered dataTable" id="dataTable" width="100%" cellspacing="0" role="grid" aria-describedby="dataTable_info">
                 <thead>
-                    <tr style="background-color: rgb(211, 227, 250); color: rgb(95, 93, 93);font-size: 0.875rem;">
+                    <tr style="background-color: rgb(211, 227, 250); color: rgb(95, 93, 93);font-size: 0.700rem;">
                         <th>CUENTA</th>
                         <th>DISPOSITIVO</th>
                         <th>CÓD. PLACA</th>
@@ -38,10 +38,11 @@
                         <th>FECHA/HORA</th>
                         <th>PUERTA</th>
                         <th>COMPRESOR</th>
+                        <th>ENERGIA</th>
                         <th>ACCIÓN</th>
                     </tr>
                 </thead>
-                <tbody id="tabla-relaciones" style="font-size: 0.875rem;">
+                <tbody id="tabla-relaciones" style="font-size: 0.700rem;">
                     {% for item in relaciones_actualizadas %}
                     <tr class="odd" style="color: rgb(112, 112, 112)">
                         <td>{{ item.relacion.cuenta.nombre_cuenta }}</td>
@@ -60,9 +61,9 @@
                         <td>
                             {% if item.ultimo_registro %}
                                 {% if item.ultimo_registro.puerta|is_true %}
-                                    Abierta
+                                  <span style="color:'red'">Abierta</span>  
                                 {% else %}
-                                    Cerrada
+                                <span style="color:'green'"> Cerrada</span> 
                                 {% endif %}
                             {% else %}
                                 N/A
@@ -76,9 +77,9 @@
                         <td>
                             {% if item.ultimo_registro %}
                                 {% if item.ultimo_registro.compresor|is_true %}
-                                    Prendido
+                                <span style="color:'red'"> Prendido</span>
                                 {% else %}
-                                    Apagado
+                                <span style="color:'green'">   Apagado </span>
                                 {% endif %}
                             {% else %}
                                 N/A
@@ -89,6 +90,24 @@
                     {% endif %}
                         
                         <td>
+
+                            {% if item.relacion.placa.firmware.energia %}
+                            <td>
+                                {% if item.ultimo_registro %}
+                                    {% if item.ultimo_registro.energia|is_true %}
+                                    <span style="color:'green'">Estable</span>
+                                    {% else %}
+                                    <span style="color:'red'">   Cortada </span>
+                                    {% endif %}
+                                {% else %}
+                                    N/A
+                                {% endif %}
+                            </td>
+                        {% else %}
+                            <td> NO INCLUYE </td>
+                        {% endif %}
+                            
+                            <td>
                             <div class="table-data-feature">
                                 {% if item.ultimo_registro %}
                                 <a href="{% url 'barcode' %}?nombre={{ item.relacion.artefacto.descripcion }}&codigo={{ item.relacion.placa.codigo }}&puerto={{ item.relacion.puerto }}"
