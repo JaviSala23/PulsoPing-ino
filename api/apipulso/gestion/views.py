@@ -222,23 +222,13 @@ def obtener_ultimo_registro(archivo_path):
         with open(url_clean, 'r') as file:
             lines = file.readlines()
             if lines:
-                last_line = last_line.strip()  # Eliminar posibles espacios en blanco o saltos de línea
-                parts = last_line.split(',')
-
-                # Asignar los valores con comprobación de longitud
-                date_str = parts[0]  # Fecha
-                temp_str = parts[1]  # Temperatura
-           
-                # Si la línea no tiene información de puerta, compresor o energía, asignar un valor por defecto
-                compresor=parts[4]if len(parts) > 4 else 'True' 
-                puerta = parts[5] if len(parts) > 5 else 'True'  # Valor por defecto: 'True'
-                energia = parts[6] if len(parts) > 6 else 'True'  # Valor por defecto: 'True'
+                last_line = lines[-1].strip()
+                date_str, temp_str, placa, puerto, compresor, puerta = last_line.split(',')
                 
                 # Convertir las cadenas a booleanos
                 compresor = compresor.strip().lower() == 'true'
                 puerta = puerta.strip().lower() == 'true'
-                energia = energia.strip.lower() == 'true'
-                print(ultimo_registro)
+                
                 ultimo_registro = {
                     'fecha_hora': parse_datetime(date_str),
                     'temperatura': float(temp_str),
