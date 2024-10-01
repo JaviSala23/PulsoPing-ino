@@ -239,6 +239,7 @@ def obtener_ultimo_registro(archivo_path):
                 compresor = compresor.strip().lower() == 'true'
                 puerta = puerta.strip().lower() == 'true'
                 energia = energia.strip.lower() == 'true'
+                print(ultimo_registro)
                 ultimo_registro = {
                     'fecha_hora': parse_datetime(date_str),
                     'temperatura': float(temp_str),
