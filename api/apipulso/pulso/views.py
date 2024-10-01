@@ -70,6 +70,7 @@ class SensorReadingListCreate(generics.ListCreateAPIView):
 
     def check_temperature_and_notify(self, reading):
         # Obtener los rangos de temperatura de Cuenta_has_Artefacto
+        print(reading)
         placa1=Placa.objects.get(pk=reading.placa)
         cuenta_artefacto = Cuenta_has_Artefacto.objects.get(placa=placa1, puerto=reading.puerto)
         temp_min = cuenta_artefacto.temp_min
