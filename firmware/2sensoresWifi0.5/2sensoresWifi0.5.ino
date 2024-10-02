@@ -144,12 +144,12 @@ void readSensors() {
 
   // Enviar datos si las lecturas son válidas
   if (!t1Failed) {
-    String json1 = "{\"temperature\":" + String(t1) + ", \"placa\":2, \"puerto\":1}";
+    String json1 = "{\"temperature\":" + String(t1) + ", \"placa\":1, \"puerto\":1}";
     sendData(json1);
   }
 
   if (!t2Failed) {
-    String json2 = "{\"temperature\":" + String(t2) + ", \"placa\":2, \"puerto\":2}";
+    String json2 = "{\"temperature\":" + String(t2) + ", \"placa\":1, \"puerto\":2}";
     sendData(json2);
   }
 }
