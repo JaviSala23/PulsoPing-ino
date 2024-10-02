@@ -28,8 +28,8 @@
                     <tr style="background-color: rgb(211, 227, 250); color: rgb(95, 93, 93);font-size: 0.700rem;">
                         <th>CUENTA</th>
                         <th>DISPOSITIVO</th>
-                        <th>CÓD. PLACA</th>
-                        <th>FIRMWARE</th>
+                        <th hidden>CÓD. PLACA</th>
+                        <th hidden>FIRMWARE</th>
                         <th>PLACA</th>
                         <th>PUERTO</th>
                         <th>TEMP. MÍN.</th>
@@ -47,8 +47,8 @@
                     <tr class="odd" style="color: rgb(112, 112, 112)">
                         <td>{{ item.relacion.cuenta.nombre_cuenta }}</td>
                         <td>{{ item.relacion.artefacto.descripcion }}</td>
-                        <td>{{ item.relacion.placa.codigo }}</td>
-                        <td>{{ item.relacion.placa.firmware.descripcion }}</td>
+                        <td hidden>{{ item.relacion.placa.codigo }}</td>
+                        <td hidden>{{ item.relacion.placa.firmware.descripcion }}</td>
                         <td>{{ item.relacion.placa.descripcion }}</td>
                         <td>{{ item.relacion.puerto }}</td>
                         <td>{{ item.relacion.temp_min }}</td>
