@@ -1,0 +1,77 @@
+{% load static %}
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Page Not Found</title>
+    <style>
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+            font-family: Arial, sans-serif;
+        }
+        body {
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            height: 100vh;
+            background-color: #e7f5e9;
+            color: #2f5d3d;
+        }
+        .container {
+            text-align: center;
+        }
+        h1 {
+            font-size: 4rem;
+            color: #34a853;
+        }
+        p {
+            font-size: 1.2rem;
+            margin: 20px 0;
+            color: #4c8c63;
+        }
+        .button {
+            text-decoration: none;
+            padding: 10px 20px;
+            background-color: #34a853;
+            color: #fff;
+            border-radius: 5px;
+            font-weight: bold;
+            transition: background-color 0.3s, transform 0.3s;
+        }
+        .button:hover {
+            background-color: #2b9149;
+            transform: scale(1.05);
+        }
+        .leaf {
+            position: absolute;
+            width: 50px;
+            height: 50px;
+            background-color: #34a853;
+            border-radius: 50%;
+            animation: float 4s ease-in-out infinite;
+        }
+        .leaf:nth-child(2) { animation-delay: 1s; }
+        .leaf:nth-child(3) { animation-delay: 2s; }
+        .leaf:nth-child(4) { animation-delay: 3s; }
+        @keyframes float {
+            0%, 100% { transform: translateY(0) rotate(0); }
+            50% { transform: translateY(-30px) rotate(180deg); }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <img src="{% static 'img/mantis-religiosa.png' %}" style="width:150px">
+        <h1>404</h1>
+        <p>Oops! Esta página no existe.</p>
+        <a href="/" class="button">Go Back Home</a>
+    </div>
+    <div class="leaf" style="top: 20%; left: 10%;"></div>
+    <div class="leaf" style="top: 30%; left: 80%;"></div>
+    <div class="leaf" style="top: 70%; left: 20%;"></div>
+    <div class="leaf" style="top: 60%; left: 70%;"></div>
+</body>
+</html>

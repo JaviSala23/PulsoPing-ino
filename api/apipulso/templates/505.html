@@ -1,0 +1,77 @@
+{% load static %}
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Server Error</title>
+    <style>
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+            font-family: Arial, sans-serif;
+        }
+        body {
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            height: 100vh;
+            background-color: #fcebe7;
+            color: #ab4d3f;
+        }
+        .container {
+            text-align: center;
+        }
+        h1 {
+            font-size: 4rem;
+            color: #d93d32;
+        }
+        p {
+            font-size: 1.2rem;
+            margin: 20px 0;
+            color: #c46a5b;
+        }
+        .button {
+            text-decoration: none;
+            padding: 10px 20px;
+            background-color: #d93d32;
+            color: #fff;
+            border-radius: 5px;
+            font-weight: bold;
+            transition: background-color 0.3s, transform 0.3s;
+        }
+        .button:hover {
+            background-color: #b83228;
+            transform: scale(1.05);
+        }
+        .bubble {
+            position: absolute;
+            width: 60px;
+            height: 60px;
+            background-color: #d93d32;
+            border-radius: 50%;
+            animation: float 5s ease-in-out infinite;
+        }
+        .bubble:nth-child(2) { animation-delay: 1s; }
+        .bubble:nth-child(3) { animation-delay: 2s; }
+        .bubble:nth-child(4) { animation-delay: 3s; }
+        @keyframes float {
+            0%, 100% { transform: translateY(0) rotate(0); }
+            50% { transform: translateY(-20px) rotate(180deg); }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <img src="{% static 'img/mantis-religiosa.png' %}" style="width:150px">
+        <h1>500</h1>
+        <p>Oops! Tenemos un problema en el servidor.</p>
+        <a href="/" class="button">Try Again</a>
+    </div>
+    <div class="bubble" style="top: 15%; left: 15%;"></div>
+    <div class="bubble" style="top: 40%; left: 85%;"></div>
+    <div class="bubble" style="top: 70%; left: 30%;"></div>
+    <div class="bubble" style="top: 65%; left: 75%;"></div>
+</body>
+</html>
