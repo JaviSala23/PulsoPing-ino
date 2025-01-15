@@ -8,14 +8,14 @@
 
 // Pines de los sensores DS18B20
 #define ONE_WIRE_BUS_1 4
-#define ONE_WIRE_BUS_2 13
-#define ONE_WIRE_BUS_3 12
+//#define ONE_WIRE_BUS_2 5
+
 // Pin para iniciar modo AP manualmente
-#define AP_MODE_PIN 2
+#define AP_MODE_PIN 16
 
 // Pines para los LEDs
 #define LED_GREEN_PIN 14
-#define LED_RED_PIN 15
+#define LED_RED_PIN 12
 
 // Configuración de red WiFi predeterminada
 char ssid[32] = "default_ssid";
@@ -31,10 +31,12 @@ DNSServer dnsServer;
 
 // Configuración del sensor DS18B20
 OneWire oneWire1(ONE_WIRE_BUS_1);
+//OneWire oneWire2(ONE_WIRE_BUS_2);
 DallasTemperature sensors1(&oneWire1);
+//DallasTemperature sensors2(&oneWire2);
 
 // Configuración del AP
-const char* apSSID = "MasterRef_WSD1ESP82660002";
+const char* apSSID = "MasterRef_SandBox";
 const char* apPassword = "masterref"; // Opcional: Agrega una contraseña al AP
 
 // Variables de tiempo
@@ -48,21 +50,21 @@ void resetModule() {
 }
 
 void setup() {
-    Serial.begin(115200);
-    sensors1.begin();
+  Serial.begin(115200);
+  sensors1.begin();
+  //sensors2.begin();
 
-    pinMode(AP_MODE_PIN, INPUT_PULLUP);
-    pinMode(ONE_WIRE_BUS_2, INPUT);
-    pinMode(ONE_WIRE_BUS_3, INPUT);
-    
-    pinMode(LED_GREEN_PIN, OUTPUT);
-    pinMode(LED_RED_PIN, OUTPUT);
+  pinMode(AP_MODE_PIN, INPUT_PULLUP);
 
-    // Inicializar EEPROM
+   // Configurar pines de LEDs
+  pinMode(LED_GREEN_PIN, OUTPUT);
+  pinMode(LED_RED_PIN, OUTPUT);
+
+ // Inicializar EEPROM
     EEPROM.begin(512);
     
     readCredentials();
-    
+  
     if (strcmp(ssid, "default_ssid") != 0) {
         connectToWiFi();
     } else {
@@ -74,24 +76,32 @@ void setup() {
 
     // Iniciar watchdog
     watchdog.attach(300, resetModule);
+
+
+
+  
+
+
 }
 
 void loop() {
-    // Reiniciar el watchdog
+  
+   // Reiniciar el watchdog
     watchdog.detach();
     watchdog.attach(300, resetModule);
+  // Verificar si se presionó el botón para limpiar credenciales y reiniciar
+  if (digitalRead(AP_MODE_PIN) == LOW) {
+    Serial.println("Botón presionado, limpiando credenciales y reiniciando...");
+    clearCredentials(); // Limpiar las credenciales
+    ESP.restart(); // Reiniciar el ESP8266
+    return; // Salir del loop para evitar ejecutar el resto del código después del reinicio
+  }
 
-    if (digitalRead(AP_MODE_PIN) == LOW) {
-        Serial.println("Botón presionado, limpiando credenciales y reiniciando...");
-        clearCredentials();
-        ESP.restart();
-        return;
-    }
+  // Procesar solicitudes del portal cautivo
+  dnsServer.processNextRequest();
+  server.handleClient();
 
-    dnsServer.processNextRequest();
-    server.handleClient();
-    
-    if (strcmp(ssid, "default_ssid") != 0) {
+   if (strcmp(ssid, "default_ssid") != 0) {
         if (WiFi.status() != WL_CONNECTED) {
             digitalWrite(LED_GREEN_PIN, LOW);
             digitalWrite(LED_RED_PIN, HIGH);
@@ -107,6 +117,7 @@ void loop() {
 }
 
 void connectToWiFi() {
+    
     Serial.print("Conectando a ");
     Serial.println(ssid);
 
@@ -145,73 +156,75 @@ void connectToWiFi() {
 }
 
 void readSensors() {
-    sensors1.requestTemperatures();
-    float t1 = sensors1.getTempCByIndex(0);
-    int puerta = 0;
-    int compresor = 0;
-    bool t1Failed = (t1 == DEVICE_DISCONNECTED_C);
+  // Leer temperatura de los sensores DS18B20
+  sensors1.requestTemperatures();
+  //sensors2.requestTemperatures();
 
-    if (t1Failed) {
-        Serial.println("Error al leer el sensor DS18B20 1!");
-    } else {
-        Serial.print("Temperatura sensor 1: ");
-        Serial.print(t1);
-        Serial.println(" *C");
-    }
+  float t1 = sensors1.getTempCByIndex(0);
+  //float t2 = sensors2.getTempCByIndex(0);
 
-    int sensorState = digitalRead(ONE_WIRE_BUS_2);
-    if (sensorState == HIGH) {
-        Serial.println("Puerta cerrada");
-        puerta = 0;
-    } else {
-        Serial.println("Puerta abierta");
-        puerta = 1;
-    }
-    
-    int sensorState1 = digitalRead(ONE_WIRE_BUS_3);
-    if (sensorState1 == HIGH) {
-        Serial.println("Compresor Prendido");
-        compresor = 1;
-    } else {
-        Serial.println("Compresor apagado");
-        compresor = 0;
-    }
+  // Verificar si falló la lectura
+  bool t1Failed = (t1 == DEVICE_DISCONNECTED_C);
+  //bool t2Failed = (t2 == DEVICE_DISCONNECTED_C);
 
-    if (!t1Failed) {
-        String json1 = "{\"temperature\":" + String(t1) + ", \"placa\":5, \"puerto\":1, \"puerta_status\":" + String(puerta) + ", \"compresor_status\":" + String(compresor) + "}";
-        sendData(json1);
-    }
+  if (t1Failed) {
+    Serial.println("Failed to read from DS18B20 sensor 1!");
+  } else {
+    Serial.print("Temperature sensor 1: ");
+    Serial.print(t1);
+    Serial.println(" *C");
+  }
+/*
+  if (t2Failed) {
+    Serial.println("Failed to read from DS18B20 sensor 2!");
+  } else {
+    Serial.print("Temperature sensor 2: ");
+    Serial.print(t2);
+    Serial.println(" *C");
+  }
+*/
+  // Enviar datos si las lecturas son válidas
+  if (!t1Failed) {
+    String json1 = "{\"temperature\":" + String(t1) + ", \"placa\":5, \"puerto\":1}";
+    sendData(json1);
+  }
+/*
+  if (!t2Failed) {
+    String json2 = "{\"temperature\":" + String(t2) + ", \"placa\":2, \"puerto\":2}";
+    sendData(json2);
+  }*/
 }
 
 void sendData(String json) {
-    String request = "POST " + String(path) + " HTTP/1.1\r\n" +
-                    "Host: " + String(host) + "\r\n" +
-                    "Content-Type: application/json\r\n" +
-                    "Content-Length: " + String(json.length()) + "\r\n" +
-                    "Connection: close\r\n\r\n" +
-                    json;
+  String request = "POST " + String(path) + " HTTP/1.1\r\n" +
+                   "Host: " + String(host) + "\r\n" +
+                   "Content-Type: application/json\r\n" +
+                   "Content-Length: " + String(json.length()) + "\r\n" +
+                   "Connection: close\r\n\r\n" +
+                   json;
 
-    Serial.println("Enviando datos al servidor:");
-    Serial.println(request);
+  Serial.println("Sending data to server:");
+  Serial.println(request);
 
-    if (client.connect(host, port)) {
-        client.print(request);
-    } else {
-        Serial.println("Conexión fallida");
-    }
+  if (client.connect(host, port)) {
+    client.print(request);
+  } else {
+    Serial.println("Connection failed");
+  }
 
-    while (client.connected() && !client.available()) {
-        delay(100);
-    }
+  // Esperar respuesta del servidor
+  while (client.connected() && !client.available()) {
+    delay(100);
+  }
 
-    while (client.available()) {
-        String line = client.readStringUntil('\r');
-        Serial.print(line);
-    }
+  // Leer la respuesta del servidor
+  while (client.available()) {
+    String line = client.readStringUntil('\r');
+    Serial.print(line);
+  }
 
-    client.stop();
+  client.stop(); // Cerrar la conexión
 }
-
 void readCredentials() {
     Serial.println("Leyendo credenciales de EEPROM...");
     

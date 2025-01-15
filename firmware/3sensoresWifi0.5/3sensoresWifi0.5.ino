@@ -5,6 +5,15 @@
 #include <OneWire.h>
 #include <DallasTemperature.h>
 
+#include <DHT.h>
+
+// Configuración del sensor de humedad
+// Configuración del sensor de humedad
+#define DHTPIN 5  // Cambiado al pin D2 (GPIO4)
+#define DHTTYPE DHT11
+DHT dht(DHTPIN, DHTTYPE);
+
+
 // Pines de los sensores DS18B20
 #define ONE_WIRE_BUS_1 4
 #define ONE_WIRE_BUS_2 13
@@ -15,6 +24,7 @@
 // Pines para los LEDs
 #define LED_GREEN_PIN 14
 #define LED_RED_PIN 15
+
 
 // Configuración de red WiFi predeterminada
 char ssid[32] = "default_ssid";
@@ -42,6 +52,7 @@ unsigned long lastCommandTime = 0;
 void setup() {
     Serial.begin(115200);
     sensors1.begin();
+    dht.begin();
 
     pinMode(AP_MODE_PIN, INPUT_PULLUP);
     pinMode(ONE_WIRE_BUS_2, INPUT);
@@ -68,6 +79,7 @@ void setup() {
 }
 
 void loop() {
+    digitalWrite(LED_RED_PIN, HIGH);
     if (digitalRead(AP_MODE_PIN) == LOW) {
         Serial.println("Botón presionado, limpiando credenciales y reiniciando...");
         clearCredentials();
@@ -111,7 +123,7 @@ void connectToWiFi() {
         }
 
         delay(1000);
-        Serial.print(".");
+        
     }
 
     Serial.println("");
@@ -140,6 +152,7 @@ void readSensors() {
         Serial.println(" *C");
     }
 
+    // Leer el estado de la puerta
     int sensorState = digitalRead(ONE_WIRE_BUS_2);
     if (sensorState == HIGH) {
         Serial.println("Puerta cerrada");
@@ -149,6 +162,7 @@ void readSensors() {
         puerta = 1;
     }
     
+    // Leer el estado del compresor
     int sensorState1 = digitalRead(ONE_WIRE_BUS_3);
     if (sensorState1 == HIGH) {
         Serial.println("Compresor Prendido");
@@ -158,8 +172,21 @@ void readSensors() {
         compresor = 0;
     }
 
-    if (!t1Failed) {
-        String json1 = "{\"temperature\":" + String(t1) + ", \"placa\":2, \"puerto\":1, \"puerta_status\":" + String(puerta) + ", \"compresor_status\":" + String(compresor) + "}";
+    // Leer la humedad del AM2302
+    float humedad = dht.readHumidity();
+    if (isnan(humedad)) {
+        Serial.println("Error al leer la humedad!");
+    } else {
+        Serial.print("Humedad: ");
+        Serial.print(humedad);
+        Serial.println(" %");
+    }
+
+    if (!t1Failed && !isnan(humedad)) {
+        String json1 = "{\"temperature\":" + String(t1) +
+                       ", \"placa\":2, \"puerto\":1, \"puerta_status\":" + String(puerta) +
+                       ", \"compresor_status\":" + String(compresor) +
+                       ", \"humidity\":" + String(humedad) + "}";
         sendData(json1);
     }
 }

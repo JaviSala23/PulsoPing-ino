@@ -1,13 +1,14 @@
 #include <ESP8266WiFi.h>
 #include <ESP8266WebServer.h>
 #include <DNSServer.h>
-#include <FS.h>
+#include <EEPROM.h>
 #include <OneWire.h>
 #include <DallasTemperature.h>
+#include <Ticker.h>
 
 // Pines de los sensores DS18B20
 #define ONE_WIRE_BUS_1 4
-#define ONE_WIRE_BUS_2 5
+//#define ONE_WIRE_BUS_2 5
 
 // Pin para iniciar modo AP manualmente
 #define AP_MODE_PIN 2
@@ -30,7 +31,7 @@ DNSServer dnsServer;
 
 // Configuración del sensor DS18B20
 OneWire oneWire1(ONE_WIRE_BUS_1);
-OneWire oneWire2(ONE_WIRE_BUS_2);
+//OneWire oneWire2(ONE_WIRE_BUS_2);
 DallasTemperature sensors1(&oneWire1);
 DallasTemperature sensors2(&oneWire2);
 
@@ -40,6 +41,13 @@ const char* apPassword = "masterref"; // Opcional: Agrega una contraseña al AP
 
 // Variables de tiempo
 unsigned long lastCommandTime = 0;
+
+// Watchdog
+Ticker watchdog;
+
+void resetModule() {
+    ESP.restart();
+}
 
 void setup() {
   Serial.begin(115200);
@@ -52,47 +60,35 @@ void setup() {
   pinMode(LED_GREEN_PIN, OUTPUT);
   pinMode(LED_RED_PIN, OUTPUT);
 
-  if (SPIFFS.begin()) {
-    Serial.println("File system mounted");
+ // Inicializar EEPROM
+    EEPROM.begin(512);
+    
     readCredentials();
-  } else {
-    Serial.println("Failed to mount file system");
-  }
+  
+    if (strcmp(ssid, "default_ssid") != 0) {
+        connectToWiFi();
+    } else {
+        Serial.println("No se encontraron credenciales. Iniciando modo AP...");
+        startAPMode();
+        digitalWrite(LED_GREEN_PIN, LOW);
+        digitalWrite(LED_RED_PIN, HIGH);
+    }
 
-  // Intentar conexión con las credenciales guardadas
-  WiFi.begin(ssid, password);
-  Serial.print("Connecting to ");
-  Serial.println(ssid);
+    // Iniciar watchdog
+    watchdog.attach(300, resetModule);
 
-  int retries = 0;
-  while (WiFi.status() != WL_CONNECTED && retries < 10) {
-    delay(500);
-    Serial.print(".");
-    retries++;
-  }
 
-  if (WiFi.status() == WL_CONNECTED) {
-    Serial.println("");
-    Serial.println("WiFi connected");
-    Serial.println("IP address: ");
-    Serial.println(WiFi.localIP());
 
-      // Encender LED verde
-    digitalWrite(LED_GREEN_PIN, HIGH);
-    digitalWrite(LED_RED_PIN, LOW);
+  
 
-    // Iniciar la lectura de sensores ahora que estamos conectados al WiFi
-    readSensors();
-  } else {
-    Serial.println("Failed to connect to WiFi. Starting AP mode...");
-    startAPMode();
-       // Encender LED verde
-    digitalWrite(LED_GREEN_PIN, LOW);
-    digitalWrite(LED_RED_PIN, HIGH);
-  }
+
 }
 
 void loop() {
+  
+   // Reiniciar el watchdog
+    watchdog.detach();
+    watchdog.attach(300, resetModule);
   // Verificar si se presionó el botón para limpiar credenciales y reiniciar
   if (digitalRead(AP_MODE_PIN) == LOW) {
     Serial.println("Botón presionado, limpiando credenciales y reiniciando...");
@@ -105,26 +101,71 @@ void loop() {
   dnsServer.processNextRequest();
   server.handleClient();
 
-  if (WiFi.status() == WL_CONNECTED) {
-    // Leer sensores y enviar datos cada 60 segundos
-    if (millis() - lastCommandTime > 60000) {
-      lastCommandTime = millis();
-      readSensors();
+   if (strcmp(ssid, "default_ssid") != 0) {
+        if (WiFi.status() != WL_CONNECTED) {
+            digitalWrite(LED_GREEN_PIN, LOW);
+            digitalWrite(LED_RED_PIN, HIGH);
+            Serial.println("WiFi desconectado. Intentando reconectar...");
+            connectToWiFi();
+        } else {
+            if (millis() - lastCommandTime > 60000) {
+                lastCommandTime = millis();
+                readSensors();
+            }
+        }
     }
-  }
+}
+
+void connectToWiFi() {
+    
+    Serial.print("Conectando a ");
+    Serial.println(ssid);
+
+    WiFi.begin(ssid, password);
+    unsigned long startAttemptTime = millis();
+
+    while (WiFi.status() != WL_CONNECTED) {
+        digitalWrite(LED_GREEN_PIN, LOW);
+        digitalWrite(LED_RED_PIN, HIGH);
+        if (digitalRead(AP_MODE_PIN) == LOW) {
+            Serial.println("Botón presionado, iniciando modo AP...");
+            clearCredentials();
+            startAPMode();
+            return;
+        }
+
+        delay(1000);
+        Serial.print(".");
+
+        if (millis() - startAttemptTime > 30000) {
+            Serial.println("\nFalló la conexión WiFi. Iniciando modo AP...");
+            startAPMode();
+            return;
+        }
+    }
+
+    Serial.println("");
+    Serial.println("WiFi conectado");
+    Serial.println("Dirección IP: ");
+    Serial.println(WiFi.localIP());
+
+    digitalWrite(LED_GREEN_PIN, HIGH);
+    digitalWrite(LED_RED_PIN, LOW);
+    
+    readSensors();
 }
 
 void readSensors() {
   // Leer temperatura de los sensores DS18B20
   sensors1.requestTemperatures();
-  sensors2.requestTemperatures();
+  //sensors2.requestTemperatures();
 
   float t1 = sensors1.getTempCByIndex(0);
-  float t2 = sensors2.getTempCByIndex(0);
+  //float t2 = sensors2.getTempCByIndex(0);
 
   // Verificar si falló la lectura
   bool t1Failed = (t1 == DEVICE_DISCONNECTED_C);
-  bool t2Failed = (t2 == DEVICE_DISCONNECTED_C);
+  //bool t2Failed = (t2 == DEVICE_DISCONNECTED_C);
 
   if (t1Failed) {
     Serial.println("Failed to read from DS18B20 sensor 1!");
@@ -133,7 +174,7 @@ void readSensors() {
     Serial.print(t1);
     Serial.println(" *C");
   }
-
+/*
   if (t2Failed) {
     Serial.println("Failed to read from DS18B20 sensor 2!");
   } else {
@@ -141,17 +182,17 @@ void readSensors() {
     Serial.print(t2);
     Serial.println(" *C");
   }
-
+*/
   // Enviar datos si las lecturas son válidas
   if (!t1Failed) {
-    String json1 = "{\"temperature\":" + String(t1) + ", \"placa\":1, \"puerto\":1}";
+    String json1 = "{\"temperature\":" + String(t1) + ", \"placa\":2, \"puerto\":1}";
     sendData(json1);
   }
-
+/*
   if (!t2Failed) {
-    String json2 = "{\"temperature\":" + String(t2) + ", \"placa\":1, \"puerto\":2}";
+    String json2 = "{\"temperature\":" + String(t2) + ", \"placa\":2, \"puerto\":2}";
     sendData(json2);
-  }
+  }*/
 }
 
 void sendData(String json) {
@@ -184,156 +225,158 @@ void sendData(String json) {
 
   client.stop(); // Cerrar la conexión
 }
-
 void readCredentials() {
-  File file = SPIFFS.open("/credentials.txt", "r");
-  if (!file) {
-    Serial.println("Failed to open credentials file");
-    return;
-  }
+    Serial.println("Leyendo credenciales de EEPROM...");
+    
+    for (int i = 0; i < 32; i++) {
+        ssid[i] = EEPROM.read(i);
+    }
+    for (int i = 0; i < 32; i++) {
+        password[i] = EEPROM.read(32 + i);
+    }
 
-  file.readBytesUntil('\n', ssid, sizeof(ssid));
-  ssid[strcspn(ssid, "\r\n")] = 0;  // Eliminar caracteres de nueva línea
-  file.readBytesUntil('\n', password, sizeof(password));
-  password[strcspn(password, "\r\n")] = 0;
-  file.close();
+    ssid[31] = '\0';
+    password[31] = '\0';
 
-  Serial.print("SSID cargado desde el archivo: ");
-  Serial.println(ssid);
-  Serial.print("Contraseña cargada desde el archivo: ");
-  Serial.println(password);
+    Serial.print("SSID leído: ");
+    Serial.println(ssid);
+    Serial.print("Contraseña leída: ");
+    Serial.println(password);
 }
 
 void writeCredentials() {
-  File file = SPIFFS.open("/credentials.txt", "w");
-  if (!file) {
-    Serial.println("Failed to open credentials file for writing");
-    return;
-  }
+    Serial.println("Escribiendo credenciales en EEPROM...");
+    
+    for (int i = 0; i < 32; i++) {
+        EEPROM.write(i, ssid[i]);
+    }
+    for (int i = 0; i < 32; i++) {
+        EEPROM.write(32 + i, password[i]);
+    }
 
-  file.println(ssid);
-  file.println(password);
-  file.close();
+    EEPROM.commit();
 
-  Serial.println("Credenciales actualizadas y escritas en el archivo");
+    Serial.println("Credenciales escritas en EEPROM");
 }
 
 void clearCredentials() {
-  if (SPIFFS.remove("/credentials.txt")) {
-    Serial.println("Archivo de credenciales borrado");
-  } else {
-    Serial.println("No se pudo borrar el archivo de credenciales");
-  }
+    Serial.println("Limpiando credenciales de EEPROM...");
+    
+    for (int i = 0; i < 64; i++) {
+        EEPROM.write(i, 0);
+    }
 
-  // Limpiar las credenciales de WiFi
-  ssid[0] = '\0';
-  password[0] = '\0';
+    EEPROM.commit();
+
+    strcpy(ssid, "default_ssid");
+    strcpy(password, "default_password");
+
+    Serial.println("Credenciales limpiadas");
 }
 
 void startAPMode() {
-  Serial.println("Starting Access Point...");
-  WiFi.softAP(apSSID, apPassword);  // Iniciar AP con SSID y contraseña
+    Serial.println("Iniciando Punto de Acceso...");
+    WiFi.softAP(apSSID, apPassword);
+    delay(1000);
+    IPAddress myIP = WiFi.softAPIP();
+    Serial.print("Dirección IP del AP: ");
+    Serial.println(myIP);
+    dnsServer.start(53, "*", myIP);
 
-  delay(1000);  // Esperar un momento para que el AP se inicie
+    server.on("/", HTTP_GET, handleRoot);
+    server.onNotFound([]() {
+        server.sendHeader("Location", "/", true);
+        server.send(302, "text/plain", "");
+    });
 
-  IPAddress myIP = WiFi.softAPIP();
-  Serial.print("AP IP address: ");
-  Serial.println(myIP);
+    server.on("/config", HTTP_POST, handleConfig);
+    server.begin();
 
-  dnsServer.start(53, "*", myIP);
-
-  server.on("/", HTTP_GET, handleRoot);
-  server.onNotFound([]() {
-    server.sendHeader("Location", "/", true);
-    server.send(302, "text/plain", "");
-  });
-
-  server.on("/config", HTTP_POST, handleConfig); // Ruta para manejar la configuración de WiFi
-  server.begin();
-
-  Serial.println("AP Mode Started. Connect to 'MasterRef_Sandbox' to configure WiFi.");
+    Serial.println("Modo AP iniciado. Conéctate a 'MasterRef_Sandbox' para configurar WiFi.");
 }
 
 void handleConfig() {
-  if (server.hasArg("ssid") && server.hasArg("password")) {
-    String newSSID = server.arg("ssid");
-    String newPassword = server.arg("password");
+    if (server.hasArg("ssid") && server.hasArg("password")) {
+        String newSSID = server.arg("ssid");
+        String newPassword = server.arg("password");
 
-    newSSID.trim();
-    newPassword.trim();
+        newSSID.trim();
+        newPassword.trim();
 
-    newSSID.toCharArray(ssid, sizeof(ssid));
-    newPassword.toCharArray(password, sizeof(password));
+        strncpy(ssid, newSSID.c_str(), sizeof(ssid) - 1);
+        strncpy(password, newPassword.c_str(), sizeof(password) - 1);
+        ssid[sizeof(ssid) - 1] = '\0';
+        password[sizeof(password) - 1] = '\0';
 
-    writeCredentials();
-    
-    server.send(200, "text/html", "<html><body><h1>Configuración guardada. Reiniciando...</h1></body></html>");
-    delay(2000);
-    ESP.restart();
-  } else {
-    server.send(400, "text/html", "<html><body><h1>Error: Faltan parámetros</h1></body></html>");
-  }
+        writeCredentials();
+        
+        server.send(200, "text/html", "<html><body><h1>Configuración guardada. Reiniciando...</h1></body></html>");
+        delay(2000);
+        ESP.restart();
+    } else {
+        server.send(400, "text/html", "<html><body><h1>Error: Faltan parámetros</h1></body></html>");
+    }
 }
 
 void handleRoot() {
-  String ssidList = "[";
-  int n = WiFi.scanNetworks();
-  Serial.print("Found networks: ");
-  Serial.println(n);
-  if (n == 0) {
-    ssidList += "]";
-  } else {
-    for (int i = 0; i < n; i++) {
-      if (i > 0) ssidList += ",";
-      ssidList += "\"" + WiFi.SSID(i) + "\"";
-      Serial.println("Network: " + WiFi.SSID(i));
+    String ssidList = "[";
+    int n = WiFi.scanNetworks();
+    Serial.print("Redes encontradas: ");
+    Serial.println(n);
+    if (n == 0) {
+        ssidList += "]";
+    } else {
+        for (int i = 0; i < n; i++) {
+            if (i > 0) ssidList += ",";
+            ssidList += "\"" + WiFi.SSID(i) + "\"";
+            Serial.println("Red: " + WiFi.SSID(i));
+        }
+        ssidList += "]";
     }
-    ssidList += "]";
-  }
-  String page = generateHTMLPage(ssidList);
-  server.send(200, "text/html", page);
+    String page = generateHTMLPage(ssidList);
+    server.send(200, "text/html", page);
 }
 
 String generateHTMLPage(String ssidList) {
-  // Generar las opciones del menú desplegable para SSID
-  String options = "";
-  if (ssidList != "[]") {
-    // Convertir JSON array a opciones de <select>
-    int start = 1; // Empezar después del primer corchete
-    int end = ssidList.indexOf(']');
-    while (start < end) {
-      int comma = ssidList.indexOf(',', start);
-      if (comma == -1 || comma > end) comma = end;
+    // Generar las opciones del menú desplegable para SSID
+    String options = "";
+    if (ssidList != "[]") {
+        // Convertir JSON array a opciones de <select>
+        int start = 1; // Empezar después del primer corchete
+        int end = ssidList.indexOf(']');
+        while (start < end) {
+            int comma = ssidList.indexOf(',', start);
+            if (comma == -1 || comma > end) comma = end;
 
-      String ssid = ssidList.substring(start, comma);
-      ssid.replace("\"", ""); // Eliminar comillas innecesarias
-      options += "<option value='" + ssid + "'>" + ssid + "</option>";
+            String ssid = ssidList.substring(start, comma);
+            ssid.replace("\"", ""); // Eliminar comillas innecesarias
+            options += "<option value='" + ssid + "'>" + ssid + "</option>";
 
-      start = comma + 1;
+            start = comma + 1;
+        }
+    } else {
+        options = "<option value=''>No se encontraron redes</option>";
     }
-  } else {
-    options = "<option value=''>No networks found</option>";
-  }
 
-  return String("<!DOCTYPE html><html><head>"
-         "<meta name='viewport' content='width=device-width, initial-scale=1.0'>"
-         "<style>"
-         "body { font-family: Arial, sans-serif; margin: 0; padding: 0; background-color: #f5f5f5; }"
-         "h1 { color: #333; text-align: center; margin-top: 20px; }"
-         "form { max-width: 600px; margin: 20px auto; padding: 20px; background: #fff; border-radius: 8px; box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1); }"
-         "label { display: block; margin-bottom: 10px; font-size: 18px; color: #555; }"
-         "input[type='text'], input[type='password'], select { width: 100%; padding: 12px; font-size: 16px; margin-bottom: 15px; border: 1px solid #ddd; border-radius: 4px; box-sizing: border-box; }"
-         "input[type='submit'] { padding: 12px; font-size: 16px; background-color: #4CAF50; color: white; border: none; border-radius: 4px; cursor: pointer; width: 100%; }"
-         "input[type='submit']:hover { background-color: #45a049; }"
-         "</style>"
-         "</head><body>"
-         "<h1>Configuración de WiFi</h1>"
-         "<form method='post' action='/config'>"
-         "<label for='ssid'>Selecciona la red WiFi</label>"
-         "<select id='ssid' name='ssid'>" + options + "</select>"
-         "<label for='password'>Contraseña</label>"
-         "<input type='password' id='password' name='password' required>"
-         "<input type='submit' value='Guardar'>"
-         "</form>"
-         "</body></html>");
+    return String("<!DOCTYPE html><html><head>"
+          "<meta name='viewport' content='width=device-width, initial-scale=1.0'>"
+          "<style>"
+          "body { font-family: Arial, sans-serif; margin: 0; padding: 0; background-color: #f5f5f5; }"
+          "h1 { color: #333; text-align: center; margin-top: 20px; }"
+          "form { max-width: 600px; margin: 20px auto; padding: 20px; background: #fff; border-radius: 8px; box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1); }"
+          "label { display: block; margin-bottom: 10px; font-size: 18px; color: #555; }"
+          "input[type='text'], input[type='password'], select { width: 100%; padding: 12px; font-size: 16px; margin-bottom: 15px; border: 1px solid #ddd; border-radius: 4px; box-sizing: border-box; }"
+          "input[type='submit'] { padding: 12px; font-size: 16px; background-color: #4CAF50; color: white; border: none; border-radius: 4px; cursor: pointer; width: 100%; }"
+          "input[type='submit']:hover { background-color: #45a049; }"
+          "</style>"
+          "</head><body>"
+          "<h1>Configuración de WiFi</h1>"
+          "<form method='post' action='/config'>"
+          "<label for='ssid'>Selecciona la red WiFi</label>"
+          "<select id='ssid' name='ssid'>" + options + "</select>"
+          "<label for='password'>Contraseña</label>"
+          "<input type='password' id='password' name='password' required>"
+          "<input type='submit' value='Guardar'>"
+          "</form>"
+          "</body></html>");
 }
