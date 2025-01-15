@@ -194,65 +194,62 @@ Cuenta Has Artefacto
 def listar_cuenta_has_artefacto(request):
     relaciones = Cuenta_has_Artefacto.objects.all()
 
-    # Lista para almacenar relaciones junto con sus últimos registros de temperatura
+    # Lista para almacenar relaciones junto con sus últimos registros de temperatura y humedad
     relaciones_actualizadas = []
 
-    # Itera sobre las relaciones para obtener y agregar el último registro de temperatura
+    # Itera sobre las relaciones para obtener y agregar el último registro de temperatura y humedad
     for relacion in relaciones:
-        
         archivo_path = relacion.url  # Ajusta esto según tu modelo y campo correspondiente
         try:
             ultimo_registro = obtener_ultimo_registro(archivo_path)
         except:
-            ultimo_registro=0
-    
-        # Agrega un diccionario con la relación y el último registro de temperatura
+            ultimo_registro = None
+
+        # Agrega un diccionario con la relación y el último registro de datos
         relaciones_actualizadas.append({
             'relacion': relacion,
             'ultimo_registro': ultimo_registro
         })
 
-    return render(request, 'artefactos/listar_cuenta_has_artefacto.html', {'relaciones_actualizadas': relaciones_actualizadas,})
+    return render(request, 'artefactos/listar_cuenta_has_artefacto.html', {'relaciones_actualizadas': relaciones_actualizadas})
 
 def obtener_ultimo_registro(archivo_path):
     ultimo_registro = None
     url_clean = archivo_path.strip()
-    
+
     if url_clean and os.path.isfile(url_clean):
         with open(url_clean, 'r') as file:
             lines = file.readlines()
             if lines:
                 last_line = lines[-1].strip()
-               # Supongamos que last_line es la última línea del archivo
-                last_line = last_line.strip()  # Eliminar espacios en blanco y saltos de línea
                 parts = last_line.split(',')
 
                 # Asignar valores con comprobación de longitud
                 date_str = parts[0]  # Fecha
                 temp_str = parts[1]  # Temperatura
-                placa = parts[2]     # Placa
-                puerto = parts[3]    # Puerto
-                compresor = parts[4] # Compresor
+                humedad_str = parts[2] if len(parts) > 2 else None  # Humedad opcional
+                placa = parts[3]  # Placa
+                puerto = parts[4]  # Puerto
+                compresor = parts[5]  # Compresor
+                energia = parts[6] if len(parts) > 6 else 'true'  # Energia con valor por defecto
+                puerta = parts[7] if len(parts) > 7 else 'true'  # Puerta con valor por defecto
 
-                # Asignar un valor por defecto a energia si no está presente
-                energia = parts[5] if len(parts) > 5 else 'true'  # Valor por defecto: 'true'
-                puerta = parts[6] if len(parts) > 6 else 'true'   # También puedes asignar un valor por defecto a puerta
-
-                # Si el número de elementos en parts es menor a 7, asigna 'true' a puerta
-                
-                # Convertir las cadenas a booleanos
+                # Convertir las cadenas a booleanos y flotantes
                 compresor = compresor.strip().lower() == 'true'
                 puerta = puerta.strip().lower() == 'true'
-                
+                energia = energia.strip().lower() == 'true'
+
                 ultimo_registro = {
                     'fecha_hora': parse_datetime(date_str),
                     'temperatura': float(temp_str),
+                    'humedad': float(humedad_str) if humedad_str else None,
                     'compresor': compresor,
                     'puerta': puerta,
-                    'energia':  energia 
+                    'energia': energia
                 }
 
     return ultimo_registro
+
 
 def actualizar_relaciones(request):
     relaciones = Cuenta_has_Artefacto.objects.all()

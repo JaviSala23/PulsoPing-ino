@@ -12,17 +12,17 @@ class SensorReadingSerializer(serializers.ModelSerializer):
     compresor_status = serializers.BooleanField(required=False, allow_null=True)
     puerta_status = serializers.BooleanField(required=False, allow_null=True)
     energia_status = serializers.BooleanField(required=False, allow_null=True)
+    humidity = serializers.FloatField(required=False, allow_null=True)  # Nuevo campo
 
     class Meta:
         model = SensorReading
-        fields = ['temperature', 'placa', 'puerto', 'timestamp', 'compresor_status', 'puerta_status', 'energia_status']
+        fields = ['temperature', 'humidity', 'placa', 'puerto', 'timestamp', 'compresor_status', 'puerta_status', 'energia_status']
         read_only_fields = ('timestamp',)
 
     def to_representation(self, instance):
         representation = super().to_representation(instance)
-        print(f"Lectura temperatura: {representation['temperature']}, Placa: {representation['placa']}, Puerto: {representation['puerto']}, Puerta: {representation.get('puerta_status')}, Compresor: {representation.get('compresor_status')}, Energia: {representation.get('energia_status')}")
+        print(f"Lectura -> Temp: {representation['temperature']}°C, Humedad: {representation.get('humidity', 'N/A')}%, Placa: {representation['placa']}, Puerto: {representation['puerto']}")
         return representation
 
     def create(self, validated_data):
-        sensor_reading = SensorReading.objects.create(**validated_data)
-        return sensor_reading
+        return SensorReading.objects.create(**validated_data)

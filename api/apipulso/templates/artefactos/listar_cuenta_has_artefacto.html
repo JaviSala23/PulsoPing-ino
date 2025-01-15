@@ -1,9 +1,10 @@
 {% extends 'layout.html' %}
 {% load custom_filters %}
+
 {% block titulo %}
 <div class="d-sm-flex align-items-center justify-content-between mb-4">
     <h2 class="title-1">Instalaciones: Relaciones Cuenta-Dispositivos</h2>
-    
+
     <a href="{% url 'nueva_cuenta_has_artefacto' 0 %}" class="btn btn-success btn-icon-split">
         <span class="icon text-white-50">
             <i class='fas fa-plus'></i>
@@ -15,30 +16,22 @@
 {% endblock %}
 
 {% block contenido %}
-<script>
-    function openPopup(url) {
-        window.open(url, 'popupWindow', 'width=600,height=400,scrollbars=yes,resizable=yes');
-    }
-    </script>
 <div class="row">
     <div class="col-sm-12">
         <div class="table-responsive">
-            <table class="table table-bordered dataTable" id="dataTable" width="100%" cellspacing="0" role="grid" aria-describedby="dataTable_info">
+            <table class="table table-bordered dataTable" id="dataTable" width="100%" cellspacing="0" role="grid">
                 <thead>
-                    <tr style="background-color: rgb(211, 227, 250); color: rgb(95, 93, 93);font-size: 0.700rem;">
+                    <tr style="background-color: rgb(211, 227, 250); color: rgb(95, 93, 93); font-size: 0.700rem;">
                         <th>CUENTA</th>
                         <th>DISPOSITIVO</th>
-                        <th hidden>CÓD. PLACA</th>
-                        <th hidden>FIRMWARE</th>
                         <th>PLACA</th>
                         <th>PUERTO</th>
                         <th>TEMP. MÍN.</th>
                         <th>TEMP. MÁX.</th>
-                        <th>ÚLT. TEMP.</th>
-                        <th>FECHA/HORA</th>
+                        <th>HUMEDAD</th>
+                        <th>ENERGÍA</th>
                         <th>PUERTA</th>
                         <th>COMPRESOR</th>
-                        <th>ENERGIA</th>
                         <th>ACCIÓN</th>
                     </tr>
                 </thead>
@@ -47,107 +40,47 @@
                     <tr class="odd" style="color: rgb(112, 112, 112)">
                         <td>{{ item.relacion.cuenta.nombre_cuenta }}</td>
                         <td>{{ item.relacion.artefacto.descripcion }}</td>
-                        <td hidden>{{ item.relacion.placa.codigo }}</td>
-                        <td hidden>{{ item.relacion.placa.firmware.descripcion }}</td>
                         <td>{{ item.relacion.placa.descripcion }}</td>
                         <td>{{ item.relacion.puerto }}</td>
                         <td>{{ item.relacion.temp_min }}</td>
                         <td>{{ item.relacion.temp_max }}</td>
 
-                        <td 
-                            {% if item.ultimo_registro %}
-                                {% if item.ultimo_registro.temperatura > item.relacion.temp_max %}
-                                    style="color: red;font-size: 0.900rem;font-weight: bold;"
-                                {% elif item.ultimo_registro.temperatura < item.relacion.temp_min %}
-                                    style="color: blue;font-size: 0.900rem;font-weight: bold;"
-                                {% else %}
-                                    style="color: green;font-size: 0.900rem;font-weight: bold;"
-                                {% endif %}
-                            {% endif %}
-                        >
-                            {% if item.ultimo_registro %}
-                                {{ item.ultimo_registro.temperatura }}
-                            {% else %}
-                                N/A
-                            {% endif %}
-                        </td>
-                        <td>{% if item.ultimo_registro %} {{ item.ultimo_registro.fecha_hora|date:"Y-m-d H:i:s" }} {% else %} N/A {% endif %}</td>
-    
-                        {% if item.relacion.placa.firmware.puerta %}
-                     
-                        
-                            {% if item.ultimo_registro %}
-                            
-                                {% if item.ultimo_registro.puerta|is_true %}
-                                <td style="color:red">
-                                 Abierta 
-                                </td>
-                                {% else %}
-                                <td style="color:green">
-                                 Cerrada </td>
-                                {% endif %}
-                            {% else %}
-                            <td>
-                                N/A
-                            </td>
-                            {% endif %}
-                        
-                    {% else %}
-                        <td> NO INCLUYE </td>
-                    {% endif %}
-                    
-                    {% if item.relacion.placa.firmware.compresor %}
-                        
-                            {% if item.ultimo_registro %}
-                                {% if item.ultimo_registro.compresor|is_true %}
-                                <td style="color:red">Prendido</td>
-                        
-                                {% else %}
-                                <td style="color:green">Apagado</td>
-                               
-                                {% endif %}
-                            {% else %}
-                            <td>N/A</td>
-                                
-                            {% endif %}
-                        
-                    {% else %}
-                        <td> NO INCLUYE </td>
-                    {% endif %}
-                        
-                      
+                        <td>{% if item.ultimo_registro and item.ultimo_registro.humedad %}{{ item.ultimo_registro.humedad }} {% else %} N/A {% endif %}</td>
 
-                            {% if item.relacion.placa.firmware.energia %}
-                            
-                                {% if item.ultimo_registro %}
-                                    {% if item.ultimo_registro.energia|is_true %}
-                                    <td style="color:green">Estable</td>
-                                 
-                                    {% else %}
-                                    <td style="color:red">Cortada</td>
-                                 
-                                    {% endif %}
-                                {% else %}
-                                <td>N/A</td>
-                                    
-                                {% endif %}
-                            
+                        <td>{% if item.ultimo_registro and item.ultimo_registro.energia %}
+                            <span style="color: green;">Estable</span>
                         {% else %}
-                            <td> NO INCLUYE </td>
-                        {% endif %}
-                            
-                            <td>
+                            <span style="color: red;">Cortada</span>
+                        {% endif %}</td>
+
+                        <td>{% if item.ultimo_registro and item.ultimo_registro.puerta %}
+                            <span style="color: red;">Abierta</span>
+                        {% else %}
+                            <span style="color: green;">Cerrada</span>
+                        {% endif %}</td>
+
+                        <td>{% if item.ultimo_registro and item.ultimo_registro.compresor %}
+                            <span style="color: red;">Prendido</span>
+                        {% else %}
+                            <span style="color: green;">Apagado</span>
+                        {% endif %}</td>
+
+                        <td>
                             <div class="table-data-feature">
                                 {% if item.ultimo_registro %}
-                                <a href="{% url 'barcode' %}?nombre={{ item.relacion.artefacto.descripcion }}&codigo={{ item.relacion.placa.codigo }}&puerto={{ item.relacion.puerto }}"
-                                    class="btn btn-info btn-sm"
-                                    onclick="openPopup(this.href); return false;">
+                                <a href="{% url 'barcode' %}?nombre={{ item.relacion.artefacto.descripcion }}&codigo={{ item.relacion.placa.codigo }}&puerto={{ item.relacion.puerto }}" class="btn btn-info btn-sm">
                                     <i class="fa-solid fa-barcode"></i>
                                 </a>
-                                <a href="{% url 'temperature_graph' item.relacion.cuenta.id_cuenta item.relacion.puerto %}" class="btn btn-info btn-sm"><i class="fa-solid fa-chart-line"></i></a>
+                                <a href="{% url 'temperature_graph' item.relacion.cuenta.id_cuenta item.relacion.puerto %}" class="btn btn-info btn-sm">
+                                    <i class="fa-solid fa-chart-line"></i>
+                                </a>
                                 {% endif %}
-                                <a href="{% url 'nueva_cuenta_has_artefacto' item.relacion.id %}" class="btn btn-warning btn-sm"><i class='fas fa-edit'></i></a>
-                                <a href="{% url 'eliminar_cuenta_has_artefacto' item.relacion.id %}" class="btn btn-danger btn-sm"><i class='far fa-trash-alt'></i></a>
+                                <a href="{% url 'nueva_cuenta_has_artefacto' item.relacion.id %}" class="btn btn-warning btn-sm">
+                                    <i class='fas fa-edit'></i>
+                                </a>
+                                <a href="{% url 'eliminar_cuenta_has_artefacto' item.relacion.id %}" class="btn btn-danger btn-sm">
+                                    <i class='far fa-trash-alt'></i>
+                                </a>
                             </div>
                         </td>
                     </tr>
@@ -157,30 +90,4 @@
         </div>
     </div>
 </div>
-
-<script>
-    /*
-// Función para actualizar la tabla cada minuto
-function actualizarTabla() {
-    $.ajax({
-        url: "{% url 'actualizar_relaciones' %}",
-        success: function(data) {
-            $('#tabla-relaciones').html(data.tabla_html);
-            
-        },
-        error: function(xhr, status, error) {
-            console.error("Error al actualizar la tabla:", error);
-        }
-    });
-}
-
-// Actualiza la tabla cada 1 minuto
-setInterval(actualizarTabla, 60000);  // 60000 milisegundos = 1 minuto
-
-// También puedes actualizar la tabla cuando la página se carga por primera vez
-$(document).ready(function() {
-    actualizarTabla();
-});*/
-</script>
-
 {% endblock %}
