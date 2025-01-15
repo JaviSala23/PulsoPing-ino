@@ -23,10 +23,8 @@
                 <thead>
                     <tr style="background-color: rgb(211, 227, 250); color: rgb(95, 93, 93); font-size: 0.700rem;">
                         <th>CUENTA</th>
-
+                        <th>DISPOSITIVO</th>
                         <th>PUERTO</th>
-                        <th>TEMP. MÍN.</th>
-                        <th>TEMP. MÁX.</th>
                         <th>TEMP. ACTUAL</th>
                         <th>HUMEDAD</th>
                         <th>ENERGÍA</th>
@@ -41,8 +39,7 @@
                         <td>{{ item.relacion.cuenta.nombre_cuenta }}</td>
                         <td>{{ item.relacion.artefacto.descripcion }}</td>
                         <td>{{ item.relacion.puerto }}</td>
-                        <td>{{ item.relacion.temp_min }}</td>
-                        <td>{{ item.relacion.temp_max }}</td>
+                       
 
                         <td>{% if item.ultimo_registro and item.ultimo_registro.temperatura %}{{ item.ultimo_registro.temperatura }} {% else %} N/A {% endif %}</td>
 
