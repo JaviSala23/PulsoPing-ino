@@ -45,25 +45,41 @@
                         <td>{{ item.relacion.temp_min }}</td>
                         <td>{{ item.relacion.temp_max }}</td>
 
-                        <td>{% if item.ultimo_registro and item.ultimo_registro.humedad %}{{ item.ultimo_registro.humedad }} {% else %} N/A {% endif %}</td>
-
-                        <td>{% if item.ultimo_registro and item.ultimo_registro.energia %}
-                            <span style="color: green;">Estable</span>
+                        {% if item.relacion.placa.firmware.humedad %}
+                            <td>{% if item.ultimo_registro and item.ultimo_registro.humedad %}{{ item.ultimo_registro.humedad }} {% else %} N/A {% endif %}</td>
                         {% else %}
-                            <span style="color: red;">Cortada</span>
-                        {% endif %}</td>
+                            <td>No Incluye</td>
+                        {% endif %}
 
-                        <td>{% if item.ultimo_registro and item.ultimo_registro.puerta %}
-                            <span style="color: red;">Abierta</span>
+                        {% if item.relacion.placa.firmware.energia %}
+                            <td>{% if item.ultimo_registro and item.ultimo_registro.energia %}
+                                <span style="color: green;">Estable</span>
+                            {% else %}
+                                <span style="color: red;">Cortada</span>
+                            {% endif %}</td>
                         {% else %}
-                            <span style="color: green;">Cerrada</span>
-                        {% endif %}</td>
+                            <td>No Incluye</td>
+                        {% endif %}
 
-                        <td>{% if item.ultimo_registro and item.ultimo_registro.compresor %}
-                            <span style="color: red;">Prendido</span>
+                        {% if item.relacion.placa.firmware.puerta %}
+                            <td>{% if item.ultimo_registro and item.ultimo_registro.puerta %}
+                                <span style="color: red;">Abierta</span>
+                            {% else %}
+                                <span style="color: green;">Cerrada</span>
+                            {% endif %}</td>
                         {% else %}
-                            <span style="color: green;">Apagado</span>
-                        {% endif %}</td>
+                            <td>No Incluye</td>
+                        {% endif %}
+
+                        {% if item.relacion.placa.firmware.compresor %}
+                            <td>{% if item.ultimo_registro and item.ultimo_registro.compresor %}
+                                <span style="color: red;">Prendido</span>
+                            {% else %}
+                                <span style="color: green;">Apagado</span>
+                            {% endif %}</td>
+                        {% else %}
+                            <td>No Incluye</td>
+                        {% endif %}
 
                         <td>
                             <div class="table-data-feature">
