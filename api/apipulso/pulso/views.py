@@ -64,7 +64,16 @@ class SensorReadingListCreate(generics.ListCreateAPIView):
             lines = lines[-86399:]  # Dejar las últimas 86,399 líneas para agregar la nueva
         
         # Añadir la nueva línea con los datos
-        new_line = f"{data['timestamp']},{data['temperature']},{data['placa'].id},{data['puerto']},{data.get('compresor_status', False)},{data.get('puerta_status', True)},{data.get('energia_status', True)}\n"
+        new_line = (
+            f"{data['timestamp']},"
+            f"{data['temperature']},"
+            f"{data.get('humidity', 'N/A')},"
+            f"{data['placa'].id},"
+            f"{data['puerto']},"
+            f"{data.get('compresor_status', False)},"
+            f"{data.get('puerta_status', True)},"
+            f"{data.get('energia_status', True)}\n"
+        )
         lines.append(new_line)
         
         # Escribir las líneas de nuevo al archivo, incluyendo la nueva
