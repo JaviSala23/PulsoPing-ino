@@ -41,9 +41,11 @@
                         <td>{{ item.relacion.puerto }}</td>
                        
 
-                        <td>{% if item.ultimo_registro and item.ultimo_registro.temperatura %}{{ item.ultimo_registro.temperatura }} {% else %} N/A {% endif %}</td>
+                        <td>{% if item.ultimo_registro and item.ultimo_registro.temperatura %}{{ item.ultimo_registro.temperatura }}{% else %}N/A{% endif %}</td>
 
                         {% if item.relacion.placa.firmware.humedad %}
+                            <td>{% if item.ultimo_registro and item.ultimo_registro.humedad %}{{ item.ultimo_registro.humedad }}{% else %}N/A{% endif %}</td>
+                        {% else %}
                             <td>No Incluye</td>
                         {% endif %}
 

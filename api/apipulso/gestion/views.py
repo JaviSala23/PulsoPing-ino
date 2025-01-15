@@ -227,7 +227,7 @@ def obtener_ultimo_registro(archivo_path):
                 # Asignar valores con comprobación de longitud
                 date_str = parts[0]  # Fecha
                 temp_str = parts[1]  # Temperatura
-                humedad_str = parts[2] if len(parts) > 2 else None  # Humedad opcional
+                humedad_str = parts[2] if len(parts) > 2 else "N/A"  # Humedad opcional
                 placa = parts[3]  # Placa
                 puerto = parts[4]  # Puerto
                 compresor = parts[5]  # Compresor
@@ -238,18 +238,18 @@ def obtener_ultimo_registro(archivo_path):
                 compresor = compresor.strip().lower() == 'true'
                 puerta = puerta.strip().lower() == 'true'
                 energia = energia.strip().lower() == 'true'
+                humedad = float(humedad_str) if humedad_str != "N/A" else None
 
                 ultimo_registro = {
                     'fecha_hora': parse_datetime(date_str),
                     'temperatura': float(temp_str),
-                    'humedad': float(humedad_str) if humedad_str else None,
+                    'humedad': humedad,
                     'compresor': compresor,
                     'puerta': puerta,
                     'energia': energia
                 }
 
     return ultimo_registro
-
 
 def actualizar_relaciones(request):
     relaciones = Cuenta_has_Artefacto.objects.all()
